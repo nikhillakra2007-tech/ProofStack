@@ -1,0 +1,31 @@
+from proofstack.dast.checks.all_checks import (
+    ALL_DAST_CHECKS,
+    CheckD01SecurityHeaders,
+    CheckD02WeakCSP,
+    CheckD03InsecureCookies,
+    CheckD04TransportSecurity,
+    CheckD05ExposedCredentials,
+    CheckD06DomXss,
+    CheckD07SensitiveRoutes,
+    CheckD08Cors,
+    CheckD09InfoDisclosure,
+    CheckD10ThirdPartyScripts,
+    CheckD11StorageTokens,
+    CheckD12Forms,
+)
+
+__all__ = [
+    "ALL_DAST_CHECKS",
+    "CheckD01SecurityHeaders",
+    "CheckD02WeakCSP",
+    "CheckD03InsecureCookies",
+    "CheckD04TransportSecurity",
+    "CheckD05ExposedCredentials",
+    "CheckD06DomXss",
+    "CheckD07SensitiveRoutes",
+    "CheckD08Cors",
+    "CheckD09InfoDisclosure",
+    "CheckD10ThirdPartyScripts",
+    "CheckD11StorageTokens",
+    "CheckD12Forms",
+]

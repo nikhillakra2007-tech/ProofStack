@@ -1,0 +1,25 @@
+models:
+  diagnosis:
+    id: "nvidia/nemotron-3-super-120b"
+    role: "diagnosis"
+    temperature: 0.2
+    max_tokens: 6000
+    timeout_s: 60
+  patch:
+    id: "nvidia/nemotron-3.5-lightning"
+    role: "patch"
+    temperature: 0.1
+    max_tokens: 4000
+    timeout_s: 60
+  repair:
+    id: "nvidia/nemotron-3.5-lightning"
+    role: "repair"
+    temperature: 0.2
+    max_tokens: 4000
+    timeout_s: 60
+
+gateway:
+  base_url: "https://api.tokenfactory.nebius.ai/v1"
+  max_retries: 0
+  escalation_target: "diagnosis"
+  json_schema_mode: "response_format"
