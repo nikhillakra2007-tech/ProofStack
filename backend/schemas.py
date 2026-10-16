@@ -324,3 +324,32 @@ class ReportResponse(BaseModel):
     generated_at: datetime
     deterministic_hash: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
+
+
+class DecisionResponse(BaseModel):
+    id: str
+    run_id: str
+    verdict: VerdictEnum
+    policy_version: str
+    profile_version: str
+    reasons: list[str]
+    family_summary: dict
+    gate_results: list[dict]
+    waiver_ids: list[str]
+    budget_usage: dict
+    evidence_manifest_hash: Optional[str] = None
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DemoSeedResponse(BaseModel):
+    status: str
+    project_id: str
+    task_id: str
+    run_id: str
+    verdict: str
+    provenance: str
+    entry_count: int
+    message: str
+    model_config = ConfigDict(from_attributes=True)
+

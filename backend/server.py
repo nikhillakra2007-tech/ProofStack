@@ -26,7 +26,7 @@ from backend.schemas import (
     PatchResponse, GateResponse, FindingResponse,
     LedgerEntryResponse, ArtifactResponse, RunEventResponse,
     LedgerVerifyResponse, ErrorResponse, RunStatusEnum, VerdictEnum,
-    ReportCreate, ReportResponse,
+    ReportCreate, ReportResponse, DecisionResponse, DemoSeedResponse,
 )
 from backend.ledger_service import LedgerService
 from backend.event_bus import event_bus
@@ -183,7 +183,8 @@ def validate_task(task_id: str, db: Session = Depends(get_db), api_key: str = De
                        "warmups": task.warmups, "samples": task.samples, "tau_noise": task.tau_noise,
                        "regression_budget": task.regression_budget, "noise_max_rel_mad": task.noise_max_rel_mad},
         "correctness": {"test_command": task.test_command, "protected_paths": task.protected_paths,
-                         "baseline_failures_allowed": task.baseline_failures_allowed},
+                         "baseline_failures_allowed": task.baseline_failures_allowed if isinstance(task.baseline_failures_allowed, list) else []},
+
         "budgets": {"wall_clock_per_experiment_s": task.wall_clock_per_experiment_s,
                      "memory_mb": task.memory_mb, "max_processes": task.max_processes,
                      "max_hypotheses": task.max_hypotheses, "max_repair_cycles": task.max_repair_cycles,
@@ -266,7 +267,7 @@ def update_run(run_id: str, data: RunUpdate, db: Session = Depends(get_db), api_
 
 
 @app.post("/api/runs/{run_id}/start")
-def start_run(run_id: str, db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+async def start_run(run_id: str, db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
     run = db.query(models.Run).filter(models.Run.id == run_id).first()
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
@@ -277,10 +278,20 @@ def start_run(run_id: str, db: Session = Depends(get_db), api_key: str = Depends
     run.updated_at = datetime.now(timezone.utc)
     run.version = (run.version or 0) + 1
     db.commit()
-    from backend.orchestrator import Orchestrator
-    orchestrator = Orchestrator(db)
-    asyncio.create_task(orchestrator.execute(run.id))
+
+    async def _run_in_background(target_run_id: str):
+        from backend.orchestrator import Orchestrator
+        from backend.database import SessionLocal
+        bg_db = SessionLocal()
+        try:
+            orchestrator = Orchestrator(bg_db)
+            await orchestrator.execute(target_run_id)
+        finally:
+            bg_db.close()
+
+    asyncio.create_task(_run_in_background(run.id))
     return {"run_id": run.id, "status": run.status.value, "message": "Run started"}
+
 
 
 @app.post("/api/runs/{run_id}/cancel")
@@ -471,3 +482,45 @@ def get_report(run_id: str, report_id: str, db: Session = Depends(get_db), api_k
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     return report
+
+
+# ---- Decision endpoint ----
+
+@app.get("/api/runs/{run_id}/decision", response_model=DecisionResponse)
+def get_run_decision(run_id: str, db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+    run = db.query(models.Run).filter(models.Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+    decision = db.query(models.Decision).filter(models.Decision.run_id == run_id).first()
+    if not decision:
+        raise HTTPException(status_code=404, detail="Decision not found for this run")
+    return decision
+
+
+# ---- Demo Fixtures (Isolated, Deterministic Walkthrough) ----
+
+@app.post("/api/demo/seed", response_model=DemoSeedResponse)
+def seed_demo(force: bool = False, db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+    from backend.demo_service import seed_demo_fixture
+    result = seed_demo_fixture(db, force=force)
+    return result
+
+
+@app.post("/api/demo/reset")
+def reset_demo(db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+    from backend.demo_service import reset_demo_fixture
+    result = reset_demo_fixture(db)
+    return result
+
+
+@app.get("/api/demo/status")
+def demo_status(db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+    from backend.demo_service import is_demo_seeded, DEMO_RUN_ID, DEMO_PROJECT_ID, DEMO_TASK_ID
+    seeded = is_demo_seeded(db)
+    return {
+        "seeded": seeded,
+        "demo_run_id": DEMO_RUN_ID if seeded else None,
+        "demo_project_id": DEMO_PROJECT_ID if seeded else None,
+        "demo_task_id": DEMO_TASK_ID if seeded else None,
+    }
+

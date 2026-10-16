@@ -149,15 +149,70 @@ All protected endpoints require the `X-API-Key` header matching `SECRET_KEY`.
 | `PATCH` | `/api/tasks/{id}` | Protected | Update task parameters |
 | `POST` | `/api/runs` | Protected | Dispatch a verification run |
 | `GET` | `/api/runs/{id}` | Protected | Fetch run status and progress |
+| `POST` | `/api/runs/{id}/start` | Protected | Dispatch/execute run in orchestrator |
 | `POST` | `/api/runs/{id}/cancel` | Protected | Abort active run |
+| `GET` | `/api/runs/{id}/decision` | Protected | Fetch canonical decision record |
 | `POST` | `/api/runs/{id}/reports` | Protected | Generate Markdown/JSON report |
 | `GET` | `/api/runs/{id}/reports/{id}` | Protected | Retrieve generated report |
 | `GET` | `/api/runs/{id}/ledger/verify` | Protected | Validate SHA-256 ledger integrity |
 | `GET` | `/api/runs/{id}/events` | Protected | Server-Sent Events (SSE) live updates |
+| `POST` | `/api/demo/seed` | Protected | Seed deterministic IDOR showcase fixture |
+| `POST` | `/api/demo/reset` | Protected | Reset demo fixture cleanly |
+| `GET` | `/api/demo/status` | Protected | Check demo fixture state |
 
 ---
 
-## 7. Verification & Test Suite
+## 7. Running the Cockpit Frontend
+
+The ProofStack Cockpit is built with Next.js 14 and Tailwind CSS. It communicates with the backend on port 8765 via `/api` proxy rewrites.
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development cockpit on http://localhost:3000
+npm run dev
+
+# Or build production bundle
+npm run build
+```
+
+Open `http://localhost:3000` in your browser. Key interface views:
+- **Overview (`/`)**: Operational metrics, status cards, quick run launcher, and demo fixture loader.
+- **Projects & Tasks (`/projects`)**: Repository registrations, task intake contracts, and schema validation.
+- **Case File (`/runs/{runId}`)**: 4-viewport investigation cockpit with the Zero-Compromise Interlock, baseline noise gauge, hypothesis/experiment timeline, patch diff with exploit trace, gate table, ledger browser, and downloadable reports.
+
+---
+
+## 8. Hackathon Demonstration Modes
+
+ProofStack provides two explicit, distinguishable paths for technical review:
+
+### Path A — Live Local Execution
+1. Open Cockpit at `http://localhost:3000` and click **+ Dispatch Live Run** (or navigate to `/projects`).
+2. Select target project and task, then click **Launch Verification Run**.
+3. Watch the orchestrator progress live through stages (`BASELINING` &rarr; `AUDITING` &rarr; `HYPOTHESIZING` &rarr; `EXPERIMENTING` &rarr; `PATCHING` &rarr; `VERIFYING` &rarr; `FINALIZING`).
+4. Inspect the resulting gates, ledger entries, and final verdict.
+
+### Path B — Seeded Deterministic Walkthrough
+When external GPU execution or Nebius credentials are unavailable, inspect the pre-packaged IDOR showcase:
+```bash
+# Seed via CLI
+python scripts/seed_demo.py --force
+
+# Or via UI: Click "⚡ Seed Demo Fixture" in the Cockpit navbar
+```
+- **Scenario**: AI-proposed caching optimization provides a **42,000x speedup** on `app/invoices.py`, but omits tenant principal in the cache key.
+- **Zero-Compromise Interlock**: Performance seats (green), but Security breaches (red, P03 IDOR leak proven). Bolt remains retracted; final verdict is strictly **REJECTED**.
+- **Cryptographic Audit**: All 5 state transitions are SHA-256 hash-chained and can be verified via the **Verify Hash-Chain Integrity** button.
+- **Teardown**: Run `python scripts/seed_demo.py --reset` to remove fixture records without touching user data.
+
+---
+
+## 9. Verification & Test Suite
 
 ### Full Automated Pytest Suite
 Run the complete backend test suite:
@@ -166,8 +221,8 @@ python -m pytest tests/ -v
 ```
 
 Current test matrix:
-- **Collected**: 43 tests
-- **Passed**: 42 passed
+- **Collected**: 45 tests
+- **Passed**: 44 passed
 - **Skipped**: 1 skipped (`test_guest_runner` requires Unix `resource` subsystem; skipped on Windows)
 
 ### 24-Step End-to-End Forensic Workflow
@@ -193,13 +248,14 @@ This script exercises:
 
 ---
 
-## 8. Security Disclosures & Platform Boundaries
+## 10. Security Disclosures & Platform Boundaries
 
 - **Sandbox Egress & Isolation**: On Windows hosts, low-level Linux cgroups and memory quotas (`resource.RLIMIT_AS`) are substituted with process timeouts. Production sandbox execution relies on isolated container runners or Nebius GPU instances.
 - **Ledger Verification**: The SHA-256 hash-chain provides tamper-evident auditability. External anchoring or immutable storage can be attached via remote checkpoints.
 
 ---
 
-## 9. License
+## 11. License
 
 Apache-2.0 License.
+

@@ -157,3 +157,52 @@ def test_cancel_run(client):
 def test_ledger_verify_empty(client):
     resp = client.post("/api/runs/nonexistent/ledger/verify")
     assert resp.status_code == 404
+
+
+def test_decision_endpoint_not_found(client):
+    resp = client.get("/api/runs/nonexistent/decision")
+    assert resp.status_code == 404
+
+
+def test_demo_seed_and_lifecycle(client):
+    # 1. Check status before seed
+    status_resp = client.get("/api/demo/status")
+    assert status_resp.status_code == 200
+    
+    # 2. Seed fixture
+    seed_resp = client.post("/api/demo/seed?force=true")
+    assert seed_resp.status_code == 200
+    seed_data = seed_resp.json()
+    assert seed_data["status"] == "seeded"
+    assert seed_data["provenance"] == "DEMO_FIXTURE"
+    assert seed_data["verdict"] == "REJECTED"
+    demo_run_id = seed_data["run_id"]
+
+    # 3. Verify status after seed
+    status_after = client.get("/api/demo/status").json()
+    assert status_after["seeded"] is True
+    assert status_after["demo_run_id"] == demo_run_id
+
+    # 4. Verify decision endpoint
+    dec_resp = client.get(f"/api/runs/{demo_run_id}/decision")
+    assert dec_resp.status_code == 200
+    dec_data = dec_resp.json()
+    assert dec_data["verdict"] == "REJECTED"
+    assert "reasons" in dec_data
+    assert any("P03" in r for r in dec_data["reasons"])
+
+    # 5. Verify ledger integrity
+    verify_resp = client.post(f"/api/runs/{demo_run_id}/ledger/verify")
+    assert verify_resp.status_code == 200
+    assert verify_resp.json()["valid"] is True
+    assert verify_resp.json()["head_hash"] == "319915dbf8ea2782e8994091c8a9f4662ded5f373ca7610856bd87dbe6893d22"
+
+    # 6. Reset fixture
+    reset_resp = client.post("/api/demo/reset")
+    assert reset_resp.status_code == 200
+    assert reset_resp.json()["status"] == "reset"
+
+    # 7. Confirm reset
+    status_final = client.get("/api/demo/status").json()
+    assert status_final["seeded"] is False
+

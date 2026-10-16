@@ -345,3 +345,10 @@ def validate_against_schema(data: dict, schema: dict) -> list[str]:
     if "enum" in schema and data not in schema["enum"]:
         errors.append(f"value {data!r} not in enum {schema['enum']}")
     return errors
+
+
+def validate_task_intake(data: dict) -> list[str]:
+    """Validate task intake data against schemas/task-intake.v1.json."""
+    schema = _load_schema("task-intake.v1.json")
+    return validate_against_schema(data, schema)
+
