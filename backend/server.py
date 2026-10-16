@@ -435,11 +435,14 @@ async def stream_events(run_id: str, request: Request, api_key: str = Depends(ve
     run_id = run_id
 
     async def event_generator():
+        yield ": connected\n\n"
         last_seq = -1
         while True:
             if await request.is_disconnected():
                 break
             async for event in event_bus.subscribe(run_id, after_seq=last_seq):
+                if await request.is_disconnected():
+                    break
                 if "seq" in event:
                     last_seq = event["seq"]
                 yield f"data: {json.dumps(event)}\n\n"
