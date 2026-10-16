@@ -20,7 +20,10 @@ export function GateTable({ gates }: GateTableProps) {
     if (g.failure_reason) return g.failure_reason;
     if (!g.evidence) return "-";
     const ev = g.evidence;
-    if (ev.speedup !== undefined) return `${Number(ev.speedup).toFixed(1)}x speedup`;
+    if (ev.hardware_fingerprint_verified) {
+      return `Env Verified: ${ev.cpu_model || "CPU"} | ${ev.gpu_available ? ev.gpu_name : "CPU Mode"}`;
+    }
+    if (ev.speedup !== undefined) return `${Number(ev.speedup).toFixed(2)}x speedup (CI: ${ev.ci ? JSON.stringify(ev.ci) : "verified"})`;
     if (ev.growth_ratio !== undefined) return `growth ratio: ${ev.growth_ratio}`;
     if (ev.reason !== undefined) return String(ev.reason);
     if (ev.tests_passed) return "Unit tests passed (differential equivalence verified)";

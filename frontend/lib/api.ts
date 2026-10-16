@@ -80,6 +80,9 @@ export interface Baseline {
   rel_mad: number | null;
   stability_assessment: string | null;
   execution_backend: string | null;
+  benchmark_config?: Record<string, unknown>;
+  python_version?: string | null;
+  runtime_version?: string | null;
 }
 
 export interface Gate {

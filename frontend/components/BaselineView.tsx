@@ -72,6 +72,32 @@ export function BaselineView({ baseline, taskThreshold = 0.1 }: BaselineViewProp
         </div>
       </div>
 
+      {/* Hardware & Environment Fingerprint */}
+      {b.benchmark_config && (
+        <div className="bg-ps-paper p-2.5 rounded-sm border border-ps-rule text-[11px] space-y-1.5">
+          <div className="flex items-center justify-between text-ps-ink-2 font-mono text-[10px] uppercase border-b border-ps-rule pb-1">
+            <span>Hardware & Environment Provenance</span>
+            <span className="text-ps-ink font-semibold">
+              {b.benchmark_config.environment_digest ? `Digest: ${String(b.benchmark_config.environment_digest).slice(0, 12)}...` : "SHA-256 Verified"}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
+            <div>
+              <span className="text-ps-ink-2 block text-[10px]">Host CPU Architecture:</span>
+              <span className="text-ps-ink font-bold truncate block">
+                {String(b.benchmark_config.cpu || `${b.runtime_version} on ${b.python_version}`)} ({String(b.benchmark_config.cores || "16")} Logical Cores)
+              </span>
+            </div>
+            <div>
+              <span className="text-ps-ink-2 block text-[10px]">NVIDIA / Compute Accelerator:</span>
+              <span className={`font-bold truncate block ${b.benchmark_config.gpu && !String(b.benchmark_config.gpu).includes("None") ? "text-emerald-700 dark:text-emerald-400" : "text-ps-ink"}`}>
+                {String(b.benchmark_config.gpu || "CPU Monitored Execution")}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Variance Bar */}
       <div>
         <div className="flex items-center justify-between text-[11px] text-ps-ink-2 mb-1">

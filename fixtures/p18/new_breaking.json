@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "open",
+        "paid",
+        "void"
+      ]
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "state"
+  ]
+}

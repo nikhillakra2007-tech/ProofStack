@@ -200,6 +200,9 @@ class BaselineResponse(BaseModel):
     rel_mad: Optional[float]
     stability_assessment: Optional[str]
     execution_backend: Optional[str]
+    benchmark_config: Optional[dict] = None
+    python_version: Optional[str] = None
+    runtime_version: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
 
 

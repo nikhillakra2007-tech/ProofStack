@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "paid"
+      ]
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "status"
+  ]
+}
