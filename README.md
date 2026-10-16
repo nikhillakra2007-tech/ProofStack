@@ -68,7 +68,7 @@ Verdicts are strictly derived from hardware-isolated empirical measurements, sta
 # Clone the repository
 git clone https://github.com/nikhillakra2007-tech/something.git
 cd something
-git checkout backend
+git checkout main
 
 # Create and activate virtual environment
 python -m venv .venv
@@ -166,8 +166,8 @@ python -m pytest tests/ -v
 ```
 
 Current test matrix:
-- **Collected**: 60 tests
-- **Passed**: 59 passed
+- **Collected**: 43 tests
+- **Passed**: 42 passed
 - **Skipped**: 1 skipped (`test_guest_runner` requires Unix `resource` subsystem; skipped on Windows)
 
 ### 24-Step End-to-End Forensic Workflow
