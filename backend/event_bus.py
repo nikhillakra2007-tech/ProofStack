@@ -33,7 +33,7 @@ class EventBus:
         try:
             while True:
                 try:
-                    event = await asyncio.wait_for(q.get(), timeout=30.0)
+                    event = await asyncio.wait_for(q.get(), timeout=5.0)
                     if event["seq"] > after_seq:
                         yield event
                 except asyncio.TimeoutError:
