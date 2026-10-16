@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ps-paper: #E9EEF2;
+  --ps-sheet: #F7F9FB;
+  --ps-ink: #13202B;
+  --ps-ink-2: #3F5262;
+  --ps-rule: #B8C6D1;
+  --ps-edge: #6F8392;
+  --ps-focus: #0B5CAD;
+  --ps-seated: #0F6B4F;
+  --ps-breach: #B42318;
+  --ps-hold: #8A5A00;
+  --ps-notrun: #566775;
+  --ps-radius: 2px;
+  --ps-space: 4px;
+  --ps-rule-w: 1px;
+}
+
+body {
+  margin: 0;
+  font-family: "Atkinson Hyperlegible Next", "Source Sans 3", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ps-ink);
+  background: var(--ps-paper);
+}
+
+.font-mono {
+  font-family: "Atkinson Hyperlegible Mono", "Source Code Pro", ui-monospace, monospace;
+}
+
+.panel {
+  background: var(--ps-sheet);
+  border: var(--ps-rule-w) solid var(--ps-rule);
+  border-radius: var(--ps-radius);
+  padding: 16px;
+}
+
+.glyph {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 1px;
+}
+
+.glyph-seated {
+  background: var(--ps-seated);
+  border-color: var(--ps-seated);
+}
+
+.glyph-breach {
+  border-color: var(--ps-breach);
+  border-top-color: transparent;
+}
+
+.glyph-hold {
+  background: var(--ps-hold);
+  opacity: 0.5;
+}
+
+.glyph-notrun {
+  border-style: dashed;
+  border-color: var(--ps-notrun);
+}
+
+.glyph-na {
+  border-color: var(--ps-ink-2);
+  border-width: 1px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--ps-radius);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--ps-rule);
+}
+
+.badge-seated { color: var(--ps-seated); border-color: var(--ps-seated); }
+.badge-breach { color: var(--ps-breach); border-color: var(--ps-breach); }
+.badge-hold { color: var(--ps-hold); border-color: var(--ps-hold); }
+.badge-notrun { color: var(--ps-notrun); border-color: var(--ps-notrun); }
+.badge-focus { color: var(--ps-focus); border-color: var(--ps-focus); }

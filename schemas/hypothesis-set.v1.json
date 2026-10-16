@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofstack.dev/schemas/hypothesis-set.v1.json",
+  "title": "HypothesisSet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "hypotheses", "experiments"],
+  "properties": {
+    "task_id": {"type": "string"},
+    "hypotheses": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"$ref": "#/$defs/hypothesis"}},
+    "experiments": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"$ref": "#/$defs/experiment"}}
+  },
+  "$defs": {
+    "hypothesis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["hypothesis_id", "root_cause_category", "taxonomy", "statement", "evidence_refs", "falsifiable_prediction"],
+      "properties": {
+        "hypothesis_id": {"type": "string", "pattern": "^H[1-3]$"},
+        "root_cause_category": {"enum": ["REDOS", "N_PLUS_1", "IDOR_CACHE", "QUADRATIC", "ASYNC_BLOCKING", "UNBOUNDED_CACHE", "TOCTOU", "SSRF",
+          "DESERIALIZATION_INJECTION", "MISSING_TIMEOUT_RETRY", "JWT_TOKEN", "PATH_TRAVERSAL", "SUPPLY_CHAIN_SECRET", "SILENT_CORRUPTION",
+          "POOL_IDEMPOTENCY", "TEST_THEATRE", "DEADLOCK_ORDER", "CONTRACT_DRIFT", "FLOAT_MONEY", "OTHER_PERF", "OTHER_CORRECTNESS"]},
+        "taxonomy": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"cwe": {"type": ["string", "null"], "pattern": "^CWE-[0-9]{1,4}$"},
+                         "perf": {"type": ["string", "null"], "pattern": "^PERF\\.[A-Z0-9_.]+$"}}
+        },
+        "statement": {"type": "string", "minLength": 10, "maxLength": 400},
+        "evidence_refs": {
+          "type": "array", "minItems": 1,
+          "items": {"type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+                    "properties": {"kind": {"enum": ["ast", "profile", "benchmark", "probe", "log"]},
+                                   "ref": {"type": "string"}, "excerpt": {"type": "string", "maxLength": 200}}}
+        },
+        "falsifiable_prediction": {"type": "string", "minLength": 10, "maxLength": 300}
+      }
+    },
+    "experiment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["experiment_id", "kind", "command", "est_runtime_s", "predictions"],
+      "properties": {
+        "experiment_id": {"type": "string", "pattern": "^E[1-6]$"},
+        "kind": {"enum": ["probe", "benchmark", "profile", "generated_test"]},
+        "probe_id": {"type": ["string", "null"], "pattern": "^P(0[1-9]|1[0-9])$"},
+        "command": {"type": "array", "items": {"type": "string"}, "minItems": 1,
+                    "description": "argv; must match the allowlist (proofstack-run <probe>|pyperf|cProfile|pytest tests_generated/...)"},
+        "est_runtime_s": {"type": "number", "minimum": 0, "maximum": 60},
+        "setup_s": {"type": "number", "minimum": 0, "default": 0},
+        "risks": {"type": "array", "items": {"enum": ["network", "nondeterministic", "new_dependency"]}},
+        "predictions": {"type": "object", "propertyNames": {"pattern": "^H[1-3]$"}, "additionalProperties": {"type": "string", "maxLength": 80},
+                        "description": "hypothesis_id -> predicted outcome label (categorical)"}
+      }
+    }
+  }
+}

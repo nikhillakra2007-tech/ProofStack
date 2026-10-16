@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofstack.dev/schemas/evidence-ledger-entry.v1.json",
+  "title": "EvidenceLedgerEntry",
+  "description": "One immutable block. hash = SHA-256(canonical JSON of this object without 'hash'). No floats anywhere.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "seq", "previous_hash", "hash", "timestamp", "run_id", "task_id", "entry_type",
+               "baseline_metrics", "candidate_metrics", "diff_patch", "gate_results", "final_verdict"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "seq": {"type": "integer", "minimum": 0},
+    "previous_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "64 zeros for the genesis entry"},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "run_id": {"type": "string"}, "task_id": {"type": "string"},
+    "entry_type": {"enum": ["RUN_STARTED", "BASELINE", "AUDIT_FINDING", "HYPOTHESES", "EXPERIMENT", "PATCH_PROPOSED", "GATE_RESULT", "FINAL_VERDICT"]},
+    "baseline_metrics": {"type": ["object", "null"], "description": "samples_ns[], median_ns, rel_mad, profile_sha256, env fingerprint; ints or decimal strings only"},
+    "candidate_metrics": {"type": ["object", "null"]},
+    "diff_patch": {"type": ["string", "null"], "description": "unified diff, verbatim"},
+    "diff_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "gate_results": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["gate_id", "family", "status"],
+        "properties": {
+          "gate_id": {"type": "string"}, "family": {"enum": ["PERF", "SEC", "CORR", "CONC", "INTEGRITY"]},
+          "status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "NOT_RUN", "NOT_APPLICABLE"]},
+          "probe_id": {"type": ["string", "null"]}, "fingerprints": {"type": "array", "items": {"type": "string"}},
+          "evidence": {"type": ["object", "null"]}, "sandbox_operation_id": {"type": ["string", "null"]}}}
+    },
+    "final_verdict": {"enum": ["ACCEPTED", "REJECTED", "INCONCLUSIVE", null]},
+    "family_summary": {"type": "object", "additionalProperties": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "NOT_RUN", "NOT_APPLICABLE"]}},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "model_calls": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["route", "model_id", "tokens_in", "tokens_out", "latency_ms"],
+      "properties": {"route": {"enum": ["diagnosis", "patch", "feedback"]}, "model_id": {"type": "string"},
+                     "tokens_in": {"type": "integer"}, "tokens_out": {"type": "integer"}, "latency_ms": {"type": "integer"},
+                     "response_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
+    "sandbox_operations": {"type": "array", "items": {"type": "string"}},
+    "environment": {"type": "object"}
+  }
+}

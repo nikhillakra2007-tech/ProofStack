@@ -1,0 +1,26 @@
+{
+  "evidence": {
+    "leaks": [
+      {
+        "attacker": "bob",
+        "object": 1,
+        "victim": "alice"
+      },
+      {
+        "attacker": "alice",
+        "object": 2,
+        "victim": "bob"
+      }
+    ]
+  },
+  "families": [
+    "SEC"
+  ],
+  "fingerprint": "f703a5ccfeb8e629",
+  "found": true,
+  "metrics": {
+    "cache_speedup_x": 2534.79
+  },
+  "probe_id": "P03",
+  "status": "EXPLOIT_PROVEN"
+}

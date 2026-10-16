@@ -1,0 +1,79 @@
+{
+  "task_id": "invoice-cache-idor",
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "root_cause_category": "OTHER_PERF",
+      "taxonomy": {
+        "cwe": null,
+        "perf": "PERF.IO.REPEATED_FETCH"
+      },
+      "statement": "get_object re-reads the same invoice row on every call; a cache would remove the 10 ms fetch.",
+      "evidence_refs": [
+        {
+          "kind": "profile",
+          "ref": "profile.pstats#_slow_fetch",
+          "excerpt": "_slow_fetch: 99.2% cumulative"
+        }
+      ],
+      "falsifiable_prediction": "Second call for the same (principal, id) is >=10x faster once any cache is present."
+    },
+    {
+      "hypothesis_id": "H2",
+      "root_cause_category": "IDOR_CACHE",
+      "taxonomy": {
+        "cwe": "CWE-639",
+        "perf": null
+      },
+      "statement": "A cache keyed only by object id would serve another principal's row from a warm entry.",
+      "evidence_refs": [
+        {
+          "kind": "ast",
+          "ref": "app/invoices.py:12",
+          "excerpt": "ownership check sits after the fetch"
+        }
+      ],
+      "falsifiable_prediction": "bob requesting alice's invoice after alice warms the cache returns the row (leak)."
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "E1",
+      "kind": "profile",
+      "probe_id": null,
+      "command": [
+        "python",
+        "-m",
+        "cProfile",
+        "-o",
+        "profile.pstats",
+        "bench/invoice_read.py"
+      ],
+      "est_runtime_s": 3,
+      "setup_s": 1,
+      "risks": [],
+      "predictions": {
+        "H1": "fetch_dominates",
+        "H2": "fetch_dominates"
+      }
+    },
+    {
+      "experiment_id": "E2",
+      "kind": "probe",
+      "probe_id": "P03",
+      "command": [
+        "proofstack-run",
+        "P03",
+        "--target",
+        "app/invoices.py"
+      ],
+      "est_runtime_s": 2,
+      "setup_s": 0,
+      "risks": [],
+      "predictions": {
+        "H1": "no_leak",
+        "H2": "leak"
+      }
+    }
+  ]
+}

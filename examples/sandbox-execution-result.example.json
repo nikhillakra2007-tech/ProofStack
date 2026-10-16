@@ -1,0 +1,41 @@
+{
+  "session_id": "run-20261013-0001",
+  "operation_id": "7d1c3e52-8a4b-4f60-b2c9-1e5f0a9d3b47",
+  "backend": "nebius-sandboxes",
+  "image_id": "0b8f6c1e-5d2a-4c7e-9a31-6f0d2b7c8e14",
+  "result_image": null,
+  "command": [
+    "python3",
+    "-m",
+    "proofstack.probes.p03_idor_cache",
+    "--target",
+    "app/invoices.py"
+  ],
+  "network_enabled": false,
+  "exit_code": 0,
+  "signal": -1,
+  "timed_out": false,
+  "wall_clock_ms": 1840,
+  "max_rss_kb": 31744,
+  "cpu_user_ms": 620,
+  "cpu_sys_ms": 110,
+  "truncated": false,
+  "stdout_path": "artifacts/p03.stdout",
+  "stderr_path": "artifacts/p03.stderr",
+  "stdout_sha256": "6e93eccada978da62c4cadc4f149b071cfffd54a74600e259922eb332c7c14bf",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "limits_applied": {
+    "wall_clock_s": 60,
+    "memory_bytes": 1073741824,
+    "processes": 128
+  },
+  "artifacts": [
+    {
+      "path": "artifacts/p03.finding.json",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bytes": 612
+    }
+  ],
+  "started_at": "2026-10-13T09:14:02.118+00:00",
+  "finished_at": "2026-10-13T09:14:04.021+00:00"
+}

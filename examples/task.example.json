@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "task_id": "invoice-cache-idor",
+  "mode": "optimize",
+  "repository": {
+    "path": "./examples/invoice-service",
+    "baseline_commit": "3f9c2ab",
+    "candidate_commit": null,
+    "candidate_patch": null
+  },
+  "target": {
+    "file": "app/invoices.py",
+    "symbol": "get_object",
+    "kind": "function",
+    "probes": {
+      "select": "auto",
+      "exclude": [
+        "P16"
+      ],
+      "params": {
+        "P03": {
+          "owners": {
+            "alice": 1,
+            "bob": 2
+          }
+        }
+      }
+    }
+  },
+  "benchmark": {
+    "command": [
+      "python",
+      "-m",
+      "bench.invoice_read"
+    ],
+    "workload_seed": 20261013,
+    "warmups": 3,
+    "samples": 20,
+    "tau_noise": 0.05,
+    "regression_budget": 0.05,
+    "noise_max_rel_mad": 0.1
+  },
+  "correctness": {
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/"
+    ],
+    "protected_paths": [
+      "tests/**",
+      "bench/**",
+      ".proofstack/**"
+    ]
+  },
+  "budgets": {
+    "wall_clock_per_experiment_s": 60,
+    "memory_mb": 1024,
+    "max_processes": 128,
+    "max_hypotheses": 3,
+    "max_repair_cycles": 3,
+    "max_model_tokens": 60000,
+    "max_total_runtime_s": 1800,
+    "max_diff_lines": 40,
+    "max_files_changed": 2
+  },
+  "sandbox": {
+    "backend": "nebius",
+    "require_backend": "nebius",
+    "image": "0b8f6c1e-5d2a-4c7e-9a31-6f0d2b7c8e14",
+    "provision_timeout_s": 20
+  },
+  "waivers": []
+}

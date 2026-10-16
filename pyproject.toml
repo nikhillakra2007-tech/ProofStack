@@ -23,9 +23,19 @@ dependencies = [
     "playwright>=1.40.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.28.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "sse-starlette>=1.8.0",
+    "python-multipart>=0.0.6",
     "pyjwt[crypto]>=2.8.0",
     "jsonschema>=4.20.0",
     "regex>=2024.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
 [project.scripts]
@@ -33,4 +43,4 @@ proofstack = "proofstack.cli.main:app"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["proofstack*"]
+include = ["proofstack*", "backend*"]

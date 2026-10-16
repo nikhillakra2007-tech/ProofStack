@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofstack.dev/schemas/probe-finding.v1.json",
+  "title": "ProbeFinding",
+  "description": "Payload of the single 'PROOFSTACK_FINDING <json>' line every probe prints on stdout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["probe_id", "found", "status", "families", "metrics", "evidence", "fingerprint"],
+  "properties": {
+    "probe_id": {"type": "string", "pattern": "^P(0[1-9]|1[0-9])$"},
+    "found": {"type": "boolean", "description": "true => defect/exploit reproduced on THIS target"},
+    "status": {"enum": ["EXPLOIT_PROVEN", "NOT_REPRODUCED", "INCONCLUSIVE"]},
+    "families": {"type": "array", "items": {"enum": ["PERF", "SEC", "CORR", "CONC"]}, "uniqueItems": true},
+    "metrics": {"type": "object"}, "evidence": {"type": "object"},
+    "fingerprint": {"type": "string", "pattern": "^([0-9a-f]{16})?$"}
+  }
+}

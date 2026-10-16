@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofstack.dev/schemas/task-intake.v1.json",
+  "title": "TaskIntake",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "mode", "repository", "target", "benchmark", "correctness", "budgets", "sandbox"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "mode": {"enum": ["optimize", "harden", "audit"], "description": "optimize: perf gain required; harden: exploit/defect must be cleared; audit: scan only"},
+    "repository": {
+      "type": "object", "additionalProperties": false, "required": ["path", "baseline_commit"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "baseline_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+        "candidate_commit": {"type": ["string", "null"], "pattern": "^[0-9a-f]{7,40}$"},
+        "candidate_patch": {"type": ["string", "null"], "description": "path to a unified diff; null => synthesize with the model"}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false, "required": ["file", "symbol"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1},
+        "symbol": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["function", "class", "module", "endpoint"], "default": "function"},
+        "probes": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "select": {"enum": ["auto", "explicit"], "default": "auto"},
+            "include": {"type": "array", "items": {"$ref": "#/$defs/probe_id"}, "uniqueItems": true},
+            "exclude": {"type": "array", "items": {"$ref": "#/$defs/probe_id"}, "uniqueItems": true},
+            "params": {"type": "object", "propertyNames": {"pattern": "^P(0[1-9]|1[0-9])$"}, "additionalProperties": {"type": "object"}}
+          }
+        }
+      }
+    },
+    "benchmark": {
+      "type": "object", "additionalProperties": false, "required": ["command", "workload_seed"],
+      "properties": {
+        "command": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "workload_seed": {"type": "integer"},
+        "warmups": {"type": "integer", "minimum": 1, "default": 3},
+        "samples": {"type": "integer", "minimum": 10, "default": 20},
+        "tau_noise": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.05},
+        "regression_budget": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.05},
+        "noise_max_rel_mad": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.10}
+      }
+    },
+    "correctness": {
+      "type": "object", "additionalProperties": false, "required": ["test_command", "protected_paths"],
+      "properties": {
+        "test_command": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "protected_paths": {"type": "array", "items": {"type": "string"}, "minItems": 1, "description": "globs the patch may not touch: tests, benchmarks, policy"},
+        "baseline_failures_allowed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "budgets": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "wall_clock_per_experiment_s": {"type": "integer", "minimum": 1, "maximum": 60, "default": 60},
+        "memory_mb": {"type": "integer", "minimum": 64, "maximum": 1024, "default": 1024},
+        "max_processes": {"type": "integer", "minimum": 8, "maximum": 128, "default": 128},
+        "max_hypotheses": {"type": "integer", "minimum": 1, "maximum": 3, "default": 3},
+        "max_repair_cycles": {"type": "integer", "minimum": 0, "maximum": 3, "default": 3},
+        "max_model_tokens": {"type": "integer", "minimum": 1000, "default": 60000},
+        "max_total_runtime_s": {"type": "integer", "minimum": 60, "default": 1800},
+        "max_diff_lines": {"type": "integer", "minimum": 1, "default": 40},
+        "max_files_changed": {"type": "integer", "minimum": 1, "default": 2}
+      }
+    },
+    "sandbox": {
+      "type": "object", "additionalProperties": false, "required": ["backend", "image"],
+      "properties": {
+        "backend": {"enum": ["nebius", "docker", "nsjail"]},
+        "require_backend": {"enum": ["nebius", "docker", "nsjail", null], "description": "fail closed instead of falling back (demo / judging runs use nebius)"},
+        "image": {"type": "string", "minLength": 1, "description": "immutable image UUID (nebius) or digest-pinned reference"},
+        "provision_timeout_s": {"type": "integer", "minimum": 1, "default": 20}
+      }
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "probe", "max_regression_pct", "approved_by", "expires"],
+        "properties": {
+          "id": {"type": "string"}, "probe": {"$ref": "#/$defs/probe_id"},
+          "max_regression_pct": {"type": "number", "minimum": 0, "maximum": 100},
+          "approved_by": {"type": "string", "minLength": 1}, "expires": {"type": "string", "format": "date"}
+        }
+      }
+    }
+  },
+  "$defs": {"probe_id": {"type": "string", "pattern": "^P(0[1-9]|1[0-9])$"}}
+}
