@@ -176,6 +176,51 @@ export interface DemoStatusResult {
   demo_task_id: string | null;
 }
 
+export interface ModelStatus {
+  provider: string;
+  base_url: string;
+  configured: boolean;
+  key_preview: string | null;
+  models: { diagnosis: string; patch: string };
+  live_inference_available: boolean;
+  provenance_mode: string;
+  status: string;
+}
+
+export interface ModelAnalyzeResult {
+  run_id: string;
+  provenance: string;
+  provider: string;
+  model_id: string;
+  fallback_reason: string | null;
+  validation_status: string;
+  call_record: Record<string, unknown>;
+  hypotheses: Array<{
+    hypothesis_id: string;
+    category: string;
+    statement: string;
+    falsifiable_prediction: string;
+    evidence_refs: Array<{ kind: string; ref: string; excerpt?: string }>;
+  }>;
+}
+
+export interface ModelPatchResult {
+  patch_id: string;
+  run_id: string;
+  cycle_number: number;
+  provenance: string;
+  provider: string;
+  model_id: string;
+  diff_text: string;
+  diff_sha256: string;
+  touches: string[];
+  line_count: number;
+  validation_status: string;
+  validation_errors: string[];
+  violations: string[];
+  rationale: string;
+}
+
 export interface ServiceHealth {
   status: string;
   version: string;
@@ -317,6 +362,19 @@ export const api = {
     fetchJSON<DemoSeedResult>(`/demo/seed?force=${force}`, { method: "POST" }),
   resetDemo: () => fetchJSON<{ status: string; message: string }>("/demo/reset", { method: "POST" }),
   getDemoStatus: () => fetchJSON<DemoStatusResult>("/demo/status"),
+
+  // Model & AI Engineering Intelligence
+  getModelStatus: () => fetchJSON<ModelStatus>("/model/status"),
+  analyzeRun: (runId: string, forceFallback: boolean = false) =>
+    fetchJSON<ModelAnalyzeResult>(`/runs/${runId}/analyze`, {
+      method: "POST",
+      body: JSON.stringify({ force_fallback: forceFallback }),
+    }),
+  proposePatch: (runId: string, hypothesisId?: string, forceFallback: boolean = false) =>
+    fetchJSON<ModelPatchResult>(`/runs/${runId}/propose-patch`, {
+      method: "POST",
+      body: JSON.stringify({ hypothesis_id: hypothesisId, force_fallback: forceFallback }),
+    }),
 };
 
 export function subscribeToEvents(

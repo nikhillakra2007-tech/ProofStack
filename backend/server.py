@@ -27,6 +27,8 @@ from backend.schemas import (
     LedgerEntryResponse, ArtifactResponse, RunEventResponse,
     LedgerVerifyResponse, ErrorResponse, RunStatusEnum, VerdictEnum,
     ReportCreate, ReportResponse, DecisionResponse, DemoSeedResponse,
+    ModelStatusResponse, ModelAnalyzeRequest, ModelAnalyzeResponse,
+    ModelPatchRequest, ModelPatchResponse,
 )
 from backend.ledger_service import LedgerService
 from backend.event_bus import event_bus
@@ -526,4 +528,54 @@ def demo_status(db: Session = Depends(get_db), api_key: str = Depends(verify_api
         "demo_project_id": DEMO_PROJECT_ID if seeded else None,
         "demo_task_id": DEMO_TASK_ID if seeded else None,
     }
+
+
+# ---- Model / AI Engineering Intelligence ----
+
+@app.get("/api/model/status", response_model=ModelStatusResponse)
+def get_model_status(db: Session = Depends(get_db), api_key: str = Depends(verify_api_key)):
+    from backend.model_service import ModelService
+    svc = ModelService(db)
+    return svc.get_status()
+
+
+@app.post("/api/runs/{run_id}/analyze", response_model=ModelAnalyzeResponse)
+async def analyze_run(
+    run_id: str,
+    data: Optional[ModelAnalyzeRequest] = None,
+    db: Session = Depends(get_db),
+    api_key: str = Depends(verify_api_key),
+):
+    run = db.query(models.Run).filter(models.Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+    force_fallback = data.force_fallback if data else False
+    from backend.model_service import ModelService
+    svc = ModelService(db)
+    try:
+        result = await svc.generate_hypotheses_for_run(run_id, force_fallback=force_fallback)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Model analysis failed: {str(exc)}")
+
+
+@app.post("/api/runs/{run_id}/propose-patch", response_model=ModelPatchResponse)
+async def propose_patch(
+    run_id: str,
+    data: Optional[ModelPatchRequest] = None,
+    db: Session = Depends(get_db),
+    api_key: str = Depends(verify_api_key),
+):
+    run = db.query(models.Run).filter(models.Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+    hyp_id = data.hypothesis_id if data else None
+    force_fallback = data.force_fallback if data else False
+    from backend.model_service import ModelService
+    svc = ModelService(db)
+    try:
+        result = await svc.propose_patch_for_run(run_id, hypothesis_id=hyp_id, force_fallback=force_fallback)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Patch proposal failed: {str(exc)}")
 

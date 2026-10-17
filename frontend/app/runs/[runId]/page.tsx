@@ -34,9 +34,9 @@ export default function RunDetailPage() {
   const [baseline, setBaseline] = useState<Baseline[]>([]);
   const [findings, setFindings] = useState<Finding[]>([]);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
-  const [hypotheses, setHypotheses] = useState<Array<{ id: string; hypothesis_id: string; category: string; statement: string; validation_status: string; falsifiable_prediction?: string }>>([]);
+  const [hypotheses, setHypotheses] = useState<Array<{ id: string; hypothesis_id: string; category: string; statement: string; validation_status: string; falsifiable_prediction?: string; model_metadata?: Record<string, unknown> }>>([]);
   const [experiments, setExperiments] = useState<Array<{ id: string; experiment_id: string; experiment_type: string; result_status: string | null; actual_observations?: Record<string, unknown>; duration_s?: number }>>([]);
-  const [patches, setPatches] = useState<Array<{ id: string; cycle_number: number; validation_status: string | null; diff_text?: string; line_count: number }>>([]);
+  const [patches, setPatches] = useState<Array<{ id: string; cycle_number: number; validation_status: string | null; diff_text?: string; line_count: number; review_status?: string | null; diff_sha256?: string; changed_files?: string[] }>>([]);
   const [decision, setDecision] = useState<Decision | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
 
@@ -44,6 +44,8 @@ export default function RunDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [proposingPatch, setProposingPatch] = useState(false);
 
   // Active view tab
   const [activeTab, setActiveTab] = useState<"casefile" | "ledger" | "reports">("casefile");
@@ -144,6 +146,30 @@ export default function RunDetailPage() {
       setError(err instanceof Error ? err.message : "Failed to cancel run");
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleTriggerAnalysis = async () => {
+    setAnalyzing(true);
+    try {
+      await api.analyzeRun(runId);
+      await loadData();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to run model diagnosis");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleProposePatch = async () => {
+    setProposingPatch(true);
+    try {
+      await api.proposePatch(runId);
+      await loadData();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to propose remediation patch");
+    } finally {
+      setProposingPatch(false);
     }
   };
 
@@ -404,10 +430,20 @@ export default function RunDetailPage() {
             <BaselineView baseline={baseline} />
 
             {/* Viewport 2: Hypotheses & Experiments */}
-            <HypothesisView hypotheses={hypotheses} experiments={experiments} />
+            <HypothesisView
+              hypotheses={hypotheses}
+              experiments={experiments}
+              onTriggerAnalysis={handleTriggerAnalysis}
+              analyzing={analyzing}
+            />
 
             {/* Viewport 3: Patch & Exploit Inspector */}
-            <PatchView patches={patches} findings={findings} />
+            <PatchView
+              patches={patches}
+              findings={findings}
+              onTriggerPatchProposal={handleProposePatch}
+              proposingPatch={proposingPatch}
+            />
 
             {/* Viewport 4: Gate Table */}
             <GateTable gates={gates} />

@@ -8,18 +8,39 @@ interface Patch {
   validation_status: string | null;
   diff_text?: string;
   line_count: number;
+  diff_sha256?: string;
+  changed_files?: string[];
+  review_status?: string | null;
 }
 
 interface PatchViewProps {
   patches: Patch[];
   findings: Finding[];
+  onTriggerPatchProposal?: () => void;
+  proposingPatch?: boolean;
 }
 
-export function PatchView({ patches, findings }: PatchViewProps) {
+export function PatchView({
+  patches,
+  findings,
+  onTriggerPatchProposal,
+  proposingPatch = false,
+}: PatchViewProps) {
   if (patches.length === 0 && findings.length === 0) {
     return (
-      <div className="panel border border-ps-rule bg-ps-sheet">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-ps-ink-2 mb-2">3. Candidate Patch & Exploit Inspector</h2>
+      <div className="panel border border-ps-rule bg-ps-sheet space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ps-ink-2">3. Candidate Patch & Exploit Inspector</h2>
+          {onTriggerPatchProposal && (
+            <button
+              onClick={onTriggerPatchProposal}
+              disabled={proposingPatch}
+              className="px-2.5 py-1 text-xs font-mono font-medium rounded border border-ps-focus bg-ps-paper hover:bg-ps-focus/10 transition-colors"
+            >
+              {proposingPatch ? "Synthesizing..." : "Propose Remediation Patch"}
+            </button>
+          )}
+        </div>
         <p className="text-xs text-ps-ink-2 italic">Awaiting candidate patch synthesis or DAST probe execution...</p>
       </div>
     );
@@ -35,11 +56,23 @@ export function PatchView({ patches, findings }: PatchViewProps) {
           <span className="text-xs font-bold uppercase tracking-wider text-ps-ink-2">3. Candidate Patch & Exploit Inspector</span>
           <span className="text-[11px] text-ps-ink-2 font-mono">AST & DAST Probes</span>
         </div>
-        {activePatch && (
-          <span className="badge badge-focus font-mono text-xs">
-            Cycle {activePatch.cycle_number} ({activePatch.line_count} lines)
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {activePatch && (
+            <span className="badge badge-focus font-mono text-xs">
+              Cycle {activePatch.cycle_number} ({activePatch.line_count} lines)
+            </span>
+          )}
+          {onTriggerPatchProposal && (
+            <button
+              onClick={onTriggerPatchProposal}
+              disabled={proposingPatch}
+              className="px-2 py-0.5 text-[11px] font-mono rounded border border-ps-rule hover:bg-ps-focus/10 transition-colors"
+              title="Synthesize new remediation patch cycle"
+            >
+              {proposingPatch ? "..." : "New Patch Cycle"}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Exploit Breaches / Findings Banner */}
@@ -84,7 +117,12 @@ export function PatchView({ patches, findings }: PatchViewProps) {
       {activePatch?.diff_text ? (
         <div>
           <div className="text-xs font-bold text-ps-ink-2 uppercase tracking-wide mb-1.5 flex items-center justify-between">
-            <span>Synthesized Diff (Proposed by Nemotron)</span>
+            <span className="flex items-center gap-2">
+              <span>Synthesized Candidate Diff</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40">
+                {activePatch.review_status || "AWAITING_VERIFICATION"}
+              </span>
+            </span>
             <span className="text-[11px] font-mono text-ps-ink-2">{activePatch.validation_status}</span>
           </div>
           <div className="bg-ps-paper p-3 rounded-sm border border-ps-rule overflow-x-auto font-mono text-xs max-h-72 overflow-y-auto">

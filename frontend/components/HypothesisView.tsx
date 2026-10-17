@@ -7,6 +7,15 @@ interface Hypothesis {
   statement: string;
   validation_status: string;
   falsifiable_prediction?: string;
+  model_metadata?: {
+    provenance?: string;
+    provider?: string;
+    model_id?: string;
+    fallback_reason?: string;
+    latency_ms?: number;
+    tokens_in?: number;
+    tokens_out?: number;
+  };
 }
 
 interface Experiment {
@@ -21,17 +30,40 @@ interface Experiment {
 interface HypothesisViewProps {
   hypotheses: Hypothesis[];
   experiments?: Experiment[];
+  onTriggerAnalysis?: () => void;
+  analyzing?: boolean;
 }
 
-export function HypothesisView({ hypotheses, experiments = [] }: HypothesisViewProps) {
+export function HypothesisView({
+  hypotheses,
+  experiments = [],
+  onTriggerAnalysis,
+  analyzing = false,
+}: HypothesisViewProps) {
   if (hypotheses.length === 0) {
     return (
-      <div className="panel border border-ps-rule bg-ps-sheet">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-ps-ink-2 mb-2">2. Hypotheses & Experimentation</h2>
-        <p className="text-xs text-ps-ink-2 italic">Awaiting AI diagnostic proposal...</p>
+      <div className="panel border border-ps-rule bg-ps-sheet space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ps-ink-2">2. Hypotheses & Experimentation</h2>
+          {onTriggerAnalysis && (
+            <button
+              onClick={onTriggerAnalysis}
+              disabled={analyzing}
+              className="px-2.5 py-1 text-xs font-mono font-medium rounded border border-ps-focus bg-ps-paper hover:bg-ps-focus/10 transition-colors"
+            >
+              {analyzing ? "Analyzing..." : "Trigger AI Diagnosis"}
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-ps-ink-2 italic">Awaiting AI diagnostic proposal or local rule evaluation...</p>
       </div>
     );
   }
+
+  const firstMetadata = hypotheses[0]?.model_metadata;
+  const isLive = firstMetadata?.provenance === "live_inference";
+  const modelId = firstMetadata?.model_id || "nvidia/nemotron-3-super-120b";
+  const fallbackReason = firstMetadata?.fallback_reason;
 
   return (
     <div className="panel border border-ps-rule bg-ps-sheet space-y-4">
@@ -40,8 +72,34 @@ export function HypothesisView({ hypotheses, experiments = [] }: HypothesisViewP
           <span className="text-xs font-bold uppercase tracking-wider text-ps-ink-2">2. Hypotheses & Experimentation</span>
           <span className="text-[11px] text-ps-ink-2 font-mono">Scientific Elimination</span>
         </div>
-        <span className="badge badge-focus text-[11px]">Proposed by Nemotron</span>
+        <div className="flex items-center gap-2">
+          {isLive ? (
+            <span className="badge text-[11px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-600/50">
+              Live AI Inference ({modelId})
+            </span>
+          ) : (
+            <span className="badge text-[11px] font-mono bg-amber-950/70 text-amber-300 border border-amber-600/50">
+              Deterministic Rule Engine (Local Fallback)
+            </span>
+          )}
+          {onTriggerAnalysis && (
+            <button
+              onClick={onTriggerAnalysis}
+              disabled={analyzing}
+              className="px-2 py-0.5 text-[11px] font-mono rounded border border-ps-rule hover:bg-ps-focus/10 transition-colors"
+              title="Re-run evidence-grounded diagnosis"
+            >
+              {analyzing ? "..." : "Re-diagnose"}
+            </button>
+          )}
+        </div>
       </div>
+
+      {fallbackReason && (
+        <div className="text-[11px] font-mono p-2 rounded bg-ps-paper/80 border border-ps-rule text-ps-ink-2">
+          <span className="font-bold text-amber-400">Provenance Note:</span> {fallbackReason}
+        </div>
+      )}
 
       {/* Hypotheses List */}
       <div className="space-y-2.5">

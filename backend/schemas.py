@@ -213,7 +213,9 @@ class HypothesisResponse(BaseModel):
     category: str
     statement: str
     validation_status: str
-    model_config = ConfigDict(from_attributes=True)
+    falsifiable_prediction: Optional[str] = None
+    model_metadata: Optional[dict] = None
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
 
 class ExperimentResponse(BaseModel):
@@ -222,6 +224,8 @@ class ExperimentResponse(BaseModel):
     experiment_id: str
     experiment_type: str
     result_status: Optional[str]
+    actual_observations: Optional[dict] = None
+    duration_s: Optional[float] = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -231,6 +235,10 @@ class PatchResponse(BaseModel):
     cycle_number: int
     validation_status: Optional[str]
     line_count: int
+    diff_text: Optional[str] = None
+    diff_sha256: Optional[str] = None
+    changed_files: Optional[list[str]] = None
+    review_status: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -355,4 +363,57 @@ class DemoSeedResponse(BaseModel):
     entry_count: int
     message: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class ModelStatusResponse(BaseModel):
+    provider: str
+    base_url: str
+    configured: bool
+    key_preview: Optional[str] = None
+    models: dict
+    live_inference_available: bool
+    provenance_mode: str
+    status: str
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ModelAnalyzeRequest(BaseModel):
+    force_fallback: bool = False
+    model_config = ConfigDict(extra="forbid")
+
+
+class ModelAnalyzeResponse(BaseModel):
+    run_id: str
+    provenance: str
+    provider: str
+    model_id: str
+    fallback_reason: Optional[str] = None
+    validation_status: str
+    call_record: dict
+    hypotheses: list[dict]
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
+
+
+class ModelPatchRequest(BaseModel):
+    hypothesis_id: Optional[str] = None
+    force_fallback: bool = False
+    model_config = ConfigDict(extra="forbid")
+
+
+class ModelPatchResponse(BaseModel):
+    patch_id: str
+    run_id: str
+    cycle_number: int
+    provenance: str
+    provider: str
+    model_id: str
+    diff_text: str
+    diff_sha256: str
+    touches: list[str]
+    line_count: int
+    validation_status: str
+    validation_errors: list[str]
+    violations: list[str]
+    rationale: str
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 

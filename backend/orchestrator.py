@@ -308,25 +308,9 @@ class Orchestrator:
     async def _do_hypothesizing(self, run_id: str, task):
         if self._is_cancelled(run_id):
             return
-        findings = self.db.query(models.Finding).filter(models.Finding.run_id == run_id).all()
-        hypotheses = self._generate_hypotheses(task, findings)
-        for h in hypotheses:
-            hyp = models.Hypothesis(
-                id=str(uuid.uuid4()),
-                run_id=run_id,
-                hypothesis_id=h["hypothesis_id"],
-                category=h["category"],
-                taxonomy=h.get("taxonomy", {}),
-                statement=h["statement"],
-                evidence_refs=h.get("evidence_refs", []),
-                falsifiable_prediction=h["falsifiable_prediction"],
-                model_metadata={"source": "deterministic_stub"},
-                validation_status="VALIDATED",
-            )
-            self.db.add(hyp)
-        self.db.commit()
-        self.ledger.append(run_id, "HYPOTHESES", {"run_id": run_id, "hypotheses": hypotheses})
-        event_bus.publish(run_id, "hypotheses.created", {"run_id": run_id, "count": len(hypotheses)})
+        from backend.model_service import ModelService
+        model_svc = ModelService(self.db)
+        await model_svc.generate_hypotheses_for_run(run_id)
 
     async def _do_experimenting(self, run_id: str, task):
         if self._is_cancelled(run_id):
@@ -356,24 +340,10 @@ class Orchestrator:
     async def _do_patching(self, run_id: str, task):
         if self._is_cancelled(run_id):
             return
-        run = self.db.query(models.Run).filter(models.Run.id == run_id).first()
-        patches = self._generate_patches(task, run)
-        for p in patches:
-            patch = models.Patch(
-                id=str(uuid.uuid4()),
-                run_id=run_id,
-                cycle_number=p["cycle_number"],
-                parent_revision=p["parent_revision"],
-                diff_text=p.get("diff_text"),
-                diff_sha256=p.get("diff_sha256"),
-                changed_files=p.get("changed_files", []),
-                line_count=p.get("line_count", 0),
-                validation_status=p.get("validation_status", "VALID"),
-                protected_path_results=p.get("protected_path_results", {}),
-                application_outcome=p.get("application_outcome", "APPLIED"),
-            )
-            self.db.add(patch)
-        self.db.commit()
+        from backend.model_service import ModelService
+        model_svc = ModelService(self.db)
+        await model_svc.propose_patch_for_run(run_id)
+
 
     async def _do_verifying(self, run_id: str, task):
         if self._is_cancelled(run_id):

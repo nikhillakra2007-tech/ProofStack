@@ -22,6 +22,30 @@ class ModelError(RuntimeError):
     pass
 
 
+class ModelConfigError(ModelError):
+    pass
+
+
+class ModelAuthError(ModelError):
+    pass
+
+
+class ModelRateLimitError(ModelError):
+    pass
+
+
+class ModelProviderError(ModelError):
+    pass
+
+
+class ModelTimeoutError(ModelError):
+    pass
+
+
+class ModelValidationError(ModelError):
+    pass
+
+
 def resolve_model(requested: str, catalog: list[str], fallbacks=()) -> tuple[str, str]:
     """-> (resolved_id, how): exact > case-insensitive > unique prefix > first fallback present > error."""
     if requested in catalog:
@@ -44,11 +68,17 @@ def resolve_model(requested: str, catalog: list[str], fallbacks=()) -> tuple[str
 class ModelClient:
     def __init__(self, api_key=None, base_url=None, validate=None, sleep=time.sleep, timeout_s=120):
         self.base = (base_url or os.environ.get("NEBIUS_BASE_URL") or DEFAULT_BASE).rstrip("/")
-        self.key = api_key or os.environ["NEBIUS_API_KEY"]
+        self.key = api_key if api_key is not None else os.environ.get("NEBIUS_API_KEY", "")
         self.validate, self.sleep, self.timeout = validate, sleep, timeout_s
         self.format_ix: dict[str, int] = {}                   # model -> index into the response_format ladder
 
+    @property
+    def is_configured(self) -> bool:
+        return bool(self.key and self.key.strip())
+
     def _http(self, method, path, body=None):
+        if not self.is_configured:
+            raise ModelConfigError("NEBIUS_API_KEY is not configured in environment or settings")
         req = urllib.request.Request(f"{self.base}/{path}", method=method,
                                      data=None if body is None else json.dumps(body).encode(),
                                      headers={"Authorization": f"Bearer {self.key}", "Content-Type": "application/json"})
@@ -82,9 +112,17 @@ class ModelClient:
                     self.sleep(float(ra) if ra.replace(".", "", 1).isdigit() else random.uniform(0, min(20, 2 ** attempts)))
                     attempts += 1
                     continue
+                if e.code in (401, 403):
+                    raise ModelAuthError(f"HTTP {e.code}: credentials invalid or unauthorized: {detail}") from e
+                if e.code == 429:
+                    raise ModelRateLimitError(f"HTTP 429: rate limited by provider: {detail}") from e
+                if e.code in (500, 502, 503, 504):
+                    raise ModelProviderError(f"HTTP {e.code}: provider server error: {detail}") from e
                 raise ModelError(f"HTTP {e.code}: {detail}") from e
             except (urllib.error.URLError, TimeoutError) as e:
                 if attempts >= max_attempts - 1:
+                    if isinstance(e, TimeoutError) or "timed out" in str(e).lower():
+                        raise ModelTimeoutError(f"transport timeout: {e!r}") from e
                     raise ModelError(f"transport failure: {e!r}") from e
                 self.sleep(random.uniform(0, min(20, 2 ** attempts)))
                 attempts += 1
