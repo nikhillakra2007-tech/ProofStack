@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { forwardToFastApi } from "@/lib/apiClient";
 
 export async function GET(req: NextRequest) {
-  try {
-    const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
-      headers: { "Content-Type": "application/json" },
-      signal: AbortSignal.timeout(1500),
-    });
-    if (fastApiResponse.ok) {
-      const data = await fastApiResponse.json();
-      return NextResponse.json(data);
-    }
-  } catch {
-    // Fallback
+  const fastApiData = await forwardToFastApi("/api/tasks", {
+    method: "GET",
+    timeoutMs: 1500,
+  });
+  if (fastApiData) {
+    return NextResponse.json(fastApiData);
   }
 
   return NextResponse.json([
@@ -50,19 +46,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Try FastAPI
-    try {
-      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(2000),
-      });
-      if (fastApiResponse.ok) {
-        const data = await fastApiResponse.json();
-        return NextResponse.json(data);
-      }
-    } catch {
-      // Fallback
+    const fastApiData = await forwardToFastApi("/api/tasks", {
+      method: "POST",
+      body,
+      timeoutMs: 2000,
+    });
+    if (fastApiData) {
+      return NextResponse.json(fastApiData);
     }
 
     const taskId = `TASK${Math.floor(1000 + Math.random() * 9000)}`;

@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MOCK_CATALOG } from "@/lib/mockData";
+import { forwardToFastApi } from "@/lib/apiClient";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { code, language = "python", problemId } = body;
 
-    // Check if FastAPI backend is available on port 8000
-    try {
-      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(1500),
-      });
-      if (fastApiResponse.ok) {
-        const data = await fastApiResponse.json();
-        return NextResponse.json(data);
-      }
-    } catch {
-      // Fall through to high-fidelity in-engine simulation
+    // Forward to FastAPI backend if active
+    const fastApiData = await forwardToFastApi("/api/run", {
+      method: "POST",
+      body,
+      timeoutMs: 1500,
+    });
+    if (fastApiData) {
+      return NextResponse.json(fastApiData);
     }
 
     const timestamp = new Date().toISOString().substring(11, 23);

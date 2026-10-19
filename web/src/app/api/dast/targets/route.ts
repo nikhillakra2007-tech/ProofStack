@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { forwardToFastApi } from "@/lib/apiClient";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,19 +22,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Try FastAPI
-    try {
-      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/dast/targets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(2000),
-      });
-      if (fastApiResponse.ok) {
-        const data = await fastApiResponse.json();
-        return NextResponse.json(data);
-      }
-    } catch {
-      // Fallback
+    const fastApiData = await forwardToFastApi("/api/dast/targets", {
+      method: "POST",
+      body,
+      timeoutMs: 2000,
+    });
+    if (fastApiData) {
+      return NextResponse.json(fastApiData);
     }
 
     const targetId = `target_${Math.random().toString(36).substring(2, 10)}`;

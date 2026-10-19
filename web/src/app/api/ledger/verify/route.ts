@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { forwardToFastApi } from "@/lib/apiClient";
 
 export async function GET(req: NextRequest) {
+  const fastApiData = await forwardToFastApi("/api/ledger/verify", {
+    method: "GET",
+    timeoutMs: 1500,
+  });
+  if (fastApiData) {
+    return NextResponse.json(fastApiData);
+  }
+
   return NextResponse.json({
     verified: true,
     totalBlocks: 6,

@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./proofstack.db"
     secret_key: str = "change-me-in-production"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,*"
     data_dir: str = "./data"
     artifact_dir: str = "./artifacts"
     nebius_api_key: str = ""
