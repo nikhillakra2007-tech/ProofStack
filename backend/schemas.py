@@ -417,3 +417,36 @@ class ModelPatchResponse(BaseModel):
     rationale: str
     model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
+
+class RunCodeRequest(BaseModel):
+    code: str
+    language: str = "python"
+    problemId: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class AuditCodeRequest(BaseModel):
+    code: str
+    problemId: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class HealCodeRequest(BaseModel):
+    code: str
+    problemId: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class DastScanRequest(BaseModel):
+    targetUrl: str = "https://staging.perfproof.internal"
+    ownershipToken: Optional[str] = "proofstack-verify-token-8f4b238e"
+    scanProfile: Optional[str] = "OWASP Top-10 Quick"
+    model_config = ConfigDict(extra="ignore")
+
+
+class DastTargetRequest(BaseModel):
+    targetUrl: str
+    repoPath: Optional[str] = "./web"
+    scanProfile: Optional[str] = "OWASP Top-10 Quick"
+    model_config = ConfigDict(extra="ignore")
+
