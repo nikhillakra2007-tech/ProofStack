@@ -142,9 +142,16 @@ All protected endpoints require the `X-API-Key` header matching `SECRET_KEY`.
 |---|---|---|---|
 | `GET` | `/api/health` | Public | Service health status |
 | `GET` | `/api/ready` | Public | Database readiness check |
+| `POST` | `/api/run` | Public | MicroVM sandbox code runner & ReDoS/SQLi canary trace |
+| `POST` | `/api/audit` | Public | Evaluate Zero-Compromise Gates G0 through G7 |
+| `POST` | `/api/heal` | Public | Synthesize defensive patch via NVIDIA Nemotron |
+| `GET` | `/api/ledger/verify` | Public | Global SHA-256 evidence chain verification |
+| `POST` | `/api/dast/scans` | Public | Live DAST scanner execution with ownership verification |
+| `POST` | `/api/dast/targets` | Public | Register web URL target for DAST telemetry |
 | `GET` | `/api/projects` | Protected | List all registered projects |
 | `POST` | `/api/projects` | Protected | Register a new project |
 | `PATCH` | `/api/projects/{id}` | Protected | Update project (with `expected_version`) |
+| `GET` | `/api/tasks` | Protected | List all benchmark & audit tasks |
 | `POST` | `/api/tasks` | Protected | Create benchmark/audit task intake |
 | `PATCH` | `/api/tasks/{id}` | Protected | Update task parameters |
 | `POST` | `/api/runs` | Protected | Dispatch a verification run |
@@ -154,36 +161,49 @@ All protected endpoints require the `X-API-Key` header matching `SECRET_KEY`.
 | `GET` | `/api/runs/{id}/decision` | Protected | Fetch canonical decision record |
 | `POST` | `/api/runs/{id}/reports` | Protected | Generate Markdown/JSON report |
 | `GET` | `/api/runs/{id}/reports/{id}` | Protected | Retrieve generated report |
-| `GET` | `/api/runs/{id}/ledger/verify` | Protected | Validate SHA-256 ledger integrity |
+| `POST` | `/api/runs/{id}/ledger/verify` | Protected | Validate run SHA-256 ledger integrity |
 | `GET` | `/api/runs/{id}/events` | Protected | Server-Sent Events (SSE) live updates |
+| `GET` | `/api/model/status` | Protected | NVIDIA Nemotron model service configuration status |
+| `POST` | `/api/runs/{id}/analyze` | Protected | Generate hypotheses using NVIDIA Nemotron |
+| `POST` | `/api/runs/{id}/propose-patch` | Protected | Synthesize and validate candidate code patch |
 | `POST` | `/api/demo/seed` | Protected | Seed deterministic IDOR showcase fixture |
 | `POST` | `/api/demo/reset` | Protected | Reset demo fixture cleanly |
 | `GET` | `/api/demo/status` | Protected | Check demo fixture state |
 
 ---
 
-## 7. Running the Cockpit Frontend
+## 7. Interactive Studio & Forensic Cockpit (`web/`)
 
-The ProofStack Cockpit is built with Next.js 14 and Tailwind CSS. It communicates with the backend on port 8765 via `/api` proxy rewrites.
+ProofStack includes a state-of-the-art **Enterprise Studio & Forensic Cockpit** built with **Next.js 14**, **Tailwind CSS**, and **Monaco Editor**, designed according to the `docs/ProofStack_Unified_UI_UX_Blueprint.pdf` specification.
 
+### Quick Start: Launch the Web Portal
 ```bash
-# Navigate to frontend
-cd frontend
+# Navigate to web directory
+cd web
 
-# Install dependencies
+# Install dependencies (Next 14, Monaco, Lucide, Tailwind)
 npm install
 
-# Start development cockpit on http://localhost:3000
+# Start development server on port 3000
 npm run dev
-
-# Or build production bundle
-npm run build
 ```
 
-Open `http://localhost:3000` in your browser. Key interface views:
-- **Overview (`/`)**: Operational metrics, status cards, quick run launcher, and demo fixture loader.
-- **Projects & Tasks (`/projects`)**: Repository registrations, task intake contracts, and schema validation.
-- **Case File (`/runs/{runId}`)**: 4-viewport investigation cockpit with the Zero-Compromise Interlock, baseline noise gauge, hypothesis/experiment timeline, patch diff with exploit trace, gate table, ledger browser, and downloadable reports.
+Open **`http://localhost:3000`** in your browser.
+
+### Key Interactive Workspaces
+- **🚀 Interactive Studio (`/studio`)**: Dual-pane Monaco code editor with live syntax analysis, benchmark problem selector, NVIDIA Nemotron defensive candidate synthesis, interactive G0–G7 gauntlet gate animations, and self-healing repair cycle loops.
+- **🎛️ 6-Tab Forensic Cockpit (`/cockpit/[taskId]`)**:
+  - **Tab 1 — Baseline & Telemetry**: Empirical execution speedup, memory delta, and noise gauge.
+  - **Tab 2 — Hypothesis Timeline**: Nemotron hypothesis ranking and experiment discriminator scores.
+  - **Tab 3 — Monaco Diff & Exploit Inspector**: Side-by-side git diff viewer with highlighted exploit canaries.
+  - **Tab 4 — Zero-Compromise Console**: Decision invariant table with cryptographic gate verdicts.
+  - **Tab 5 — Live Sandbox Terminal**: MicroVM terminal stream with real-time probe logs.
+  - **Tab 6 — Live DAST Scanner**: Web telemetry vulnerability scanner with OWASP Top-10 active probes.
+- **🛡️ Live DAST Scanner (`/dast`)**: Real-time website security telemetry with cryptographic ownership token validation and automated patch proposals.
+- **🔗 Cryptographic Evidence Ledger (`/ledger`)**: SHA-256 hash-chain browser with an interactive tampering toggle to visually prove cryptographic seal violation.
+- **📖 Public Architecture & Tour (`/home`)**: 14-section product storytelling page with an interactive feature walkthrough modal.
+
+*(Note: The operational run-centric casefile view is also available under `frontend/` on port 3001 if multi-app concurrency is desired).*
 
 ---
 
