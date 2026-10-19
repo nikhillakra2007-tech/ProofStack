@@ -1,5 +1,6 @@
 import "./globals.css";
 import AppShell from "@/components/AppShell";
+import LenisScrollProvider from "@/components/LenisScrollProvider";
 
 export const metadata = {
   title: "ProofStack | Autonomous DevSecOps Engine",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" data-palette="cobalt-ledger">
       <body>
-        <AppShell>{children}</AppShell>
+        <LenisScrollProvider>
+          <AppShell>{children}</AppShell>
+        </LenisScrollProvider>
       </body>
     </html>
   );

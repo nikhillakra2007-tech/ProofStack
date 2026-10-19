@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
+import Reveal, { StaggerContainer, StaggerItem } from "@/components/Reveal";
 
 export default function ScrollStorySections() {
   const router = useRouter();
@@ -99,7 +100,7 @@ Verified by ProofStack Engine · Nebius Token Factory · NVIDIA Nemotron
           SECTION 2: THREE GATES
           ========================================================================= */}
       <section id="three-gates" style={{ padding: "64px 0", borderTop: "1px solid var(--line)" }}>
-        <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto 40px" }}>
+        <Reveal style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto 40px" }}>
           <div className="eyebrow" style={{ color: "var(--brand)", marginBottom: "6px" }}>
             The Zero-Compromise Policy
           </div>
@@ -110,9 +111,9 @@ Verified by ProofStack Engine · Nebius Token Factory · NVIDIA Nemotron
             Standard AI copilot fixes make code fast by silently stripping auth checks or introducing race conditions.
             ProofStack evaluates candidate patches simultaneously across three strict gates.
           </p>
-        </div>
+        </Reveal>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+        <StaggerContainer style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
           {/* Gate 1 */}
           <div className="card" style={{ padding: "24px", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "var(--pass)" }} />
@@ -160,7 +161,7 @@ Verified by ProofStack Engine · Nebius Token Factory · NVIDIA Nemotron
               Exploit oracles · tenant isolation · AST bans
             </div>
           </div>
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* =========================================================================
