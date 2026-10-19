@@ -4,104 +4,80 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
+import { MOCK_LEDGER_CHAIN } from "@/lib/mockData";
+import type { LedgerBlock } from "@/lib/types";
 
-interface ChainBlockData {
-  index: number;
-  type: string;
-  actor: string;
-  time: string;
-  prevHash: string;
-  entryHash: string;
-  payload: Record<string, any>;
+const ZERO_HASH = "0".repeat(64);
+const SHA256_HEX = /^[0-9a-f]{64}$/i;
+
+/**
+ * The tamper simulation targets the hypothesis-scoring block. Its position is
+ * resolved from the shared chain so the simulation can never drift away from
+ * the authoritative ledger data.
+ */
+const TAMPER_TARGET_INDEX = (() => {
+  const idx = MOCK_LEDGER_CHAIN.findIndex((b) => b.type === "HYPOTHESIS");
+  return idx >= 0 ? idx : 0;
+})();
+
+function formatTimestamp(iso: string): string {
+  const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/.exec(iso);
+  return m ? `${m[1]} ${m[2]}Z` : iso;
 }
 
-const CLEAN_BLOCKS: ChainBlockData[] = [
-  {
-    index: 0,
-    type: "TASK_INTAKE",
-    actor: "nitin@perfproof.local",
-    time: "11:30:00 PM",
-    prevHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    entryHash: "8f4b238e89c132890dbaf423a8e9e19d7010a3952f012c8b74f38891ac3980bc",
-    payload: {
-      task_id: "TASK9142",
-      target: "orders.py:get_orders",
-      class: "performance",
-    },
-  },
-  {
-    index: 1,
-    type: "BASELINE",
-    actor: "controller/baseline",
-    time: "11:31:12 PM",
-    prevHash: "8f4b238e89c132890dbaf423a8e9e19d7010a3952f012c8b74f38891ac3980bc",
-    entryHash: "318cb92931ea789dcba2891901a8df9038ba1c890123f890dbca901283901def",
-    payload: {
-      median_time_s: 0.428,
-      cv: 0.041,
-      tau_noise: 0.05,
-      sql_queries: 5001,
-    },
-  },
-  {
-    index: 2,
-    type: "HYPOTHESIS",
-    actor: "controller/discriminator",
-    time: "11:32:28 PM",
-    prevHash: "318cb92931ea789dcba2891901a8df9038ba1c890123f890dbca901283901def",
-    entryHash: "45a89df0123bc890192389102389019238901238901238901234e890123890123",
-    payload: {
-      supported_hypothesis: "H1",
-      claim: "N+1 query explosion via iterative customer load",
-      score: 0.96,
-    },
-  },
-  {
-    index: 3,
-    type: "PATCH",
-    actor: "model/nemotron-3.5-lightning",
-    time: "11:33:04 PM",
-    prevHash: "45a89df0123bc890192389102389019238901238901238901234e890123890123",
-    entryHash: "e890123890123890123890123890123890123890123890123890123890123890",
-    payload: {
-      candidate: "nemotron-3.5-lightning",
-      template: "Template B (joinedload)",
-      identity_preserved: true,
-    },
-  },
-  {
-    index: 4,
-    type: "GATE_RESULT",
-    actor: "gauntlet/zero-compromise",
-    time: "11:33:48 PM",
-    prevHash: "e890123890123890123890123890123890123890123890123890123890123890",
-    entryHash: "d901238901238901238901238901238901238901238901238901238901238901",
-    payload: {
-      G0: "PASS",
-      G1: "PASS",
-      G2: "PASS",
-      G3: "PASS",
-      G4: "PASS",
-      G5: "PASS",
-      G6: "PASS",
-      G7: "PASS",
-    },
-  },
-  {
-    index: 5,
-    type: "DEFENSIVE_PATCH_COMMIT",
-    actor: "controller/commit",
-    time: "11:34:02 PM",
-    prevHash: "d901238901238901238901238901238901238901238901238901238901238901",
-    entryHash: "b3e94a8f1234567890abcdef1234567890abcdef1234567890abcdef12345678",
-    payload: {
-      verdict: "ACCEPT",
-      delta_perf: 0.742,
-      tau_noise: 0.05,
-      head_commit: "c8a94e1",
-    },
-  },
-];
+interface ChainVerification {
+  ok: boolean;
+  verifiedCount: number;
+  brokenIndex: number | null;
+  reason: string;
+}
+
+/**
+ * Recomputes the SHA-256 hash-chain invariants over the shared ledger data:
+ * every entry_hash must be a 64-char digest, every prev_hash must equal the
+ * previous entry_hash (genesis block links to the zero hash), and every block
+ * must be marked verified by the controller.
+ */
+function verifyChain(blocks: LedgerBlock[]): ChainVerification {
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+
+    if (!SHA256_HEX.test(block.entry_hash)) {
+      return {
+        ok: false,
+        verifiedCount: i,
+        brokenIndex: block.index,
+        reason: `entry_hash of block #${block.index} is not a valid 64-character SHA-256 digest`,
+      };
+    }
+
+    const expectedPrev = i === 0 ? ZERO_HASH : blocks[i - 1].entry_hash;
+    if (block.prev_hash !== expectedPrev) {
+      return {
+        ok: false,
+        verifiedCount: i,
+        brokenIndex: block.index,
+        reason: `prev_hash of block #${block.index} does not match the entry_hash of block #${blocks[i - 1].index}`,
+      };
+    }
+
+    if (!block.verified) {
+      return {
+        ok: false,
+        verifiedCount: i,
+        brokenIndex: block.index,
+        reason: `block #${block.index} is not marked verified by the controller`,
+      };
+    }
+  }
+
+  return {
+    ok: true,
+    verifiedCount: blocks.length,
+    brokenIndex: null,
+    reason: "",
+  };
+}
 
 export default function LedgerPage() {
   const { role } = useAuth();
@@ -110,14 +86,25 @@ export default function LedgerPage() {
 
   const [notification, setNotification] = useState<string>("");
 
+  const chain = MOCK_LEDGER_CHAIN;
+  const tamperBlock = chain[TAMPER_TARGET_INDEX];
+  const originalScore = tamperBlock ? tamperBlock.payload?.score : undefined;
+
   const handleSimulateTamper = () => {
     setIsTampered(true);
-    setNotification("Adversarial payload injected into Block #2: 'score' changed from 0.96 to 0.99 [TAMPERED]. Hash chain broken.");
+    setNotification(
+      `Adversarial payload injected into Block #${TAMPER_TARGET_INDEX}: 'score' changed from ${originalScore} to 0.99 [TAMPERED]. Hash chain broken.`
+    );
   };
 
   const handleRestoreClean = () => {
     setIsTampered(false);
-    setNotification("Evidence ledger restored to authentic SHA-256 state. All 6 blocks cryptographically verified.");
+    const result = verifyChain(MOCK_LEDGER_CHAIN);
+    setNotification(
+      result.ok
+        ? `Evidence ledger restored to authentic SHA-256 state. All ${result.verifiedCount} blocks cryptographically verified.`
+        : `Chain re-verification failed at block #${result.brokenIndex}: ${result.reason}`
+    );
     setTimeout(() => setNotification(""), 4000);
   };
 
@@ -266,11 +253,11 @@ export default function LedgerPage() {
               className="mono"
               style={{ color: "var(--fail)", fontSize: "13px", letterSpacing: ".05em" }}
             >
-              ADVERSARIAL TAMPER DETECTED AT BLOCK #2 (HYPOTHESIS SCORE FORGED)
+              ADVERSARIAL TAMPER DETECTED AT BLOCK #{TAMPER_TARGET_INDEX} (HYPOTHESIS SCORE FORGED)
             </b>
             <div style={{ fontSize: "12.5px", marginTop: "4px", lineHeight: 1.6 }}>
-              A single byte in Block #2 was mutated: <code style={{ background: "rgba(239, 68, 68, 0.2)", padding: "2px 6px", borderRadius: "4px" }}>&quot;score&quot;: 0.96 → &quot;0.99 [TAMPERED]&quot;</code>.
-              Because SHA-256 is strictly chained, the calculated entry hash diverged from the stored hash. Downstream blocks #3, #4, and #5 immediately failed verification (<span style={{ color: "var(--fail)", fontWeight: 700 }}>HASH MISMATCH</span>), proving that no verdict or measurement can ever be forged or modified undetected.
+              A single byte in Block #{TAMPER_TARGET_INDEX} was mutated: <code style={{ background: "rgba(239, 68, 68, 0.2)", padding: "2px 6px", borderRadius: "4px" }}>&quot;score&quot;: {originalScore} → &quot;0.99 [TAMPERED]&quot;</code>.
+              Because SHA-256 is strictly chained, the calculated entry hash diverged from the stored hash. Downstream blocks #{TAMPER_TARGET_INDEX + 1}, #{TAMPER_TARGET_INDEX + 2}, and #{TAMPER_TARGET_INDEX + 3} immediately failed verification (<span style={{ color: "var(--fail)", fontWeight: 700 }}>HASH MISMATCH</span>), proving that no verdict or measurement can ever be forged or modified undetected.
             </div>
           </div>
         </div>
@@ -278,9 +265,9 @@ export default function LedgerPage() {
 
       {/* Centered 880px Chain Rail */}
       <div style={{ maxWidth: "880px", margin: "0 auto", paddingBottom: "24px" }}>
-        {CLEAN_BLOCKS.map((block, idx) => {
-          const isFailing = isTampered && block.index >= 2;
-          const isTamperedTarget = isTampered && block.index === 2;
+        {chain.map((block, idx) => {
+          const isFailing = isTampered && block.index >= TAMPER_TARGET_INDEX;
+          const isTamperedTarget = isTampered && block.index === TAMPER_TARGET_INDEX;
 
           return (
             <React.Fragment key={block.index}>
@@ -321,7 +308,7 @@ export default function LedgerPage() {
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
-                      {block.time}
+                      {formatTimestamp(block.timestamp)}
                     </span>
 
                     {isFailing ? (
@@ -332,12 +319,16 @@ export default function LedgerPage() {
                         </svg>
                         HASH MISMATCH
                       </span>
-                    ) : (
+                    ) : block.verified ? (
                       <span className="chip pass">
                         <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                         Verified
+                      </span>
+                    ) : (
+                      <span className="chip warn" style={{ fontWeight: 700 }}>
+                        UNVERIFIED
                       </span>
                     )}
                   </span>
@@ -351,7 +342,7 @@ export default function LedgerPage() {
                   <div className="hbox" style={{ padding: "8px 10px", background: "var(--surface2)", borderRadius: "6px", border: "1px solid var(--line)" }}>
                     <small style={{ fontSize: "10px", color: "var(--ink2)", display: "block" }}>PREV_HASH</small>
                     <div className="hash mono" style={{ fontSize: "10.5px", color: "var(--ink)" }}>
-                      {block.prevHash}
+                      {block.prev_hash}
                     </div>
                   </div>
                   <div className="hbox" style={{ padding: "8px 10px", background: "var(--surface2)", borderRadius: "6px", border: "1px solid var(--line)" }}>
@@ -365,10 +356,10 @@ export default function LedgerPage() {
                       }}
                     >
                       {isTamperedTarget
-                        ? "45a89df0123bc890192389102389019238901238901238901234e890123890ff [MUTATED HASH]"
+                        ? `${block.entry_hash.slice(0, -2)}ff [MUTATED HASH]`
                         : isFailing
-                        ? `${block.entryHash.slice(0, 48)}... [CASCADE MISMATCH]`
-                        : block.entryHash}
+                        ? `${block.entry_hash.slice(0, 48)}... [CASCADE MISMATCH]`
+                        : block.entry_hash}
                     </div>
                   </div>
                 </div>
@@ -394,7 +385,7 @@ export default function LedgerPage() {
                           ...block.payload,
                           score: "0.99 [TAMPERED]",
                           _tampered_by: "adversarial_injection",
-                          _expected_score: 0.96,
+                          _expected_score: block.payload?.score,
                         }
                       : block.payload,
                     null,
@@ -404,11 +395,11 @@ export default function LedgerPage() {
               </div>
 
               {/* Chain Link (Down Arrow) */}
-              {idx < CLEAN_BLOCKS.length - 1 && (
+              {idx < chain.length - 1 && (
                 <div
                   className="link"
                   style={{
-                    color: isTampered && idx >= 1 ? "var(--fail)" : "var(--ink3)",
+                    color: isTampered && idx >= TAMPER_TARGET_INDEX - 1 ? "var(--fail)" : "var(--ink3)",
                     textAlign: "center",
                     padding: "8px 0",
                     display: "grid",

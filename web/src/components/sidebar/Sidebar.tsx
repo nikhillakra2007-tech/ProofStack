@@ -105,6 +105,20 @@ export default function Sidebar({ onOpenNewTaskModal }: SidebarProps) {
         <span className="tag">6</span>
       </Link>
 
+      {/* DAST Scanner */}
+      {roleDef.canAccessStudio && (
+        <Link
+          href="/dast"
+          className={`nav ${isRouteActive("/dast") ? "on" : ""}`}
+        >
+          <svg className="i" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+          <span>DAST Scanner</span>
+        </Link>
+      )}
+
       {/* Ledger */}
       <Link
         href="/ledger"

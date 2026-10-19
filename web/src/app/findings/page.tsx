@@ -3,7 +3,8 @@
 import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { ROLES } from "@/lib/roles";
+import { ROLES, TENANT_UUID } from "@/lib/roles";
+import { MOCK_CATALOG } from "@/lib/mockData";
 
 interface FindingRecord {
   id: string;
@@ -16,12 +17,16 @@ interface FindingRecord {
   truthRank?: number;
   description: string;
   naiveVerdict?: "Rejected";
+  naiveReason?: string;
   safeVerdict?: "Accepted";
+  safeReason?: string;
+  /** Catalog problem this finding maps to, resolved from the shared catalog by title. */
+  problemId?: string;
   patchDeleted: string;
   patchAdded: string;
 }
 
-const ALL_FINDINGS: FindingRecord[] = [
+const BASE_FINDINGS: FindingRecord[] = [
   {
     id: "fd_d44e55667788",
     severity: "HIGH",
@@ -33,7 +38,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 1,
     description: "Production JS bundle inlines AWS IAM credential literal leading to unrestricted cloud resource access.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: the key literal is only relocated into process.env.SERVER_ONLY_AWS_KEY, which Next.js still inlines into the client bundle.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: the credential is read from a server-only environment variable that no client module references.",
     patchDeleted: "const AWS_KEY = 'AKIAIOSFODNN7EXAMPLE';",
     patchAdded: "const AWS_KEY = process.env.SERVER_ONLY_AWS_KEY;",
   },
@@ -48,7 +57,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 2,
     description: "Dynamic probe confirmed unescaped user location.hash flows directly into an element.innerHTML sink without sanitization.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: HTML-encoding the fragment before assigning it to innerHTML still leaves a raw HTML sink that a crafted payload can escape.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: textContent renders the fragment as inert text, so no markup carried by location.hash is ever parsed.",
     patchDeleted: "document.getElementById('results').innerHTML = location.hash;",
     patchAdded: "document.getElementById('results').textContent = location.hash;",
   },
@@ -63,7 +76,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 3,
     description: "HTTP GET /.env returned status 200 with matching DATABASE_URL and secret credentials exposed publicly.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: moving the file out of public/ hides it from the static route but leaves the credential inside the deployed image and the repository history.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: the file is deleted from the static root and the publish step refuses any .env artifact, so the secret never reaches the CDN.",
     patchDeleted: "mv public/.env /var/www/",
     patchAdded: "# Remove .env from static assets public directory completely",
   },
@@ -78,7 +95,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 2,
     description: "Speedup caching keyed only by document id allows cross-tenant data access.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: scoping the cache key by tenant alone still serves a cached document to any authenticated user inside that tenant.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: authorization is re-evaluated on every call and the cache key carries the tenant boundary, so a cross-tenant read cannot hit the cache.",
     patchDeleted: "cache_key = doc_id",
     patchAdded: 'cache_key = f"{tenant_id}:{doc_id}"',
   },
@@ -93,7 +114,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 4,
     description: "Main document response omitted Content-Security-Policy and X-Content-Type-Options: nosniff headers.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: a single Content-Security-Policy header leaves HSTS and X-Content-Type-Options unset, so downgrade and MIME-sniffing attacks still succeed.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: CSP, HSTS and nosniff are emitted together on every response, closing the whole misconfiguration class rather than one header of it.",
     patchDeleted: "// headers: none",
     patchAdded: "Content-Security-Policy: default-src 'self'",
   },
@@ -108,7 +133,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 5,
     description: "script-src directive includes 'unsafe-inline' and wildcard origin (*) allowing arbitrary script execution.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: a hard-coded nonce is predictable and stays valid across responses, so a wildcard or inline injection still executes.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: a per-request random nonce replaces 'unsafe-inline' and the wildcard origin is dropped from script-src.",
     patchDeleted: "script-src * 'unsafe-inline'",
     patchAdded: "script-src 'self' 'nonce-rAnd0m'",
   },
@@ -123,7 +152,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 6,
     description: "Cookie 'session_id' set without HttpOnly flag; accessible to client JavaScript.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: adding SameSite alone leaves the cookie readable from client JavaScript, so a single XSS still exfiltrates the session.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: HttpOnly, Secure and SameSite=Strict are set together, so the session is neither script-readable nor cross-site transmittable.",
     patchDeleted: "res.setHeader('Set-Cookie', `session_id=${id}; Path=/`);",
     patchAdded: "res.setHeader('Set-Cookie', `session_id=${id}; Path=/; HttpOnly; SameSite=Strict; Secure`);",
   },
@@ -138,7 +171,11 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 7,
     description: "Synchronous blocking IO inside an async def route freezes the entire Python asyncio event loop for all requests.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: dropping the async decorator turns the route into a blocking worker while the blocking call itself is left untouched.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: the blocking call is replaced by a cooperative await, so the event loop keeps serving concurrent requests without lag.",
     patchDeleted: "time.sleep(2.5) # blocking io",
     patchAdded: "await asyncio.sleep(2.5) # cooperative non-blocking yield",
   },
@@ -153,11 +190,38 @@ const ALL_FINDINGS: FindingRecord[] = [
     truthRank: 1,
     description: "Iterative customer relationship loads fired 5,001 SQL queries. Defensive patch verified and committed to ledger.",
     naiveVerdict: "Rejected",
+    naiveReason:
+      "Rejected: rewriting the loop as a set-based comprehension reorders the result rows, breaking the pagination contract the API guarantees.",
     safeVerdict: "Accepted",
+    safeReason:
+      "Accepted: eager loading collapses 5,001 statements into 1 while preserving first-occurrence row order and bound parameters.",
     patchDeleted: "for order in orders: customer = db.query(Customer)...",
     patchAdded: "orders = db.query(Order).options(joinedload(Order.customer)).all()",
   },
 ];
+
+/**
+ * A finding only claims a catalog problem when the shared catalog actually
+ * contains a problem with the exact same title. No finding is mapped by guess.
+ */
+const CATALOG_PROBLEM_BY_TITLE = new Map(MOCK_CATALOG.map((p) => [p.title, p.id]));
+
+const ALL_FINDINGS: FindingRecord[] = BASE_FINDINGS.map((f) => ({
+  ...f,
+  problemId: CATALOG_PROBLEM_BY_TITLE.get(f.title),
+}));
+
+const TOTAL_FINDINGS = ALL_FINDINGS.length;
+const OPEN_FINDINGS = ALL_FINDINGS.filter((f) => f.status === "Open").length;
+const FIXED_FINDINGS = ALL_FINDINGS.filter((f) => f.status === "Fixed").length;
+
+const countBySeverity = (severity: FindingRecord["severity"]) =>
+  ALL_FINDINGS.filter((f) => f.severity === severity).length;
+
+const VERDICT_CHIP_CLASS: Record<string, string> = {
+  Rejected: "fail",
+  Accepted: "pass",
+};
 
 function FindingsContent() {
   const router = useRouter();
@@ -212,7 +276,11 @@ function FindingsContent() {
     ALL_FINDINGS.find((f) => f.id === selectedFindingId) || ALL_FINDINGS[3];
 
   const handleSelfHeal = () => {
-    router.push("/studio?problem=T1-3");
+    if (selectedFinding?.problemId) {
+      router.push(`/studio?problem=${selectedFinding.problemId}`);
+    } else {
+      router.push("/studio");
+    }
   };
 
   const handleOpenCockpit = () => {
@@ -274,7 +342,7 @@ function FindingsContent() {
     const jsonStr = JSON.stringify(
       {
         exportedAt: new Date().toISOString(),
-        tenant: "8f4b238e-89c1-4289-0dba-f423a8e9e19d",
+        tenant: TENANT_UUID,
         total: filteredFindings.length,
         findings: filteredFindings,
       },
@@ -483,19 +551,19 @@ function FindingsContent() {
             className={statusFilter === "All" ? "on" : ""}
             onClick={() => setStatusFilter("All")}
           >
-            All 9
+            All {TOTAL_FINDINGS}
           </span>
           <span
             className={statusFilter === "Open" ? "on" : ""}
             onClick={() => setStatusFilter("Open")}
           >
-            Open 8
+            Open {OPEN_FINDINGS}
           </span>
           <span
             className={statusFilter === "Fixed" ? "on" : ""}
             onClick={() => setStatusFilter("Fixed")}
           >
-            Fixed 1
+            Fixed {FIXED_FINDINGS}
           </span>
         </div>
 
@@ -538,9 +606,9 @@ function FindingsContent() {
             >
               {[
                 { label: "Any Severity", val: "ANY" },
-                { label: "HIGH only (4)", val: "HIGH" },
-                { label: "MED only (4)", val: "MED" },
-                { label: "LOW only (1)", val: "LOW" },
+                { label: `HIGH only (${countBySeverity("HIGH")})`, val: "HIGH" },
+                { label: `MED only (${countBySeverity("MED")})`, val: "MED" },
+                { label: `LOW only (${countBySeverity("LOW")})`, val: "LOW" },
               ].map((item) => (
                 <div
                   key={item.val}
@@ -883,44 +951,63 @@ function FindingsContent() {
 
             <div className="mono" style={{ margin: "12px 0", fontSize: "11.5px", color: "var(--ink2)" }}>
               {selectedFinding.location} · Truth Rank {selectedFinding.truthRank || 1}
+              {selectedFinding.problemId && ` · Catalog ${selectedFinding.problemId}`}
             </div>
 
             <div className="grid" style={{ gap: "8px", marginBottom: "12px" }}>
-              <div
-                className="row"
-                style={{
-                  justifyContent: "space-between",
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 10px",
-                }}
-              >
-                <span className="row">
-                  <svg className="i" viewBox="0 0 24 24" style={{ color: "var(--fail)" }}>
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                  Naive fix
-                </span>
-                <span className="chip fail">Rejected</span>
-              </div>
-              <div
-                className="row"
-                style={{
-                  justifyContent: "space-between",
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 10px",
-                }}
-              >
-                <span className="row">
-                  <svg className="i" viewBox="0 0 24 24" style={{ color: "var(--pass)" }}>
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Safe fix
-                </span>
-                <span className="chip pass">Accepted</span>
-              </div>
+              {[
+                {
+                  label: "Naive fix",
+                  verdict: selectedFinding.naiveVerdict,
+                  reason: selectedFinding.naiveReason,
+                  icon: (
+                    <svg className="i" viewBox="0 0 24 24" style={{ color: "var(--fail)" }}>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: "Safe fix",
+                  verdict: selectedFinding.safeVerdict,
+                  reason: selectedFinding.safeReason,
+                  icon: (
+                    <svg className="i" viewBox="0 0 24 24" style={{ color: "var(--pass)" }}>
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ),
+                },
+              ].map((row) => (
+                <div key={row.label}>
+                  <div
+                    className="row"
+                    style={{
+                      justifyContent: "space-between",
+                      border: "1px solid var(--line)",
+                      borderRadius: "7px",
+                      padding: "8px 10px",
+                    }}
+                  >
+                    <span className="row">
+                      {row.icon}
+                      {row.label}
+                    </span>
+                    <span
+                      className={`chip ${row.verdict ? VERDICT_CHIP_CLASS[row.verdict] || "warn" : "warn"}`}
+                    >
+                      {row.verdict || "Not evaluated"}
+                    </span>
+                  </div>
+                  {row.reason && (
+                    <div
+                      className="sub"
+                      style={{ fontSize: "11.5px", marginTop: "5px", lineHeight: 1.5 }}
+                    >
+                      {row.reason}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             <div className="eyebrow" style={{ marginBottom: "6px" }}>
@@ -949,7 +1036,7 @@ function FindingsContent() {
                     <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
                     <path d="M19 15l.7 1.8L21.5 17.5l-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z" />
                   </svg>
-                  Self-Heal (Nemotron)
+                  {selectedFinding.problemId ? "Self-Heal (Nemotron)" : "Open in Studio"}
                 </button>
               )}
               <button

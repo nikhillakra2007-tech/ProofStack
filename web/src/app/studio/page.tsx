@@ -152,11 +152,13 @@ function StudioContent() {
 
       // Set hardened candidate code with strict input validation and query timeout bound
       setHardenedCandidateCode(
-        `from fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session, joinedload\nfrom proofstack.models import Order, Customer\n\nrouter = APIRouter()\n\n@router.get("/orders")\n@login_required\ndef get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):\n    # ITERATION 2: Hardened defensive patch with strict parameter validation and 250ms timeout\n    if not tenant_id or not user_id:\n        raise HTTPException(status_code=400, detail="Missing required tenant identity context")\n    \n    orders = (\n        db.query(Order)\n        .options(joinedload(Order.customer))\n        .filter(Order.tenant_id == tenant_id, Order.user_id == user_id)\n        .execution_options(timeout=0.25)\n        .all()\n    )\n    for order in orders:\n        order.customer_name = order.customer.name if order.customer else "Unknown"\n    return orders`
+        `${selectedProblem.safeFixSnippet}\n\n# ITERATION 2 (hardened): ${selectedProblem.probeMethod}\n# ${selectedProblem.safeReason}`
       );
 
       setSnippetMode("safe");
-      setToastMessage("Iteration 2 defensive patch synthesized (Score: 0.99) · Strict validation applied.");
+      setToastMessage(
+        `Iteration 2 defensive patch synthesized for ${selectedProblem.id} (Score: 0.99).`
+      );
       setTimeout(() => setToastMessage(null), 4000);
     }, 1500);
   };
@@ -435,23 +437,13 @@ function StudioContent() {
                 overflowX: "auto",
               }}
             >
-              <div className="bar">Baseline · orders.py</div>
-              <div className="ln"><s>1</s><em>from fastapi import APIRouter, Depends</em></div>
-              <div className="ln del"><s>2</s><em>from sqlalchemy.orm import Session</em></div>
-              <div className="ln"><s>3</s><em>from proofstack.models import Order, Customer</em></div>
-              <div className="ln"><s>4</s><em></em></div>
-              <div className="ln"><s>5</s><em>router = APIRouter()</em></div>
-              <div className="ln"><s>6</s><em></em></div>
-              <div className="ln"><s>7</s><em>@router.get(&quot;/orders&quot;)</em></div>
-              <div className="ln"><s>8</s><em>@login_required</em></div>
-              <div className="ln"><s>9</s><em>def get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):</em></div>
-              <div className="ln del"><s>10</s><em>    # VULNERABLE: Iterative queries trigger N+1 explosion</em></div>
-              <div className="ln del"><s>11</s><em>    orders = db.query(Order).filter(Order.tenant_id == tenant_id).all()</em></div>
-              <div className="ln"><s>12</s><em></em></div>
-              <div className="ln del"><s>13</s><em>    for order in orders:</em></div>
-              <div className="ln del"><s>14</s><em>        customer = db.query(Customer).filter_by(id=order.customer_id).first()</em></div>
-              <div className="ln del"><s>15</s><em>        order.customer_name = customer.name</em></div>
-              <div className="ln"><s>16</s><em>    return orders</em></div>
+              <div className="bar">Baseline · {selectedProblem.id}</div>
+              {selectedProblem.bugSnippet.split("\n").map((line, i) => (
+                <div className="ln" key={i}>
+                  <s>{i + 1}</s>
+                  <em>{line || " "}</em>
+                </div>
+              ))}
             </div>
 
             {/* Candidate Column */}
@@ -468,60 +460,20 @@ function StudioContent() {
                   : "Baseline Code"}
               </div>
 
-              {isSafeMode && iteration === 2 ? (
-                <>
-                  <div className="ln"><s>1</s><em>from fastapi import APIRouter, Depends, HTTPException</em></div>
-                  <div className="ln add"><s>2</s><em>from sqlalchemy.orm import Session, joinedload</em></div>
-                  <div className="ln"><s>3</s><em>from proofstack.models import Order, Customer</em></div>
-                  <div className="ln"><s>4</s><em></em></div>
-                  <div className="ln"><s>5</s><em>router = APIRouter()</em></div>
-                  <div className="ln"><s>6</s><em>@router.get(&quot;/orders&quot;)</em></div>
-                  <div className="ln"><s>7</s><em>@login_required</em></div>
-                  <div className="ln"><s>8</s><em>def get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):</em></div>
-                  <div className="ln add"><s>9</s><em>    # ITERATION 2: Input validation &amp; query bounds enforced</em></div>
-                  <div className="ln add"><s>10</s><em>    if not tenant_id or not user_id:</em></div>
-                  <div className="ln add"><s>11</s><em>        raise HTTPException(status_code=400, detail=&quot;Missing tenant context&quot;)</em></div>
-                  <div className="ln add"><s>12</s><em>    orders = (</em></div>
-                  <div className="ln add"><s>13</s><em>        db.query(Order)</em></div>
-                  <div className="ln add"><s>14</s><em>        .options(joinedload(Order.customer))</em></div>
-                  <div className="ln add"><s>15</s><em>        .filter(Order.tenant_id == tenant_id, Order.user_id == user_id)</em></div>
-                  <div className="ln add"><s>16</s><em>        .execution_options(timeout=0.25)</em></div>
-                  <div className="ln add"><s>17</s><em>        .all()</em></div>
-                  <div className="ln add"><s>18</s><em>    )</em></div>
-                </>
-              ) : isSafeMode ? (
-                <>
-                  <div className="ln"><s>1</s><em>from fastapi import APIRouter, Depends</em></div>
-                  <div className="ln add"><s>2</s><em>from sqlalchemy.orm import Session, joinedload</em></div>
-                  <div className="ln"><s>3</s><em>from proofstack.models import Order, Customer</em></div>
-                  <div className="ln"><s>4</s><em></em></div>
-                  <div className="ln"><s>5</s><em>router = APIRouter()</em></div>
-                  <div className="ln"><s>6</s><em>@router.get(&quot;/orders&quot;)</em></div>
-                  <div className="ln"><s>7</s><em>@login_required</em></div>
-                  <div className="ln"><s>8</s><em>def get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):</em></div>
-                  <div className="ln add"><s>9</s><em>    # DEFENSIVE FIX: Eager loading via joinedload</em></div>
-                  <div className="ln add"><s>10</s><em>    orders = (</em></div>
-                  <div className="ln add"><s>11</s><em>        db.query(Order)</em></div>
-                  <div className="ln add"><s>12</s><em>        .options(joinedload(Order.customer))</em></div>
-                  <div className="ln add"><s>13</s><em>        .filter(Order.tenant_id == tenant_id, Order.user_id == user_id)</em></div>
-                  <div className="ln add"><s>14</s><em>        .all()</em></div>
-                  <div className="ln add"><s>15</s><em>    )</em></div>
-                </>
-              ) : isNaiveMode ? (
-                <>
-                  <div className="ln"><s>1</s><em>from fastapi import APIRouter, Depends</em></div>
-                  <div className="ln del"><s>2</s><em># NAIVE FIX: Concatenating unparameterized query strings</em></div>
-                  <div className="ln del"><s>3</s><em>def get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):</em></div>
-                  <div className="ln del"><s>4</s><em>    sql = f&quot;SELECT * FROM orders WHERE tenant_id = &apos;{"{tenant_id}"}&apos;&quot;</em></div>
-                  <div className="ln del"><s>5</s><em>    return db.execute(sql).fetchall()  # SQL INJECTION RISK!</em></div>
-                </>
-              ) : (
-                <>
-                  <div className="ln"><s>1</s><em>from fastapi import APIRouter, Depends</em></div>
-                  <div className="ln"><s>2</s><em># Baseline unoptimized code</em></div>
-                  <div className="ln"><s>3</s><em>orders = db.query(Order).filter(Order.tenant_id == tenant_id).all()</em></div>
-                </>
-              )}
+              {candidateDisplayCode.split("\n").map((line, i) => {
+                const tone =
+                  snippetMode === "naive"
+                    ? " del"
+                    : snippetMode === "safe" || iteration === 2
+                    ? " add"
+                    : "";
+                return (
+                  <div className={`ln${tone}`} key={i}>
+                    <s>{i + 1}</s>
+                    <em>{line || " "}</em>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

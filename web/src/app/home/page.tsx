@@ -1,482 +1,555 @@
-"use client";
+﻿"use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import Chatbot from "@/components/Chatbot";
-import Flowchart, { GateFlowchart } from "@/components/Flowchart";
+import { MOCK_CATALOG } from "@/lib/mockData";
+import Chatbot from "@/components/chatbot/Chatbot";
+import ScrollReveal from "@/components/animations/ScrollReveal";
+
+const NAV = [
+  { label: "Philosophy", href: "#philosophy" },
+  { label: "Pipeline", href: "#pipeline" },
+  { label: "Gates", href: "#gates" },
+  { label: "Detectors", href: "#detectors" },
+  { label: "Ledger", href: "#ledger" },
+  { label: "Pricing", href: "#pricing" },
+];
+
+const TIERS = [
+  {
+    id: "Tier 1",
+    name: "Performance",
+    count: 8,
+    body: "Latency, query amplification and memory regressions that a reviewer would miss under time pressure.",
+  },
+  {
+    id: "Tier 2",
+    name: "Security",
+    count: 7,
+    body: "Authorisation, injection, deserialisation and secret-handling invariants with live exploit oracles.",
+  },
+  {
+    id: "Tier 3",
+    name: "Concurrency",
+    count: 4,
+    body: "Lost updates, blocking calls, deadlocks and descriptor leaks detected under contention.",
+  },
+];
 
 export default function PublicHomePage() {
   const router = useRouter();
   const { loginAs } = useAuth();
-  const [activeProblem, setActiveProblem] = useState<"idor" | "redos" | "nplusone">("idor");
+  const [isMenu, setIsMenu] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
 
-  const handleLaunchDemo = () => {
+  useEffect(() => {
+    const t = setTimeout(() => setHeroReady(true), 120);
+    return () => clearTimeout(t);
+  }, []);
+
+  const launch = () => {
     loginAs("developer");
     router.push("/cockpit/TASK9142");
   };
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#060B0D", color: "#E9F4F6", overflowX: "hidden" }}>
-      {/* Navbar */}
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          background: "rgba(6, 11, 13, 0.8)",
-          backdropFilter: "blur(16px) saturate(1.5)",
-          WebkitBackdropFilter: "blur(16px) saturate(1.5)",
-          borderBottom: "1px solid rgba(25, 227, 255, 0.06)",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            padding: "0 24px",
-            height: "56px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div
-              style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, rgba(25, 227, 255, 0.2), rgba(91, 201, 140, 0.1))",
-                border: "1px solid rgba(25, 227, 255, 0.3)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4" style={{ color: "#19E3FF" }}>
-                <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                <polyline points="2 17 12 22 22 17" />
-                <polyline points="2 12 12 17 22 12" />
-              </svg>
-            </div>
-            <span style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.02em" }}>ProofStack</span>
-          </div>
+  const detectors = useMemo(() => MOCK_CATALOG, []);
 
-          <nav style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-            <a href="#how-it-works" style={{ fontSize: "13px", color: "#8FA5AC", transition: "color 0.2s" }}>How it works</a>
-            <a href="#gates" style={{ fontSize: "13px", color: "#8FA5AC", transition: "color 0.2s" }}>Gates</a>
-            <a href="#ledger" style={{ fontSize: "13px", color: "#8FA5AC", transition: "color 0.2s" }}>Ledger</a>
-            <button onClick={() => router.push("/login")} style={{ fontSize: "13px", color: "#8FA5AC" }}>Sign in</button>
-            <motion.button
-              onClick={handleLaunchDemo}
-              className="btn-primary"
-              style={{ height: "36px", padding: "0 18px", fontSize: "12px" }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+  return (
+    <div className="ac-site" style={{ background: "var(--bg)", color: "var(--ink)" }}>
+      <ScrollReveal />
+
+      {/* ============ FIXED BLEND HEADER ============ */}
+      <header className={`blend-header ${isMenu ? "is-menu" : ""}`}>
+        <div className="blend-header__inner wrap">
+          <a href="#top" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
+            <span style={{ fontSize: "14px", letterSpacing: ".04em" }}>ProofStack</span>
+          </a>
+
+          <nav style={{ display: "flex", gap: "28px", alignItems: "center" }}>
+            {NAV.map((n) => (
+              <a key={n.href} href={n.href} style={{ fontSize: "13px" }}>
+                {n.label}
+              </a>
+            ))}
+            <button
+              onClick={launch}
+              style={{ fontSize: "13px", borderBottom: "1px solid currentColor", paddingBottom: "3px" }}
             >
               Live demo
-            </motion.button>
+            </button>
+            <button
+              onClick={() => setIsMenu((m) => !m)}
+              style={{ display: "none", fontSize: "13px" }}
+              aria-label="Menu"
+            >
+              Menu
+            </button>
           </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section style={{ position: "relative", padding: "80px 24px", maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Background gradient */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "800px",
-            height: "600px",
-            background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(25, 227, 255, 0.08) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          style={{ textAlign: "center", position: "relative" }}
-        >
-          <motion.span
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
+      {/* ============ HERO ============ */}
+      <section className="hero" id="top">
+        {/* ambient sphere */}
+        <div className="bg-sphere" style={{ display: "grid", placeItems: "center" }}>
+          <div
+            aria-hidden
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              fontSize: "11px",
-              fontWeight: 600,
-              color: "#19E3FF",
-              padding: "5px 14px",
-              borderRadius: "20px",
-              background: "rgba(25, 227, 255, 0.08)",
-              border: "1px solid rgba(25, 227, 255, 0.15)",
-              marginBottom: "24px",
+              width: "min(70vh, 70vw)",
+              height: "min(70vh, 70vw)",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle at 32% 28%, rgba(233,229,218,.20) 0%, rgba(142,90,54,.16) 38%, rgba(10,10,9,0) 68%)",
+              filter: "blur(calc(2 * var(--u)))",
+              animation: "markSpin 24s cubic-bezier(.45,0,.55,1) infinite",
             }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-            </svg>
-            Nebius Token Factory · NVIDIA Nemotron 3
-          </motion.span>
+          />
+        </div>
 
-          <h1
-            style={{
-              fontSize: "56px",
-              lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              fontWeight: 700,
-              margin: "0 0 20px",
-              fontFamily: "'Space Grotesk', 'Inter', sans-serif",
-            }}
-          >
-            Ship AI patches.
-            <br />
-            <span className="text-gradient">Prove they&apos;re safe.</span>
+        <div className="hero__inner">
+          <div className="hero__kicker is-in" style={heroReady ? undefined : { opacity: 0 }}>
+            <span className={heroReady ? "is-in" : ""}>Autonomous Verification Â· 2026</span>
+          </div>
+
+          <h1 className="hero__title">
+            <span className="ln"><span className={`ln__in ${heroReady ? "is-in" : ""}`} style={{ "--li": 0 } as React.CSSProperties}>Between speed</span></span>
+            <span className="ln"><span className={`ln__in ${heroReady ? "is-in" : ""}`} style={{ "--li": 1 } as React.CSSProperties}>and safety.</span></span>
           </h1>
 
-          <p
-            style={{
-              fontSize: "17px",
-              lineHeight: 1.6,
-              color: "#8FA5AC",
-              maxWidth: "580px",
-              margin: "0 auto 36px",
-            }}
-          >
-            ProofStack runs every candidate patch through correctness, security, and performance
-            gates in isolated sandboxes. Only zero-compromise fixes get accepted — sealed on a
-            tamper-evident hash chain.
+          <p className={`hero__sub ${heroReady ? "is-in" : ""}`}>
+            AI writes the patch. ProofStack decides whether it ships.
           </p>
+        </div>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
-            <motion.button
-              onClick={handleLaunchDemo}
-              className="btn-primary"
-              style={{ height: "48px", padding: "0 28px", fontSize: "14px" }}
-              whileHover={{ scale: 1.03, boxShadow: "0 0 32px rgba(25, 227, 255, 0.3)" }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Open live demo
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-              </svg>
-            </motion.button>
-            <motion.button
-              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
-              className="btn-secondary"
-              style={{ height: "48px", padding: "0 24px", fontSize: "14px" }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              See how it works
-            </motion.button>
-          </div>
-        </motion.div>
-      </section>
+        {/* spinning mark */}
+        <svg className={`hero__mark ${heroReady ? "is-in" : ""}`} viewBox="0 0 57.12 70.22" style={{ position: "absolute", left: "50%", bottom: "calc(90 * var(--u))", transform: "translateX(-50%)" }}>
+          <path d="M28.56 2 2 19v32.2L28.56 68 55.12 51.2V19L28.56 2Zm0 5.6 21.2 13.6v27.6L28.56 62.4 7.36 48.8V21.2L28.56 7.6Z" fill="currentColor" />
+          <path d="M28.56 14 8 27.6v15.2l20.56 13.6 20.56-13.6V27.6L28.56 14Zm0 4.3 16.9 11.2-6.1 4-10.8-7.2-10.8 7.2-6.1-4L28.56 18.3Z" fill="currentColor" opacity=".65" />
+        </svg>
 
-      {/* Flowchart Section */}
-      <section id="how-it-works" style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 24px" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          style={{ textAlign: "center", marginBottom: "40px" }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "#19E3FF", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
-            Pipeline
-          </div>
-          <h2 style={{ fontSize: "36px", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>
-            From slow endpoint to verified verdict.
-          </h2>
-        </motion.div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "24px",
-            borderRadius: "16px",
-            background: "rgba(14, 22, 25, 0.5)",
-            border: "1px solid rgba(25, 227, 255, 0.08)",
-          }}
-        >
-          <Flowchart />
+        <div className={`hero__foot ${heroReady ? "is-in" : ""}`}>
+          <span className="hero__place">REMOTE Â· OPEN SOURCE Â· 2026</span>
+          <a className="link-arrow" href="#philosophy">
+            Scroll to explore
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
+            </svg>
+          </a>
         </div>
       </section>
 
-      {/* Gates Section */}
-      <section id="gates" style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 24px" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          style={{ textAlign: "center", marginBottom: "32px" }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "#FF7A70", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
-            Zero-Compromise
-          </div>
-          <h2 style={{ fontSize: "36px", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>
-            8 gates. All must pass.
+      {/* ============ PHILOSOPHY ============ */}
+      <section className="sec wrap" id="philosophy">
+        <div className="sec__label label" data-rv>
+          Philosophy
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "18em" }}>
+            Delegate the work to a machine. Keep the judgement for yourself.
           </h2>
-          <p style={{ fontSize: "15px", color: "#8FA5AC", marginTop: "12px", maxWidth: "520px", margin: "12px auto 0" }}>
-            Any single gate failure = instant REJECT. No exceptions, no &quot;probably fine&quot;.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "32px",
-            borderRadius: "16px",
-            background: "rgba(14, 22, 25, 0.5)",
-            border: "1px solid rgba(25, 227, 255, 0.08)",
-          }}
-        >
-          <GateFlowchart />
-        </motion.div>
+          <div className="prose" data-rv style={{ marginTop: "calc(40 * var(--u))", maxWidth: "46em" }}>
+            <p>
+              Large language models optimise for benchmark metrics. A patch that removes an
+              authorisation check will look faster and score better. <strong>Nothing in the model
+              stops it from shipping.</strong>
+            </p>
+            <p>
+              ProofStack takes the decision away from the model. Every candidate is executed in an
+              isolated microVM, measured against a reproducible baseline, and put through eight
+              gates that must <strong>all</strong> pass. One security regression and the patch is
+              dead â€” regardless of how fast it made things.
+            </p>
+            <p>
+              Deterministic code decides. The model only proposes.
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* Problem Comparison Section */}
-      <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 24px" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          style={{ textAlign: "center", marginBottom: "32px" }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "#F2B04A", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
-            Real Cases
-          </div>
-          <h2 style={{ fontSize: "36px", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>
-            Fast patches that break security.
+      {/* ============ PIPELINE FLOW ============ */}
+      <section className="sec wrap" id="pipeline">
+        <div className="sec__label label" data-rv>
+          Pipeline
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "20em" }}>
+            Five steps from a slow endpoint to a signed verdict.
           </h2>
-        </motion.div>
-
-        <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "24px" }}>
+        </div>
+        <ol className="flow">
           {[
-            { id: "idor" as const, label: "Cache IDOR" },
-            { id: "redos" as const, label: "ReDoS Trap" },
-            { id: "nplusone" as const, label: "N+1 + SQLi" },
-          ].map((tab) => (
-            <motion.button
-              key={tab.id}
-              onClick={() => setActiveProblem(tab.id)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "10px",
-                fontSize: "12px",
-                fontWeight: 600,
-                background: activeProblem === tab.id ? "rgba(25, 227, 255, 0.1)" : "transparent",
-                border: `1px solid ${activeProblem === tab.id ? "rgba(25, 227, 255, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
-                color: activeProblem === tab.id ? "#19E3FF" : "#8FA5AC",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              whileHover={{ scale: 1.02 }}
-            >
-              {tab.label}
-            </motion.button>
+            { no: "01", title: "Baseline Profile", body: "cProfile and pyperf measure p95 latency, SQL query count and memory footprint against a pinned commit." },
+            { no: "02", title: "Hypotheses", body: "Nemotron-3-Super drafts three competing architectural approaches with explicit trade-offs." },
+            { no: "03", title: "Sandbox Probing", body: "Each candidate runs in an isolated microVM with network=none, a 60 second cap and a 1 GB quota." },
+            { no: "04", title: "Patch Synthesis", body: "Nemotron-3.5-Lightning writes the defensive patch, then the diff is pinned to the run." },
+            { no: "05", title: "Verdict + Ledger", body: "Eight gates run. The result is sealed into a SHA-256 hash chain and cannot be edited afterwards." },
+          ].map((s, i) => (
+            <li key={s.no} data-rv>
+              <div className="flow__no">{s.no}</div>
+              <div className="flow__title">{s.title}</div>
+              <div className="flow__body">{s.body}</div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ============ GATES CARDS ============ */}
+      <section className="sec wrap" id="gates">
+        <div className="sec__label label" data-rv>
+          Gates
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "22em" }}>
+            Eight gates. A single failure rejects the patch.
+          </h2>
+        </div>
+        <div className="cards">
+          {[
+            { tag: "G0", title: "AST Integrity", body: "The diff must not touch the lockfile, weaken a type boundary or smuggle in an undeclared dependency." },
+            { tag: "G1", title: "Unit Tests", body: "The original 28 unit and integration tests re-execute in the sandbox. Zero behavioural change is tolerated." },
+            { tag: "G2", title: "Exploit Oracle", body: "IDOR, SQL injection and ReDoS probes run against the candidate. A leak is a leak, however small." },
+            { tag: "G3", title: "Identity Guard", body: "Authorisation predicates are compared before and after. Removing a tenant check fails instantly." },
+            { tag: "G4", title: "Concurrency", body: "Lost updates, blocking calls in async paths and pool deadlocks are detected under contention." },
+            { tag: "G5", title: "Performance", body: "Wall clock and CPU time must beat the noise floor of 5 percent. Marginal wins are treated as noise." },
+            { tag: "G6", title: "Memory", body: "tracemalloc growth stays under 20 MB. An in-process cache that leaks fails the gate." },
+            { tag: "G7", title: "Hygiene", body: "No hardcoded secrets, no eval, no unvetted subprocess calls, no undeclared supply chain additions." },
+          ].map((c) => (
+            <article className="card" key={c.tag} data-rv>
+              <div className="card__tag">{c.tag}</div>
+              <div className="card__title">{c.title}</div>
+              <div className="card__body">{c.body}</div>
+            </article>
           ))}
         </div>
-
-        <motion.div
-          key={activeProblem}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
-            maxWidth: "900px",
-            margin: "0 auto",
-          }}
-        >
-          <div
-            style={{
-              padding: "20px",
-              borderRadius: "14px",
-              background: "rgba(255, 122, 112, 0.05)",
-              border: "1px solid rgba(255, 122, 112, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: "11px", fontWeight: 600, color: "#FF7A70", marginBottom: "8px" }}>AI PATCH — REJECTED</div>
-            <pre
-              style={{
-                fontSize: "12px",
-                lineHeight: 1.6,
-                color: "#FF7A70",
-                fontFamily: "'JetBrains Mono', monospace",
-                margin: 0,
-                overflowX: "auto",
-              }}
-            >
-              {activeProblem === "idor"
-                ? `def get_cached(doc_id):\n    return redis.get(f"doc:{doc_id}")\n    # Missing tenant_id = IDOR!`
-                : activeProblem === "redos"
-                ? `EMAIL_REGEX = r"^([a-zA-Z0-9]+)*@([a-zA-Z0-9]+)*$"\n    # Catastrophic backtracking`
-                : `db.execute(f"SELECT * FROM orders\n    WHERE tenant = '{tenant_id}'")\n    # SQL injection`}
-            </pre>
-          </div>
-
-          <div
-            style={{
-              padding: "20px",
-              borderRadius: "14px",
-              background: "rgba(91, 201, 140, 0.05)",
-              border: "1px solid rgba(91, 201, 140, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: "11px", fontWeight: 600, color: "#5BC98C", marginBottom: "8px" }}>PROOFSTACK PATCH — ACCEPTED</div>
-            <pre
-              style={{
-                fontSize: "12px",
-                lineHeight: 1.6,
-                color: "#5BC98C",
-                fontFamily: "'JetBrains Mono', monospace",
-                margin: 0,
-                overflowX: "auto",
-              }}
-            >
-              {activeProblem === "idor"
-                ? `def get_cached(tenant_id, doc_id):\n    key = f"{tenant_id}:{hash(doc_id)}"\n    return redis.get(key)`
-                : activeProblem === "redos"
-                ? `EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@\\n    [a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"\n    # Linear time guaranteed`
-                : `db.query(Order).options(\n    joinedload(Order.customer))\\n    .filter(Order.tenant_id == tenant_id).all()`}
-            </pre>
-          </div>
-        </motion.div>
       </section>
 
-      {/* Evidence Ledger Section */}
-      <section id="ledger" style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 24px" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          style={{ textAlign: "center", marginBottom: "32px" }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "#5BC98C", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "8px" }}>
-            Cryptographic Proof
-          </div>
-          <h2 style={{ fontSize: "36px", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>
-            Every verdict, hash-chained.
+      {/* ============ CODE CONTRAST ============ */}
+      <section className="sec wrap">
+        <div className="sec__label label" data-rv>
+          Reality
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "20em" }}>
+            The patch that looked perfect and was not.
           </h2>
-          <p style={{ fontSize: "15px", color: "#8FA5AC", marginTop: "12px", maxWidth: "500px", margin: "12px auto 0" }}>
-            SHA-256 append-only ledger. Tamper any block → chain breaks → verdict invalidated.
+          <p className="prose" data-rv style={{ marginTop: "calc(32 * var(--u))", maxWidth: "40em" }}>
+            An AI cached checkout documents by id alone. It was fifteen times faster. It also let
+            Tenant B read Tenant A. The performance gate was green. The security gate was not.
           </p>
-        </motion.div>
+        </div>
+        <div className="codeblock" data-rv>
+          <span className="cmt">{"# AI candidate â€” REJECTED at gate G2"}</span>{"\n"}
+          <span className="neg">{"- def get_cached(doc_id):"}</span>{"\n"}
+          <span className="neg">{"-     return redis.get(f\"doc:{doc_id}\")"}</span>{"\n"}
+          <span className="neg">{"-     # tenant principal missing from the cache key"}</span>{"\n\n"}
+          <span className="cmt">{"# ProofStack candidate â€” ACCEPTED, 3/3 gates"}</span>{"\n"}
+          <span className="pos">{"+ def get_cached(tenant_id, doc_id):"}</span>{"\n"}
+          <span className="pos">{"+     key = f\"{tenant_id}:{sha256(doc_id)}\""}</span>{"\n"}
+          <span className="pos">{"+     return redis.get(key)"}</span>
+        </div>
+      </section>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          style={{
-            maxWidth: "800px",
-            margin: "0 auto",
-            padding: "24px",
-            borderRadius: "16px",
-            background: "rgba(14, 22, 25, 0.5)",
-            border: "1px solid rgba(25, 227, 255, 0.08)",
-          }}
-        >
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", lineHeight: 1.8 }}>
-            {[
-              { block: 0, label: "TASK_INTAKE", hash: "8f4b238e89c1…", color: "#19E3FF" },
-              { block: 1, label: "BASELINE", hash: "318cb92931ea…", color: "#00B8D4" },
-              { block: 2, label: "CANDIDATE_PATCH", hash: "45a89df0123b…", color: "#B08CF0" },
-              { block: 3, label: "GATE_RESULTS", hash: "e89012389012…", color: "#F2B04A" },
-              { block: 4, label: "FINAL_VERDICT", hash: "d4e1529a… [HEAD]", color: "#5BC98C" },
-            ].map((entry, i) => (
-              <motion.div
-                key={entry.block}
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+      {/* ============ LEDGER ROWS ============ */}
+      <section className="sec wrap" id="ledger">
+        <div className="sec__label label" data-rv>
+          Ledger
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "20em" }}>
+            Every verdict, hash-chained and tamper-evident.
+          </h2>
+          <p className="prose" data-rv style={{ marginTop: "calc(32 * var(--u))", maxWidth: "40em" }}>
+            Each state transition is appended to a SHA-256 chain. Mutate any block and every
+            subsequent link breaks. The audit trail is the product.
+          </p>
+        </div>
+        <ul className="topics">
+          {[
+            { no: "Block 0", label: "Task Intake", hash: "8f4b238e89c13289â€¦", status: "Sealed" },
+            { no: "Block 1", label: "Baseline Profile", hash: "318cb92931ea789dâ€¦", status: "Sealed" },
+            { no: "Block 2", label: "Candidate Patch", hash: "45a89df0123bc890â€¦", status: "Sealed" },
+            { no: "Block 3", label: "Gate Results", hash: "e890123890123890â€¦", status: "Sealed" },
+            { no: "Block 4", label: "Final Verdict", hash: "d4e1529a1b2c3d4eâ€¦", status: "Head" },
+          ].map((b) => (
+            <li key={b.no} data-rv>
+              <span className="topics__no">{b.no}</span>
+              <span className="topics__label">{b.label}</span>
+              <span className="topics__hash">{b.hash}</span>
+              <span className="topics__status">{b.status}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ============ DETECTORS ============ */}
+      <section className="sec wrap" id="detectors">
+        <div className="sec__label label" data-rv>
+          Detectors
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "18em" }}>
+            Nineteen problem classes, each with a working exploit.
+          </h2>
+          <p className="prose" data-rv style={{ marginTop: "calc(28 * var(--u))", maxWidth: "42em" }}>
+            Every class ships with a vulnerable fixture, the naive AI fix that a model will reach
+            for, and the hardened patch that passes. The probe method is executable, not
+            aspirational.
+          </p>
+        </div>
+
+        <div className="cards cards--3">
+          {TIERS.map((tier) => {
+            const items = detectors.filter((d) => d.tier === tier.id);
+            return (
+              <article className="card" key={tier.id} data-rv>
+                <div className="card__tag">
+                  {tier.id} Â· {tier.count} classes
+                </div>
+                <div className="card__title">{tier.name}</div>
+                <div className="card__body">{tier.body}</div>
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: "calc(20 * var(--u)) 0 0",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "calc(7 * var(--u))",
+                  }}
+                >
+                  {items.map((d) => (
+                    <li
+                      key={d.id}
+                      style={{
+                        display: "flex",
+                        gap: "calc(10 * var(--u))",
+                        fontSize: "calc(12.5 * var(--u))",
+                        lineHeight: 1.5,
+                        color: "var(--ink2)",
+                        borderTop: "1px solid var(--line)",
+                        paddingTop: "calc(9 * var(--u))",
+                      }}
+                    >
+                      <span
+                        className="mono"
+                        style={{ color: "var(--ink3)", flexShrink: 0, fontSize: "calc(11 * var(--u))" }}
+                      >
+                        {d.id}
+                      </span>
+                      <span>{d.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
+
+        <div style={{ marginTop: "calc(40 * var(--u))", display: "flex", gap: "calc(30 * var(--u))", flexWrap: "wrap" }} data-rv>
+          <button className="link-arrow" onClick={() => router.push("/catalog")}>
+            Browse the full catalogue
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      {/* ============ INTEGRATIONS ============ */}
+      <section className="sec wrap" id="integrations">
+        <div className="sec__label label" data-rv>
+          Integrate
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "16em" }}>
+            Runs where your code already lives.
+          </h2>
+        </div>
+        <div className="cards cards--4">
+          {[
+            { tag: "CLI", title: "proofstack verify", body: "Point it at a repo and a target. It profiles, patches, gates and writes the ledger locally. Exit code is the verdict." },
+            { tag: "CI", title: "GitHub Action", body: "One step in a pull request workflow. Every gate is enforced before merge, and the evidence pack is attached to the run." },
+            { tag: "API", title: "REST + SSE", body: "Trigger runs, stream live stage transitions, and pull reports programmatically. Every endpoint is documented in OpenAPI." },
+            { tag: "Hooks", title: "Webhooks", body: "Signed HMAC callbacks on each gate verdict and final decision, so your incident tooling learns the verdict first." },
+          ].map((c) => (
+            <article className="card" key={c.tag} data-rv>
+              <div className="card__tag">{c.tag}</div>
+              <div className="card__title">{c.title}</div>
+              <div className="card__body">{c.body}</div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* ============ PRICING / PLANS ============ */}
+      <section className="sec wrap" id="pricing">
+        <div className="sec__label label" data-rv>
+          Pricing
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "16em" }}>
+            Start free. Enforce everywhere.
+          </h2>
+          <p className="prose" data-rv style={{ marginTop: "calc(28 * var(--u))", maxWidth: "40em" }}>
+            The engine and the whole detector catalogue are open source. Paid tiers buy scale,
+            isolation and governance.
+          </p>
+        </div>
+        <div className="cards cards--3">
+          {[
+            {
+              tag: "Community",
+              title: "Free, forever",
+              price: "$0",
+              body: "All 19 detectors, local sandboxes, the full ledger, and the CLI. Runs on your own hardware with no telemetry leaving the box.",
+              items: ["All 19 detector classes", "Local microVM sandboxes", "Unlimited local runs", "Markdown + JSON evidence export"],
+            },
+            {
+              tag: "Team",
+              title: "Shared control plane",
+              price: "$15",
+              body: "Per seat, billed monthly. Adds hosted sandboxes, shared projects, token budgets and the GitHub Action.",
+              items: ["Hosted Nebius sandboxes", "GitHub Action + webhooks", "Shared projects and history", "Token budgets per member"],
+            },
+            {
+              tag: "Enterprise",
+              title: "Governed at scale",
+              price: "Custom",
+              body: "Self-hosted or dedicated tenancy, four-tier RBAC, immutable audit anchoring and a signed SLA.",
+              items: ["4-tier RBAC and tenant isolation", "Immutable ledger anchoring", "SSO, SCIM and audit export", "Signed SLA and dedicated support"],
+            },
+          ].map((plan) => (
+            <article className="card" key={plan.tag} data-rv>
+              <div className="card__tag">{plan.tag}</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "calc(8 * var(--u))", marginTop: "calc(16 * var(--u))" }}>
+                <div style={{ fontWeight: 300, fontSize: "calc(34 * var(--u))", lineHeight: 1 }}>{plan.price}</div>
+                <div style={{ fontSize: "calc(12 * var(--u))", color: "var(--ink2)" }}>{plan.title}</div>
+              </div>
+              <div className="card__body">{plan.body}</div>
+              <ul
                 style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "calc(20 * var(--u)) 0 0",
                   display: "flex",
-                  justifyContent: "space-between",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  marginBottom: "6px",
-                  border: `1px solid ${entry.color}15`,
+                  flexDirection: "column",
+                  gap: "calc(8 * var(--u))",
                 }}
               >
-                <span style={{ color: entry.color, fontWeight: 600 }}>
-                  BLOCK #{entry.block}
-                </span>
-                <span style={{ color: "#5F6F74" }}>{entry.label}</span>
-                <span style={{ color: "#8FA5AC" }}>{entry.hash}</span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+                {plan.items.map((it) => (
+                  <li
+                    key={it}
+                    style={{
+                      display: "flex",
+                      gap: "calc(9 * var(--u))",
+                      fontSize: "calc(12.5 * var(--u))",
+                      color: "var(--ink2)",
+                    }}
+                  >
+                    <span style={{ color: "var(--pass)" }}>âœ“</span>
+                    {it}
+                  </li>
+                ))}
+              </ul>
+              <button
+                className="link-arrow"
+                style={{ marginTop: "auto", alignSelf: "flex-start", fontSize: "calc(13 * var(--u))" }}
+                onClick={launch}
+              >
+                {plan.tag === "Community" ? "Run it now" : "Talk to us"}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
-          <h2 style={{ fontSize: "40px", fontWeight: 700, letterSpacing: "-0.02em", margin: "0 0 16px" }}>
-            Stop guessing. Start proving.
+      {/* ============ FINAL CTA ============ */}
+      <section className="sec wrap">
+        <div className="sec__label label" data-rv>
+          Start
+        </div>
+        <div className="sec__body">
+          <h2 className="h-xl" data-rv style={{ maxWidth: "14em" }}>
+            Run the first verification in under two minutes.
           </h2>
-          <p style={{ fontSize: "16px", color: "#8FA5AC", maxWidth: "500px", margin: "0 auto 32px" }}>
-            Run your first verification in under 2 minutes. No sign-up required.
+          <p className="prose" data-rv style={{ marginTop: "calc(28 * var(--u))", maxWidth: "38em" }}>
+            No sign-up. No credit card. Seeded repositories, live sandboxes, and a verdict you can
+            export as evidence the moment it lands.
           </p>
-          <motion.button
-            onClick={handleLaunchDemo}
-            className="btn-primary"
-            style={{ height: "52px", padding: "0 36px", fontSize: "15px" }}
-            whileHover={{ scale: 1.03, boxShadow: "0 0 40px rgba(25, 227, 255, 0.3)" }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Launch ProofStack
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-          </motion.button>
-        </motion.div>
+          <div style={{ marginTop: "calc(40 * var(--u))", display: "flex", gap: "calc(30 * var(--u))", flexWrap: "wrap" }} data-rv>
+            <button className="link-arrow" onClick={launch}>
+              Open the live cockpit
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+            <button className="link-arrow" onClick={() => router.push("/login")}>
+              Sign in with a role
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ borderTop: "1px solid rgba(25, 227, 255, 0.06)", padding: "32px 24px" }}>
-        <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 600 }}>ProofStack</span>
-            <span style={{ fontSize: "11px", color: "#5F6F74" }}>v1.0 · Apache-2.0</span>
+      {/* ============ FOOTER ============ */}
+      <footer className="site-footer">
+        <div className="wrap">
+          <div className="site-footer__cols">
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "calc(16 * var(--u))" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+                <span style={{ fontSize: "15px" }}>ProofStack</span>
+              </div>
+              <p style={{ fontSize: "calc(13 * var(--u))", lineHeight: 1.9, color: "var(--ink2)", maxWidth: "26em" }}>
+                Autonomous verification for AI-written fixes. Faster code, with proof it is still safe.
+              </p>
+            </div>
+            <div>
+              <div className="site-footer__title">Product</div>
+              <ul>
+                <li><a href="#pipeline">Pipeline</a></li>
+                <li><a href="#gates">Gates</a></li>
+                <li><a href="#ledger">Ledger</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="site-footer__title">Developers</div>
+              <ul>
+                <li><a href="#pipeline">Quickstart</a></li>
+                <li><a href="#gates">API reference</a></li>
+                <li><a href="#ledger">GitHub Action</a></li>
+                <li><a href="#pricing">Changelog</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="site-footer__title">Elsewhere</div>
+              <ul>
+                <li><a href="#top">Repository</a></li>
+                <li><a href="#top">Devpost</a></li>
+                <li><a href="#top">Contact</a></li>
+              </ul>
+            </div>
           </div>
-          <div style={{ fontSize: "12px", color: "#5F6F74" }}>
-            © 2026 · Built for Nebius × NVIDIA AI Hackathon
+          <div className="site-footer__bar">
+            <span>Â© 2026 ProofStack</span>
+            <span>Built for the Nebius Ã— NVIDIA Global AI Hackathon</span>
+            <span>Nemotron-3 Super 120B Â· Nebius Token Factory</span>
           </div>
         </div>
       </footer>

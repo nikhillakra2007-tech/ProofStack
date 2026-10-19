@@ -10,29 +10,30 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          950: "#060A12",
-          900: "#0B1220", // Authoritative dark ink background
-          850: "#0E1729",
-          800: "#131D31",
-          700: "#1E293B",
-          600: "#334155",
-          500: "#64748B",
-          400: "#94A3B8",
-          300: "#CBD5E1",
-          200: "#E2E8F0",
-          100: "#F1F5F9",
-          50: "#F8FAFC",
+          950: "#0a0a09",
+          900: "#121210",
+          850: "#141412",
+          800: "#1a1917",
+          750: "#201f1c",
+          700: "#2a2825",
+          600: "#3a3733",
+          500: "#6d6862",
+          400: "#7a766c",
+          300: "#9c978b",
+          200: "#cfc9bb",
+          100: "#e2ddd2",
+          50: "#e9e5da",
         },
         nemotron: {
-          DEFAULT: "#6366F1",
-          glow: "#818CF8",
-          dark: "#4338CA",
+          DEFAULT: "#8e5a36",
+          glow: "#c98d5e",
+          dark: "#5c3a22",
         },
         proof: {
-          accept: "#10B981",
-          reject: "#F43F5E",
-          inconclusive: "#F59E0B",
-          neutral: "#64748B",
+          accept: "#7fae7a",
+          reject: "#c26b5e",
+          inconclusive: "#b08a4a",
+          neutral: "#7a766c",
         }
       },
       fontFamily: {
@@ -40,8 +41,8 @@ module.exports = {
         sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
       },
       borderColor: {
-        hairline: "rgba(255, 255, 255, 0.08)",
-        subtle: "rgba(255, 255, 255, 0.14)",
+        hairline: "rgba(233, 229, 218, 0.10)",
+        subtle: "rgba(233, 229, 218, 0.18)",
       }
     },
   },

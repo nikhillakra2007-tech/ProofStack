@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export type ThemeMode = "light" | "dark" | "system";
 
 export type PaletteId =
+  | "warm-ink"
   | "cobalt-ledger"
   | "sage-walnut"
   | "blush-jet"
@@ -28,6 +29,13 @@ export interface PaletteMeta {
 }
 
 export const PALETTES: PaletteMeta[] = [
+  {
+    id: "warm-ink",
+    name: "Warm Ink",
+    subtitle: "warm black + bone white + burnt umber",
+    lightSwatches: ["#e9e5da", "#14130f", "#14130f", "#8e5a36"],
+    darkSwatches: ["#0a0a09", "#e9e5da", "#e9e5da", "#8e5a36"],
+  },
   {
     id: "cobalt-ledger",
     name: "Cobalt Ledger",
@@ -127,9 +135,9 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>("light");
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
-  const [palette, setPaletteState] = useState<PaletteId>("cobalt-ledger");
+  const [theme, setThemeState] = useState<ThemeMode>("dark");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
+  const [palette, setPaletteState] = useState<PaletteId>("warm-ink");
   const [density, setDensityState] = useState<DensityMode>("comfortable");
   const [isTampered, setIsTampered] = useState<boolean>(false);
   const [isCopilotOpen, setIsCopilotOpen] = useState<boolean>(false);
@@ -137,8 +145,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize from localStorage or media query
   useEffect(() => {
-    const savedTheme = (localStorage.getItem("proofstack_theme") as ThemeMode) || "system";
-    const savedPalette = (localStorage.getItem("proofstack_palette") as PaletteId) || "cobalt-ledger";
+    const savedTheme = (localStorage.getItem("proofstack_theme") as ThemeMode) || "dark";
+    const savedPalette = (localStorage.getItem("proofstack_palette") as PaletteId) || "warm-ink";
     const savedDensity = (localStorage.getItem("proofstack_density") as DensityMode) || "comfortable";
 
     setThemeState(savedTheme);

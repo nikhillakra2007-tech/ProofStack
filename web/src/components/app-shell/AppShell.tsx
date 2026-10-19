@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ThemeProvider, useTheme } from "@/lib/theme";
-import Sidebar from "./Sidebar";
-import Topbar from "./Topbar";
-import Footer from "./Footer";
-import CopilotFab from "./CopilotFab";
-import CommandPalette from "./CommandPalette";
-import IngestModal from "./IngestModal";
-import AICopilotDrawer from "./AICopilotDrawer";
+import Sidebar from "@/components/sidebar/Sidebar";
+import Topbar from "@/components/topbar/Topbar";
+import Footer from "@/components/footer/Footer";
+import CopilotFab from "@/components/copilot/CopilotFab";
+import CommandPalette from "@/components/command-palette/CommandPalette";
+import IngestModal from "@/components/ingest-modal/IngestModal";
+import AICopilotDrawer from "@/components/copilot/AICopilotDrawer";
 import { ROLES } from "@/lib/roles";
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
@@ -134,8 +135,6 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
     return (
       <div style={{ width: "100%", minHeight: "100vh", background: "var(--bg)" }}>
         {children}
-        <CopilotFab />
-        <AICopilotDrawer />
       </div>
     );
   }
@@ -145,8 +144,6 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
     return (
       <div className="ps nosidebar app-frame" style={{ width: "100%", height: "100vh" }}>
         {children}
-        <CopilotFab />
-        <AICopilotDrawer />
       </div>
     );
   }
@@ -165,7 +162,15 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
         />
 
         <main className="page" id="main-content">
-          <div className="page-container">{children}</div>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="page-container"
+          >
+            {children}
+          </motion.div>
         </main>
 
         <Footer />

@@ -5,6 +5,101 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
+import { MOCK_GATES, MOCK_HYPOTHESES, MOCK_IDENTITY_CHECKS } from "@/lib/mockData";
+import type { IdentityCheck } from "@/lib/types";
+
+const pct = (value: number) => Math.round(value * 100);
+
+const joinAnd = (items: string[]) => {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+};
+
+const SELECTED_HYPOTHESIS =
+  MOCK_HYPOTHESES.find((h) => h.status === "CONFIRMED") || MOCK_HYPOTHESES[0];
+
+const REFUTED_HYPOTHESES = MOCK_HYPOTHESES.filter(
+  (h) => h.id !== SELECTED_HYPOTHESIS.id
+);
+
+const PRESERVED_CHECKS = MOCK_IDENTITY_CHECKS.filter((c) => c.preserved).length;
+
+/**
+ * Identity Guard (G3) remediation snippets, one per identity check type.
+ * Each body names the invariant it protects and shows the exact diff that
+ * keeps that invariant alive in the candidate patch.
+ */
+function buildIdentityRemediation(check: IdentityCheck): string {
+  const header = `# ${check.type} guard: ${check.name}`;
+  const origin = `# baseline: ${check.baselineLocation} -> candidate: ${check.candidateLocation}`;
+
+  switch (check.type) {
+    case "parameter":
+      return `${header}
+${origin}
+# The scope parameter must survive the patch with its type and its wiring intact.
+--- a/orders.py
++++ b/orders.py
+@@ def get_orders(tenant_id: UUID, user_id: str, db: Session = Depends(get_db)) @@
+-def get_orders(tenant_id: str, user_id: str, db: Session = Depends(get_db)):
++def get_orders(tenant_id: UUID, user_id: str, db: Session = Depends(get_db)):
+     # ${check.name} is threaded into the query filter and into the cache key.`;
+
+    case "predicate":
+      return `${header}
+${origin}
+# The tenant equality predicate must remain in the candidate query filter.
+--- a/orders.py
++++ b/orders.py
+@@
+-    orders = db.query(Order).filter(Order.user_id == user_id).all()
++    orders = db.query(Order).filter(Order.tenant_id == tenant_id, Order.user_id == user_id).all()
+     # ${check.name} keeps every row inside the caller's tenant boundary.`;
+
+    case "decorator":
+      return `${header}
+${origin}
+# The authentication decorator must stay attached to the route handler.
+--- a/orders.py
++++ b/orders.py
+@@
+ @router.get("/orders")
+-def get_orders(tenant_id: UUID, user_id: str, db: Session = Depends(get_db)):
++@login_required
++def get_orders(tenant_id: UUID, user_id: str, db: Session = Depends(get_db)):
+     # ${check.name} gates the handler before any query is issued.`;
+
+    case "authorization_branch":
+    default:
+      return `${header}
+${origin}
+# The explicit cross-tenant rejection branch must remain in the candidate loop.
+--- a/orders.py
++++ b/orders.py
+@@
+     for order in orders:
++        if order.tenant_id != ctx.tenant:
++            raise PermissionDenied("Access forbidden")
+         order.customer_name = order.customer.name
+     # ${check.name} is the last line of defence before a foreign row is returned.`;
+  }
+}
+
+/**
+ * Fallback for a check id that has no verified fix template: it lists the
+ * identity invariants that must hold, taken from the shared identity data.
+ */
+function buildUnmappedRemediation(checkId: string): string {
+  const invariants = MOCK_IDENTITY_CHECKS.map(
+    (c) => `#   - ${c.type}: ${c.name}  (baseline ${c.baselineLocation})`
+  ).join("\n");
+
+  return `# Check ${checkId}: no verified fix template exists in the remediation registry.
+# Identity Guard G3 invariants that the candidate patch must preserve:
+${invariants}
+# Re-run the G0-G7 gauntlet before any verdict is accepted for this check.`;
+}
 
 function CockpitContent() {
   const router = useRouter();
@@ -51,6 +146,9 @@ function CockpitContent() {
 
   // Terminal logs state
   const [copiedLogs, setCopiedLogs] = useState<boolean>(false);
+
+  // Expandable hypothesis evidence (Tab 2)
+  const [expandedHypothesis, setExpandedHypothesis] = useState<string | null>(null);
 
   useEffect(() => {
     if (tabParam) {
@@ -124,11 +222,25 @@ function CockpitContent() {
       },
     };
 
-    const targetFix = fixes[checkId] || {
-      title: `${checkId}: Security Remediation`,
-      file: "config.py",
-      fix: `# Verified Defensive Fix synthesized via NVIDIA Nemotron 3.5\n# Invariant predicates preserved across all routes.`,
-    };
+    const identityCheck =
+      MOCK_IDENTITY_CHECKS.find((c) => c.type === checkId || c.name === checkId) ||
+      MOCK_IDENTITY_CHECKS.find(
+        (c) =>
+          c.type.toLowerCase().includes(checkId.toLowerCase()) ||
+          c.name.toLowerCase().includes(checkId.toLowerCase())
+      );
+
+    const targetFix = fixes[checkId] || (identityCheck
+      ? {
+          title: `${identityCheck.type}: ${identityCheck.name}`,
+          file: identityCheck.baselineLocation.split(":")[0] || "orders.py",
+          fix: buildIdentityRemediation(identityCheck),
+        }
+      : {
+          title: `${checkId}: Security Remediation`,
+          file: "config.py",
+          fix: buildUnmappedRemediation(checkId),
+        });
 
     setRemediationModal({ id: checkId, ...targetFix });
   };
@@ -507,71 +619,65 @@ function CockpitContent() {
 
           {/* 3 Hypothesis Cards */}
           <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
-            {/* H1 CONFIRMED */}
-            <div className="hyp win">
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <span className="id">H1</span>
-                <span className="chip pass">✓ CONFIRMED</span>
-              </div>
-              <div className="claim">
-                N+1 query explosion triggered by customer attribute read inside the order iteration loop.
-              </div>
-              <dl>
-                <dt>Model Score</dt>
-                <dd>94%</dd>
-                <dt>Computed Support</dt>
-                <dd>96%</dd>
-                <div className="meter">
-                  <i style={{ width: "96%" }} />
-                </div>
-                <dt>Experiment</dt>
-                <dd>counter_probe</dd>
-              </dl>
-            </div>
+            {MOCK_HYPOTHESES.map((h) => {
+              const isConfirmed = h.status === "CONFIRMED";
+              const isRefuted = h.status === "REFUTED";
+              const isExpanded = expandedHypothesis === h.id;
+              const statusChip = isConfirmed
+                ? { cls: "pass", label: "✓ CONFIRMED" }
+                : isRefuted
+                ? { cls: "fail", label: "✕ REFUTED" }
+                : { cls: "warn", label: "◷ TESTING" };
 
-            {/* H2 REFUTED */}
-            <div className="hyp">
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <span className="id">H2</span>
-                <span className="chip fail">✕ REFUTED</span>
-              </div>
-              <div className="claim">
-                Unindexed primary key scanning causing full table lock contention on orders table.
-              </div>
-              <dl>
-                <dt>Model Score</dt>
-                <dd>32%</dd>
-                <dt>Computed Support</dt>
-                <dd>8%</dd>
-                <div className="meter">
-                  <i style={{ width: "8%" }} />
-                </div>
-                <dt>Experiment</dt>
-                <dd>static_ast</dd>
-              </dl>
-            </div>
+              return (
+                <div
+                  key={h.id}
+                  className={`hyp ${isConfirmed ? "win" : ""}`}
+                  onClick={() => setExpandedHypothesis(isExpanded ? null : h.id)}
+                  style={{ cursor: "pointer" }}
+                  title="Click to expand the measured evidence for this hypothesis"
+                >
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <span className="id">{h.id}</span>
+                    <span className={`chip ${statusChip.cls}`}>{statusChip.label}</span>
+                  </div>
+                  <div className="claim">{h.claim}</div>
+                  <dl>
+                    <dt>Model Score</dt>
+                    <dd>{pct(h.modelScore)}%</dd>
+                    <dt>Computed Support</dt>
+                    <dd>{pct(h.computedSupport)}%</dd>
+                    <div className="meter">
+                      <i style={{ width: `${pct(h.computedSupport)}%` }} />
+                    </div>
+                    <dt>Experiment</dt>
+                    <dd>{h.experimentKind}</dd>
+                    {isExpanded && (
+                      <>
+                        <dt>Catalog Problem</dt>
+                        <dd>{h.problemId}</dd>
+                        <dt>Status</dt>
+                        <dd>{h.status}</dd>
+                      </>
+                    )}
+                  </dl>
 
-            {/* H3 REFUTED */}
-            <div className="hyp">
-              <div className="row" style={{ justifyContent: "space-between" }}>
-                <span className="id">H3</span>
-                <span className="chip fail">✕ REFUTED</span>
-              </div>
-              <div className="claim">
-                Connection pool starvation due to sync driver blocking within the async request context.
-              </div>
-              <dl>
-                <dt>Model Score</dt>
-                <dd>41%</dd>
-                <dt>Computed Support</dt>
-                <dd>12%</dd>
-                <div className="meter">
-                  <i style={{ width: "12%" }} />
+                  {isExpanded && (
+                    <div className="code" style={{ marginTop: "10px", fontSize: "11px" }}>
+                      <div className="bar">Code references</div>
+                      {h.codeRefs.map((ref) => (
+                        <div className="ln" key={`${ref.file}:${ref.lineStart}`}>
+                          <s>{ref.lineStart}</s>
+                          <em>
+                            {ref.file}:{ref.lineStart}-{ref.lineEnd}
+                          </em>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <dt>Experiment</dt>
-                <dd>race_harness</dd>
-              </dl>
-            </div>
+              );
+            })}
           </div>
 
           {/* Timeline Rail */}
@@ -589,13 +695,13 @@ function CockpitContent() {
               <div style={{ borderLeft: "2px solid var(--brand)", paddingLeft: "8px" }}>
                 <b style={{ fontSize: "12px", display: "block" }}>Hypotheses</b>
                 <span className="mono" style={{ fontSize: "10px", color: "var(--ink2)" }}>
-                  H1 · H2 · H3
+                  {MOCK_HYPOTHESES.map((h) => h.id).join(" · ")}
                 </span>
               </div>
               <div style={{ borderLeft: "2px solid var(--pass)", paddingLeft: "8px" }}>
                 <b style={{ fontSize: "12px", display: "block" }}>Discriminator</b>
                 <span className="mono" style={{ fontSize: "10px", color: "var(--pass)" }}>
-                  Score = 0.96
+                  Score = {SELECTED_HYPOTHESIS.computedSupport}
                 </span>
               </div>
               <div style={{ borderLeft: "2px solid var(--brand)", paddingLeft: "8px" }}>
@@ -607,7 +713,7 @@ function CockpitContent() {
               <div style={{ borderLeft: "2px solid var(--pass)", paddingLeft: "8px" }}>
                 <b style={{ fontSize: "12px", display: "block" }}>Gauntlet</b>
                 <span className="mono" style={{ fontSize: "10px", color: "var(--pass)" }}>
-                  G0 – G7 PASS
+                  {MOCK_GATES.length > 0 && `${MOCK_GATES[0].gateId} – ${MOCK_GATES[MOCK_GATES.length - 1].gateId} PASS`}
                 </span>
               </div>
               <div style={{ borderLeft: "2px solid var(--brand)", paddingLeft: "8px" }}>
@@ -630,19 +736,26 @@ function CockpitContent() {
             <div className="card">
               <div className="eyebrow">SELECTED HYPOTHESIS</div>
               <b style={{ fontSize: "15px", display: "block", marginTop: "4px" }}>
-                H1 · Confirmed
+                {SELECTED_HYPOTHESIS.id} ·{" "}
+                {SELECTED_HYPOTHESIS.status === "CONFIRMED"
+                  ? "Confirmed"
+                  : SELECTED_HYPOTHESIS.status}
               </b>
               <div className="sub" style={{ fontSize: "11.5px", marginTop: "4px" }}>
-                Computed support 96% beat refuted H2 (8%) and H3 (12%)
+                Computed support {pct(SELECTED_HYPOTHESIS.computedSupport)}% beat refuted{" "}
+                {joinAnd(
+                  REFUTED_HYPOTHESES.map((h) => `${h.id} (${pct(h.computedSupport)}%)`)
+                )}
               </div>
             </div>
             <div className="card">
               <div className="eyebrow">EXPERIMENT CHOSEN</div>
               <b className="mono" style={{ fontSize: "14px", display: "block", marginTop: "4px" }}>
-                e_counter_probe
+                e_{SELECTED_HYPOTHESIS.experimentKind}
               </b>
               <div className="sub mono" style={{ fontSize: "11.5px", marginTop: "4px" }}>
-                DISCRIMINATOR: Score(e_counter_probe) = 0.96
+                DISCRIMINATOR: Score(e_{SELECTED_HYPOTHESIS.experimentKind}) ={" "}
+                {SELECTED_HYPOTHESIS.computedSupport}
               </div>
             </div>
             <div className="card">
@@ -767,116 +880,43 @@ function CockpitContent() {
                 </b>
               </div>
               <span className="chip pass" style={{ marginLeft: "auto" }}>
-                5 / 5 PRESERVED
+                {PRESERVED_CHECKS} / {MOCK_IDENTITY_CHECKS.length} PRESERVED
               </span>
             </div>
 
             <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
-              <div
-                style={{
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 12px",
-                  background: "var(--bg)",
-                }}
-              >
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b className="mono" style={{ fontSize: "12px" }}>
-                    tenant_id: UUID
-                  </b>
-                  <span className="chip pass" style={{ fontSize: "9px" }}>
-                    PRESERVED
-                  </span>
+              {MOCK_IDENTITY_CHECKS.map((check, i) => (
+                <div
+                  key={`${check.type}:${check.name}`}
+                  style={{
+                    gridColumn: i === MOCK_IDENTITY_CHECKS.length - 1 ? "span 2" : undefined,
+                    border: "1px solid var(--line)",
+                    borderRadius: "7px",
+                    padding: "8px 12px",
+                    background: "var(--bg)",
+                  }}
+                >
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <b className="mono" style={{ fontSize: "12px" }}>
+                      {check.name}
+                    </b>
+                    <span
+                      className={`chip ${check.preserved ? "pass" : "fail"}`}
+                      style={{ fontSize: "9px" }}
+                    >
+                      {check.preserved ? "PRESERVED" : "NOT PRESERVED"}
+                    </span>
+                  </div>
+                  <div
+                    className="mono"
+                    style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}
+                  >
+                    {check.type} · {check.candidateLocation}
+                    {check.baselineLocation !== check.candidateLocation &&
+                      ` (baseline ${check.baselineLocation})`}
+                  </div>
                 </div>
-                <div className="mono" style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}>
-                  parameter · orders.py:42
-                </div>
-              </div>
-
-              <div
-                style={{
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 12px",
-                  background: "var(--bg)",
-                }}
-              >
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b className="mono" style={{ fontSize: "12px" }}>
-                    user_id: str
-                  </b>
-                  <span className="chip pass" style={{ fontSize: "9px" }}>
-                    PRESERVED
-                  </span>
-                </div>
-                <div className="mono" style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}>
-                  parameter · orders.py:42
-                </div>
-              </div>
-
-              <div
-                style={{
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 12px",
-                  background: "var(--bg)",
-                }}
-              >
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b className="mono" style={{ fontSize: "12px" }}>
-                    Order.tenant_id == tenant_id
-                  </b>
-                  <span className="chip pass" style={{ fontSize: "9px" }}>
-                    PRESERVED
-                  </span>
-                </div>
-                <div className="mono" style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}>
-                  predicate · orders.py:46
-                </div>
-              </div>
-
-              <div
-                style={{
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 12px",
-                  background: "var(--bg)",
-                }}
-              >
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b className="mono" style={{ fontSize: "12px" }}>
-                    @login_required
-                  </b>
-                  <span className="chip pass" style={{ fontSize: "9px" }}>
-                    PRESERVED
-                  </span>
-                </div>
-                <div className="mono" style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}>
-                  decorator · orders.py:40
-                </div>
-              </div>
-
-              <div
-                style={{
-                  gridColumn: "span 2",
-                  border: "1px solid var(--line)",
-                  borderRadius: "7px",
-                  padding: "8px 12px",
-                  background: "var(--bg)",
-                }}
-              >
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <b className="mono" style={{ fontSize: "12px" }}>
-                    if order.tenant_id != ctx.tenant: raise
-                  </b>
-                  <span className="chip pass" style={{ fontSize: "9px" }}>
-                    PRESERVED
-                  </span>
-                </div>
-                <div className="mono" style={{ fontSize: "10.5px", color: "var(--ink2)", marginTop: "3px" }}>
-                  authorization_branch · orders.py:52
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -943,125 +983,37 @@ function CockpitContent() {
 
           {/* 8 Gate Cells (4 x 2 Grid) */}
           <div className="gates">
-            {/* G0 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G0 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G0: Pre-gate</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">AST Scan, Slopsquatting &amp; Secrets</div>
-              <div className="p">Zero banned imports, zero committed keys, AST syntax valid.</div>
-            </div>
+            {MOCK_GATES.map((gate) => {
+              const isPass = gate.status === "PASS";
+              const isFail = gate.status === "FAIL";
+              const isError = gate.status === "ERROR";
+              const statusChip = isPass
+                ? { cls: "pass", label: "✓ PASS" }
+                : isFail
+                ? { cls: "fail", label: "✕ FAIL" }
+                : isError
+                ? { cls: "fail", label: "! ERROR" }
+                : { cls: "warn", label: "— NOT RUN" };
 
-            {/* G1 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G1 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G1: Correctness</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Baseline vs Candidate Test Suite</div>
-              <div className="p">All 28 baseline tests passed on candidate (0 regressions).</div>
-            </div>
-
-            {/* G2 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G2 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G2: Security</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Exploit Oracle Re-Execution</div>
-              <div className="p">Target red probe flipped RED -&gt; GREEN. Untouched probes stay GREEN.</div>
-            </div>
-
-            {/* G3 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G3 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G3: Identity</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Identity &amp; Auth Preservation</div>
-              <div className="p">user_id, tenant_id, and @login_required preserved in AST.</div>
-            </div>
-
-            {/* G4 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G4 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G4: Concurrency</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Race Condition &amp; Deadlock Watchdog</div>
-              <div className="p">20-thread stress completed: 0 lost updates, loop lag 12ms (&lt;50ms).</div>
-            </div>
-
-            {/* G5 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G5 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G5: Performance</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Truth-Hierarchy Invariant Check</div>
-              <div className="p">Exact SQL count: 5001 -&gt; 1. DeltaPerf = +74.2% (&gt; tau_noise 5.0%).</div>
-            </div>
-
-            {/* G6 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G6 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G6: Resources</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Tracemalloc &amp; FD Leak Monitor</div>
-              <div className="p">Memory growth: 1.2MB (&lt;20MB ceiling), open FD delta = 0 (&lt;5).</div>
-            </div>
-
-            {/* G7 */}
-            <div
-              className="gate"
-              onClick={() => handleTabChange(5)}
-              style={{ cursor: "pointer" }}
-              title="Click to view G7 in Sandbox logs"
-            >
-              <div className="h">
-                <span className="id">G7: Patch Hygiene</span>
-                <span className="chip pass">✓ PASS</span>
-              </div>
-              <div className="t">Writable Scope &amp; Lockfile Guard</div>
-              <div className="p">Diff strictly confined to writable paths; tests untouched.</div>
-            </div>
+              return (
+                <div
+                  key={gate.gateId}
+                  className={`gate ${isFail || isError ? "fail" : ""}`}
+                  onClick={() => handleTabChange(5)}
+                  style={{ cursor: "pointer" }}
+                  title={`Click to view ${gate.gateId} in Sandbox logs`}
+                >
+                  <div className="h">
+                    <span className="id">
+                      {gate.gateId}: {gate.name}
+                    </span>
+                    <span className={`chip ${statusChip.cls}`}>{statusChip.label}</span>
+                  </div>
+                  <div className="t">{gate.description}</div>
+                  <div className="p">{gate.details}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
