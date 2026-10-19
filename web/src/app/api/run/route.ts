@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MOCK_CATALOG } from "@/lib/mockData";
 
-const API_URL = process.env.PROOFSTACK_API_URL || "http://127.0.0.1:8000";
-const API_KEY = process.env.PROOFSTACK_API_KEY || "change-me-in-production";
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -11,12 +8,9 @@ export async function POST(req: NextRequest) {
 
     // Check if FastAPI backend is available on port 8000
     try {
-      const fastApiResponse = await fetch(`${API_URL}/api/run`, {
+      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/run", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": API_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(1500),
       });

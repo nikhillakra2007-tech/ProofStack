@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_URL = process.env.PROOFSTACK_API_URL || "http://127.0.0.1:8000";
-const API_KEY = process.env.PROOFSTACK_API_KEY || "change-me-in-production";
-
 export async function GET(req: NextRequest) {
   try {
-    const fastApiResponse = await fetch(`${API_URL}/api/tasks`, {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": API_KEY,
-      },
+    const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
+      headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(1500),
     });
     if (fastApiResponse.ok) {
@@ -57,12 +51,9 @@ export async function POST(req: NextRequest) {
 
     // Try FastAPI
     try {
-      const fastApiResponse = await fetch(`${API_URL}/api/tasks`, {
+      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": API_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(2000),
       });
