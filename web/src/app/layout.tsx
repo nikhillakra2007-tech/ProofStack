@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="light" data-palette="cobalt-ledger">
+    <html lang="en" data-theme="dark" data-palette="cyan-ink">
       <body>
         <LenisScrollProvider>
           <AppShell>{children}</AppShell>

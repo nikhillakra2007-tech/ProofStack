@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
 
 interface MarketingHeroProps {
   onOpenTour: () => void;
@@ -88,70 +89,117 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
     <section
       style={{
         position: "relative",
-        padding: "48px 28px 24px",
+        padding: "80px 28px 60px",
         maxWidth: "1400px",
         margin: "0 auto",
         width: "100%",
+        overflow: "hidden",
       }}
     >
-      {/* 2-Column Hero Grid */}
+      {/* Animated mesh gradient background */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse 80% 50% at 20% 40%, color-mix(in srgb, var(--brand) 18%, transparent) 0%, transparent 60%)," +
+            "radial-gradient(ellipse 60% 40% at 85% 60%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 50%)," +
+            "radial-gradient(ellipse 40% 30% at 50% 90%, color-mix(in srgb, var(--pass) 8%, transparent) 0%, transparent 40%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Grid overlay */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(color-mix(in srgb, var(--brand) 4%, transparent) 1px, transparent 1px)," +
+            "linear-gradient(90deg, color-mix(in srgb, var(--brand) 4%, transparent) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
       <div
         style={{
+          position: "relative",
           display: "grid",
           gridTemplateColumns: "1.05fr 1.15fr",
-          gap: "40px",
+          gap: "60px",
           alignItems: "center",
         }}
       >
         {/* Left Column: Headlines & CTA */}
-        <div>
-          {/* Sponsor Proof Chip */}
-          <div style={{ marginBottom: "16px" }}>
-            <span
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <div style={{ marginBottom: "20px" }}>
+            <motion.span
               className="chip brand"
               style={{
                 fontSize: "11px",
-                padding: "4px 10px",
+                padding: "5px 14px",
                 height: "auto",
                 fontWeight: 600,
                 textTransform: "none",
                 letterSpacing: ".02em",
                 borderRadius: "20px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
             >
               <svg style={{ width: "13px", height: "13px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 6v6l4 2" />
               </svg>
               Runs on Nebius Token Factory · NVIDIA Nemotron 3
-            </span>
+            </motion.span>
           </div>
 
-          {/* Headline (Lora Serif, 2 lines, no gradient text) */}
           <h1
             style={{
               fontFamily: "var(--f-display)",
-              fontSize: "56px",
-              lineHeight: 1.08,
-              letterSpacing: "-.02em",
+              fontSize: "64px",
+              lineHeight: 1.05,
+              letterSpacing: "-.03em",
               fontWeight: 600,
               color: "var(--ink)",
-              margin: "0 0 20px 0",
+              margin: "0 0 24px 0",
             }}
           >
             Make it faster.
             <br />
-            Prove it&apos;s still safe.
+            <span
+              style={{
+                background: "linear-gradient(135deg, var(--brand), var(--accent))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Prove it&apos;s still safe.
+            </span>
           </h1>
 
-          {/* Sub-headline */}
           <p
             style={{
-              fontSize: "16px",
-              lineHeight: 1.55,
+              fontSize: "17px",
+              lineHeight: 1.6,
               color: "var(--ink2)",
-              maxWidth: "540px",
-              margin: "0 0 28px 0",
+              maxWidth: "520px",
+              margin: "0 0 32px 0",
             }}
           >
             ProofStack investigates a slow endpoint, tests competing fixes in isolated
@@ -159,55 +207,66 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             security gates all pass. Every step is sealed into a hash-chained evidence ledger.
           </p>
 
-          {/* CTA Buttons */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px", flexWrap: "wrap" }}>
-            <button
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "18px", flexWrap: "wrap" }}>
+            <motion.button
               type="button"
               className="btn lg"
               onClick={handleOpenLiveDemo}
               style={{
                 cursor: "pointer",
-                padding: "0 22px",
+                padding: "0 28px",
                 fontSize: "14px",
                 fontWeight: 600,
+                background: "linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 80%, var(--accent)))",
+                border: "none",
+                color: "#fff",
+                borderRadius: "12px",
+                height: "48px",
+                boxShadow: "0 4px 24px color-mix(in srgb, var(--brand) 30%, transparent)",
               }}
+              whileHover={{ scale: 1.02, boxShadow: "0 8px 32px color-mix(in srgb, var(--brand) 40%, transparent)" }}
+              whileTap={{ scale: 0.98 }}
             >
               Open live demo
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               type="button"
               className="btn lg sec"
               onClick={onOpenTour}
               style={{
                 cursor: "pointer",
-                padding: "0 18px",
+                padding: "0 20px",
                 fontSize: "14px",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
+                borderRadius: "12px",
+                height: "48px",
+                border: "1px solid var(--line)",
+                background: "var(--surface)",
               }}
+              whileHover={{ scale: 1.02, borderColor: "var(--brand)" }}
+              whileTap={{ scale: 0.98 }}
             >
               <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
               Watch the 2-min tour
-            </button>
+            </motion.button>
           </div>
 
-          {/* Micro-copy */}
           <div
             style={{
               fontSize: "12px",
               color: "var(--ink3)",
-              marginBottom: "28px",
+              marginBottom: "32px",
               letterSpacing: ".01em",
             }}
           >
             No sign-up · seeded demo repos · live runs on Nebius Token Factory
           </div>
 
-          {/* Toolchain Chips */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--ink2)", marginRight: "4px" }}>
               Verifies
@@ -218,27 +277,49 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             <span className="chip">cProfile</span>
             <span className="chip">tracemalloc</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Column: Live Verdict Card (INV-4821) */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <div
             className="card"
             style={{
-              padding: "20px 22px",
-              boxShadow: "0 14px 34px rgba(0,0,0,0.08)",
-              border: "1px solid var(--line)",
-              background: "var(--surface)",
-              borderRadius: "12px",
+              padding: "24px 26px",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--brand) 15%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--brand) 20%, transparent)",
+              background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              borderRadius: "16px",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            {/* Header: INV-4821 & Verified badge */}
+            {/* Glow accent */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: "-40%",
+                right: "-20%",
+                width: "300px",
+                height: "300px",
+                background: "radial-gradient(circle, color-mix(in srgb, var(--brand) 15%, transparent) 0%, transparent 70%)",
+                pointerEvents: "none",
+              }}
+            />
+
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                marginBottom: "14px",
+                marginBottom: "16px",
+                position: "relative",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -257,8 +338,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               </span>
             </div>
 
-            {/* Steps summary */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "18px", position: "relative" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--ink)" }}>
                 <span style={{ color: "var(--pass)" }}>✓</span>
                 <span>Baseline profiled — p95 412 ms</span>
@@ -273,22 +353,21 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               </div>
             </div>
 
-            {/* Candidate Comparison (Side-by-Side) */}
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                gap: "12px",
-                marginBottom: "16px",
+                gap: "14px",
+                marginBottom: "18px",
+                position: "relative",
               }}
             >
-              {/* Candidate A · naive cache (REJECTED) */}
               <div
                 style={{
-                  border: "1px solid color-mix(in srgb, var(--fail) 35%, var(--line))",
-                  borderRadius: "8px",
-                  padding: "12px",
-                  background: "color-mix(in srgb, var(--fail) 3%, var(--surface))",
+                  border: "1px solid color-mix(in srgb, var(--fail) 30%, transparent)",
+                  borderRadius: "12px",
+                  padding: "14px",
+                  background: "color-mix(in srgb, var(--fail) 5%, var(--surface))",
                   opacity: replayStep < 4 ? 0.6 : 1,
                   transition: "all 200ms ease",
                 }}
@@ -299,7 +378,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                 <div
                   style={{
                     fontFamily: "var(--f-display)",
-                    fontSize: "26px",
+                    fontSize: "28px",
                     fontWeight: 700,
                     color: "var(--ink)",
                     margin: "2px 0 6px",
@@ -323,14 +402,13 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                 </div>
               </div>
 
-              {/* Candidate B · tenant-isolated (ACCEPTED) */}
               <div
                 style={{
-                  border: "1px solid color-mix(in srgb, var(--pass) 45%, var(--line))",
-                  borderRadius: "8px",
-                  padding: "12px",
+                  border: "1px solid color-mix(in srgb, var(--pass) 40%, transparent)",
+                  borderRadius: "12px",
+                  padding: "14px",
                   background: "color-mix(in srgb, var(--pass) 5%, var(--surface))",
-                  boxShadow: "0 2px 8px color-mix(in srgb, var(--pass) 12%, transparent)",
+                  boxShadow: "0 4px 20px color-mix(in srgb, var(--pass) 10%, transparent)",
                   opacity: replayStep < 5 ? 0.6 : 1,
                   transition: "all 200ms ease",
                 }}
@@ -341,7 +419,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                 <div
                   style={{
                     fontFamily: "var(--f-display)",
-                    fontSize: "26px",
+                    fontSize: "28px",
                     fontWeight: 700,
                     color: "var(--pass)",
                     margin: "2px 0 6px",
@@ -367,11 +445,11 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               </div>
             </div>
 
-            {/* Evidence Ledger Strip */}
             <div
               style={{
                 borderTop: "1px solid var(--line)",
-                paddingTop: "12px",
+                paddingTop: "14px",
+                position: "relative",
               }}
             >
               <div
@@ -379,7 +457,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: "8px",
+                  marginBottom: "10px",
                   fontSize: "11px",
                 }}
               >
@@ -391,13 +469,12 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                 </span>
               </div>
 
-              {/* 6 chained blocks with short hashes */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(6, 1fr)",
                   gap: "4px",
-                  marginBottom: "12px",
+                  marginBottom: "14px",
                 }}
               >
                 {[
@@ -413,9 +490,9 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                     <div
                       key={i}
                       style={{
-                        padding: "6px 4px",
+                        padding: "8px 4px",
                         border: "1px solid var(--line)",
-                        borderRadius: "5px",
+                        borderRadius: "6px",
                         background: isActive ? "var(--surface2)" : "transparent",
                         textAlign: "center",
                         opacity: isActive ? 1 : 0.4,
@@ -433,7 +510,6 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
                 })}
               </div>
 
-              {/* Actions row: Export evidence (Markdown) & Replay this run */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
                 <button
                   type="button"
@@ -466,14 +542,15 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               {replayToast && (
                 <div
                   style={{
-                    marginTop: "8px",
-                    padding: "6px 10px",
-                    borderRadius: "5px",
-                    background: "var(--surface2)",
+                    marginTop: "10px",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "color-mix(in srgb, var(--brand) 10%, var(--surface))",
                     fontSize: "11.5px",
                     color: "var(--brand)",
                     fontFamily: "var(--f-mono)",
                     textAlign: "center",
+                    border: "1px solid color-mix(in srgb, var(--brand) 20%, transparent)",
                   }}
                 >
                   {replayToast}
@@ -481,23 +558,29 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Bottom Hero Bar: Gate Pipeline */}
-      <div
+      <motion.div
         style={{
-          marginTop: "42px",
-          padding: "16px 20px",
-          border: "1px solid var(--line)",
-          borderRadius: "10px",
-          background: "var(--surface)",
+          marginTop: "48px",
+          padding: "20px 24px",
+          border: "1px solid color-mix(in srgb, var(--brand) 15%, transparent)",
+          borderRadius: "14px",
+          background: "color-mix(in srgb, var(--surface) 60%, transparent)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           flexWrap: "wrap",
-          gap: "14px",
+          gap: "16px",
+          position: "relative",
         }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>
@@ -505,7 +588,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
           </span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px" }}>
             <span style={{ color: "var(--pass)", fontWeight: 700 }}>✓</span>
             <b>Gate 1 Correctness</b>
@@ -533,7 +616,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             How it works ↓
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
