@@ -23,18 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const s = getStoredSession();
     if (s) {
       setSession(s);
-    } else {
-      // Default initial session for instant interactive exploration
-      const initial: UserSession = {
-        userId: "usr_developer",
-        tenantId: "00000000-0000-0000-0000-000000000001",
-        email: "dev@sentinel.internal",
-        role: "developer",
-        token: "jwt_sentinel_developer_signed",
-        canOverridePolicy: false,
-      };
-      setStoredSession(initial);
-      setSession(initial);
     }
   }, []);
 

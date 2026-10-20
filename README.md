@@ -1,9 +1,9 @@
 # Sentinel Gate — Autonomous AST Security Verification & Cryptographic Remediation Platform
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Production-D7BE82?style=for-the-badge&logo=vercel&logoColor=0E120D)](https://sentinel-gate-seven.vercel.app)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-515A47?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-7A4419?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![Audit](https://img.shields.io/badge/Merkle_Ledger-SHA--256-D7BE82?style=for-the-badge&logo=shield&logoColor=0E120D)](https://sentinel-gate-seven.vercel.app/ledger)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Production-38BDF8?style=for-the-badge&logo=vercel&logoColor=030712)](https://sentinel-gate-seven.vercel.app)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app)
+[![Audit](https://img.shields.io/badge/Merkle_Ledger-SHA--256-10B981?style=for-the-badge&logo=shield&logoColor=white)](https://sentinel-gate-seven.vercel.app/ledger)
 
 > **🚀 LIVE PRODUCTION PLATFORM**: **[https://sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)**  
 > *Engineered for High-Assurance AI Patch Synthesis, Zero-Day Exploit Neutralization, and Cryptographic Release Auditing.*
@@ -16,18 +16,29 @@ Deterministic Code Decides; The Generative Model Only Proposes.
 
 ## 🌐 Live Production Navigation Guide
 
-Access the complete Sentinel Gate platform directly on Vercel:
+Access every core module and dedicated role workspace directly on Vercel:
 
-| Platform Module | Production URL | Operational Role |
+| Platform Module | Production URL | Operational Role / Capability |
 | :--- | :--- | :--- |
-| **🌐 Public Landing & Walkthrough** | **[sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)** | 10-section cinematic walkthrough, demo video, and interactive radar. |
+| **🌐 Public Landing & Walkthrough** | **[sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)** | Cinematic 11-section walkthrough, demo video, interactive threat radar, and role selectors. |
 | **🛡️ Remediation Cockpit** | **[sentinel-gate-seven.vercel.app/cockpit](https://sentinel-gate-seven.vercel.app/cockpit)** | Side-by-side AST Hardened diff vs vulnerable source, 8-gate radar. |
 | **🔬 AST Studio** | **[sentinel-gate-seven.vercel.app/studio](https://sentinel-gate-seven.vercel.app/studio)** | Interactive Nemotron 70B prompt playground & synthetic repair testing. |
 | **🚨 Vulnerability Registry** | **[sentinel-gate-seven.vercel.app/findings](https://sentinel-gate-seven.vercel.app/findings)** | Triaged CVE/CWE vulnerability feed with automated confidence ranking. |
 | **⚡ OWASP DAST Sandbox** | **[sentinel-gate-seven.vercel.app/dast](https://sentinel-gate-seven.vercel.app/dast)** | 12 dynamic attack probes (SQLi, IDOR, SSRF, prototype pollution). |
 | **🔗 Merkle Audit Ledger** | **[sentinel-gate-seven.vercel.app/ledger](https://sentinel-gate-seven.vercel.app/ledger)** | SHA-256 Merkle chain verification with live block tamper simulation. |
 | **⚙️ Platform Settings** | **[sentinel-gate-seven.vercel.app/settings](https://sentinel-gate-seven.vercel.app/settings)** | In-app API keys for NVIDIA Nemotron, model parameters & hardware keys. |
-| **🔐 Role Authentication** | **[sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)** | 1-click RBAC access: Lead Developer, Security Auditor, Operations Admin. |
+| **🔐 Role Authentication** | **[sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)** | 1-click RBAC access with 4 verified operator personas. |
+
+### 👥 Dedicated Operator Role Portals
+
+Each operator role has an isolated workspace with security primitives tailored to their clearance:
+
+| Dedicated Role Portal | Live Route | Target Persona | Isolated Capabilities |
+| :--- | :--- | :--- | :--- |
+| **👨‍💻 Lead Developer** | **[/developer](https://sentinel-gate-seven.vercel.app/developer)** | Alex Chen (Staff Dev) | Tree-Sitter compiler grammar inspector, AST invariants, patch diff. |
+| **🔍 Security Auditor** | **[/auditor](https://sentinel-gate-seven.vercel.app/auditor)** | Elena Rostova (Lead Auditor) | SHA-256 Merkle chain verification, adversary bit-flip injection, audit packs. |
+| **🖥️ Operations Admin** | **[/admin](https://sentinel-gate-seven.vercel.app/admin)** | Marcus Vance (Ops Admin) | Ephemeral gVisor microVM pools, NVIDIA H100 inference quotas, CI/CD triggers. |
+| **👑 SuperAdmin (CISO)** | **[/ciso](https://sentinel-gate-seven.vercel.app/ciso)** | Dr. Sarah Lin (CISO) | Real-time zero-trust posture, SOC2/FedRAMP matrix, emergency dual-key gate. |
 
 ---
 
@@ -74,10 +85,10 @@ graph TD
         Q --> R[Auto Pull-Request Merged with Attestation]
     end
 
-    style Intake fill:#0E120D,stroke:#515A47,stroke-width:2px,color:#FDFBF7
-    style NeuralSynthesis fill:#151B13,stroke:#D7BE82,stroke-width:2px,color:#FDFBF7
-    style AdversarialSandbox fill:#1E261B,stroke:#7A4419,stroke-width:2px,color:#FDFBF7
-    style LedgerProof fill:#0E120D,stroke:#D7BE82,stroke-width:2px,color:#FDFBF7
+    style Intake fill:#0B0F19,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
+    style NeuralSynthesis fill:#0E1526,stroke:#F59E0B,stroke-width:2px,color:#F8FAFC
+    style AdversarialSandbox fill:#0B0F19,stroke:#10B981,stroke-width:2px,color:#F8FAFC
+    style LedgerProof fill:#030712,stroke:#A855F7,stroke-width:2px,color:#F8FAFC
 ```
 
 ---
@@ -122,9 +133,13 @@ The codebase is organized with **maximum 1–2 files per directory** for maintai
 frontend/src/
 ├── app/                              # Next.js App Router (2 files in root)
 │   ├── layout.tsx                    # Global Providers, Fonts & Metadata
-│   ├── page.tsx                      # 10-Section Cinematic Landing Page
+│   ├── page.tsx                      # 11-Section Cinematic Landing Page
+│   ├── admin/page.tsx                # Operations Admin Dedicated Workspace
+│   ├── auditor/page.tsx              # Security Auditor Dedicated Workspace
+│   ├── ciso/page.tsx                 # SuperAdmin CISO Executive Console
 │   ├── cockpit/page.tsx              # Remediation Cockpit & Side-by-Side AST Diff
 │   ├── dast/page.tsx                 # 12-Probe Dynamic Exploit Scanner
+│   ├── developer/page.tsx            # Lead Developer AST Invariant Workspace
 │   ├── findings/page.tsx             # Vulnerability Triage Registry
 │   ├── ledger/page.tsx               # SHA-256 Merkle Chain & Tamper Simulator
 │   ├── login/page.tsx                # Role-Based Authentication Controller
@@ -134,16 +149,16 @@ frontend/src/
 ├── components/                       # Strictly Organized (1-2 Files Per Directory)
 │   ├── bento-pillars/                # BentoPillars.tsx (3 Core Architectural Pillars)
 │   ├── boot-sequence/                # BootSequence.tsx (Hardware Telemetry Progression)
-│   ├── brand-logo/                   # BrandLogo.tsx (Precision Vector Shield SVG)
+│   ├── brand-logo/                   # BrandLogo.tsx (Precision Geometric Shield SVG)
 │   ├── comparison-matrix/            # ComparisonMatrix.tsx (Technical Superiority Matrix)
 │   ├── defense-pipeline/             # DefensePipeline.tsx (4-Stage Architecture Showcase)
 │   ├── demo-video/                   # DemoVideo.tsx (Interactive Video Walkthrough)
 │   ├── faq-accordion/                # FaqAccordion.tsx (Technical Deep-Dive FAQ)
 │   ├── footer/                       # Footer.tsx (Enterprise Footer with Live Backend Status)
 │   ├── hero-terminal/                # HeroTerminal.tsx (Live AST Invariant Terminal)
-│   ├── horizon-nav/                  # HorizonNav.tsx (Sticky Horizon Dock + Light/Dark Switcher)
+│   ├── horizon-nav/                  # HorizonNav.tsx (Sticky Horizon Dock + Role Switcher)
 │   ├── layout/                       # CurtainTransition.tsx, MainLayout.tsx (2 files)
-│   ├── particle-field/               # ParticleField.tsx (Interactive Constellation Canvas)
+│   ├── particle-field/               # ParticleField.tsx (Deep Cosmic Stars & Network Filaments)
 │   ├── resilience-calc/              # ResilienceCalc.tsx (Enterprise ROI & MTTR Calculator)
 │   ├── scroll-provider/              # ScrollProvider.tsx (Lenis Smooth Scrolling)
 │   └── sentinel-radar/               # SentinelRadar.tsx (Real-Time Threat Radar & Interceptor)
@@ -156,20 +171,22 @@ frontend/src/
 │   └── mockData.ts                   # Realistic Telemetry, Vulnerabilities & Ledger Blocks
 │
 └── styles/
-    └── globals.css                   # Custom Color Palette & High-DPI Glassmorphism (1 file)
+    └── globals.css                   # Cosmic Pitch Black & Clean Porcelain Themes (1 file)
 ```
 
 ---
 
-## 🎨 Luxury Palette Tokens
+## 🎨 Cosmic Deep Black & Harmonious Multi-Color System
 
-Curated palette (`coolors.co/515a47-d7be82-7a4419`):
+The visual system is engineered for dual-mode excellence:
 
-- **Deep Ebony**: `#515A47` (Invariants, structural borders, subtle accents)
-- **Soft Fawn (Primary Gold)**: `#D7BE82` (Glows, primary buttons, interactive highlights)
-- **Saddle Brown (Bronze/Amber)**: `#7A4419` (Exploit warnings, gradient depths)
-- **Luxury Obsidian Base**: `#0E120D` / `#151B13` (Dark mode surface)
-- **Luxury Alabaster Base**: `#FAF8F5` / `#FFFFFF` (Light mode surface)
+- **Dark Mode (Default)**: Deep Cosmic Pitch Black (`#030712` / `#000000`) canvas. Interactive constellation network with twinkling stars and vibrant glowing cyber nodes:
+  - **Electric Azure (`#38BDF8`)**: Primary brand actions, active routes, and telemetry.
+  - **Neon Emerald (`#10B981`)**: AST verified state, passed exploit probes, and healthy runners.
+  - **Cyber Gold (`#F59E0B`)**: Merkle blocks, root hash signatures, and cryptographic seals.
+  - **Cosmic Violet (`#A855F7`)**: Zero-trust compliance frameworks and CISO executive controls.
+  - **Oracle Crimson (`#F43F5E`)**: Adversary tamper simulation and critical exploit vectors.
+- **Light Mode**: High-contrast, clean porcelain alabaster (`#F8FAFC` / `#FFFFFF`) with crisp slate borders (`#E2E8F0`). **Zero muddy brown tones.**
 
 ---
 

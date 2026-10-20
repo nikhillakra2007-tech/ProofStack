@@ -1,43 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #0E120D;
-  --surface: #151B13;
-  --surface-raised: rgba(21, 27, 19, 0.85);
-  --card-bg: #151B13;
-  --ebony: #515A47;
-  --fawn: #D7BE82;
-  --saddle: #7A4419;
+  /* DARK MODE: Deep Cosmic Pitch Black with Radiant Cyber Multi-Color Accents */
+  --bg: #030712;
+  --surface: #0B0F19;
+  --surface-raised: rgba(11, 15, 25, 0.85);
+  --card-bg: #0E1526;
   
-  --line: rgba(81, 90, 71, 0.35);
-  --line-strong: rgba(215, 190, 130, 0.35);
+  --primary: #38BDF8;
+  --primary-glow: rgba(56, 189, 248, 0.25);
   
-  --ink: #FDFBF7;
-  --ink-secondary: #D7BE82;
-  --ink-body: #D6D1C4;
-  --ink-muted: #9E9889;
+  --cyan: #06B6D4;
+  --azure: #38BDF8;
+  --emerald: #10B981;
+  --gold: #F59E0B;
+  --violet: #A855F7;
+  --rose: #F43F5E;
+  --fawn: #F59E0B;
+  
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(56, 189, 248, 0.35);
+  --line-subtle: rgba(255, 255, 255, 0.04);
+  
+  --ink: #F8FAFC;
+  --ink-secondary: #E2E8F0;
+  --ink-body: #94A3B8;
+  --ink-muted: #64748B;
 }
 
 html.light, [data-theme="light"] {
-  --bg: #FAF8F5;
+  /* LIGHT MODE: Crisp High-Contrast Porcelain Alabaster - Zero Muddy Brown */
+  --bg: #F8FAFC;
   --surface: #FFFFFF;
   --surface-raised: rgba(255, 255, 255, 0.95);
   --card-bg: #FFFFFF;
-  --ebony: #515A47;
-  --fawn: #B8974D;
-  --saddle: #7A4419;
   
-  --line: rgba(81, 90, 71, 0.18);
-  --line-strong: rgba(184, 151, 77, 0.35);
+  --primary: #0284C7;
+  --primary-glow: rgba(2, 132, 199, 0.15);
   
-  --ink: #1B2219;
-  --ink-secondary: #7A4419;
-  --ink-body: #384033;
-  --ink-muted: #6B7264;
+  --cyan: #0891B2;
+  --azure: #0284C7;
+  --emerald: #059669;
+  --gold: #D97706;
+  --violet: #7C3AED;
+  --rose: #E11D48;
+  --fawn: #D97706;
+  
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(2, 132, 199, 0.3);
+  --line-subtle: rgba(15, 23, 42, 0.04);
+  
+  --ink: #0F172A;
+  --ink-secondary: #1E293B;
+  --ink-body: #475569;
+  --ink-muted: #64748B;
 }
 
 * {
@@ -57,11 +77,11 @@ html, body {
 }
 
 ::selection {
-  background: rgba(215, 190, 130, 0.3);
+  background: rgba(56, 189, 248, 0.3);
   color: var(--ink);
 }
 
-/* Custom Luxury Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -70,14 +90,14 @@ html, body {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(81, 90, 71, 0.5);
+  background: var(--line-strong);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--fawn);
+  background: var(--primary);
 }
 
-/* Natural Modern Glass Panels */
+/* Glass Panels */
 .glass-panel {
   background: var(--surface-raised);
   backdrop-filter: blur(20px);
@@ -89,7 +109,7 @@ html, body {
 .glass-panel-glow {
   background: var(--surface);
   border: 1px solid var(--line-strong);
-  box-shadow: 0 10px 30px rgba(215, 190, 130, 0.08);
+  box-shadow: 0 10px 30px var(--primary-glow);
 }
 
 /* Interactive Clean Hover */
@@ -99,30 +119,24 @@ html, body {
 .interactive-card:hover {
   transform: translateY(-2px);
   border-color: var(--line-strong);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
-/* Natural Heading Gradient */
+/* Heading Gradients */
 .text-gradient {
-  background: linear-gradient(135deg, var(--ink) 30%, var(--fawn) 80%, var(--saddle) 100%);
+  background: linear-gradient(135deg, var(--ink) 30%, var(--primary) 70%, var(--violet) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Subtle Glowing Orbs in Palette Colors */
-@keyframes orbFloat {
-  0%, 100% {
-    transform: translateY(0px) scale(1);
-  }
-  50% {
-    transform: translateY(-24px) scale(1.05);
-  }
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--rose) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.orb-ambient-1 {
-  animation: orbFloat 16s ease-in-out infinite;
-}
-
-.orb-ambient-2 {
-  animation: orbFloat 20s ease-in-out infinite reverse;
+.text-gradient-azure {
+  background: linear-gradient(135deg, var(--azure) 0%, var(--emerald) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

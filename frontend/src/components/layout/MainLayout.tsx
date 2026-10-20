@@ -22,38 +22,20 @@ export function MainLayout({ children }: MainLayoutProps) {
         overflowX: "hidden",
       }}
     >
-      {/* Interactive Particle Constellation Joining Background */}
+      {/* Interactive Particle & Star Constellation Network */}
       <ParticleField />
 
-      {/* Ambient Radiant Glows in Soft Fawn (D7BE82) & Saddle Brown (7A4419) & Ebony (515A47) */}
+      {/* Cyber Celestial Ambient Radiance */}
       <div
-        className="orb-ambient-1"
+        className="orb-ambient-1 pointer-events-none fixed -top-40 left-[10%] w-[650px] h-[650px] rounded-full blur-[110px] -z-10"
         style={{
-          position: "fixed",
-          top: "-160px",
-          left: "15%",
-          width: "650px",
-          height: "650px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(215, 190, 130, 0.14) 0%, rgba(81, 90, 71, 0.08) 50%, transparent 70%)",
-          filter: "blur(90px)",
-          pointerEvents: "none",
-          zIndex: 0,
+          background: "radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(168, 85, 247, 0.06) 50%, transparent 70%)",
         }}
       />
       <div
-        className="orb-ambient-2"
+        className="orb-ambient-2 pointer-events-none fixed top-[40%] -right-40 w-[700px] h-[700px] rounded-full blur-[120px] -z-10"
         style={{
-          position: "fixed",
-          top: "45%",
-          right: "-160px",
-          width: "700px",
-          height: "700px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(122, 68, 25, 0.16) 0%, rgba(215, 190, 130, 0.06) 50%, transparent 70%)",
-          filter: "blur(100px)",
-          pointerEvents: "none",
-          zIndex: 0,
+          background: "radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(56, 189, 248, 0.05) 50%, transparent 70%)",
         }}
       />
 

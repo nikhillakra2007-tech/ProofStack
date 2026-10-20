@@ -14,6 +14,7 @@ export interface RoleDefinition {
   roleTitle: string;
   description: string;
   badgeColor: string;
+  defaultPath: string;
   canAccessStudio: boolean;
   canApproveRelease: boolean;
   canOverridePolicy: boolean;
@@ -26,6 +27,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     roleTitle: "Staff Software Engineer",
     description: "Synthesize patches, inspect AST diffs, and run DAST exploit probes.",
     badgeColor: "#10B981",
+    defaultPath: "/developer",
     canAccessStudio: true,
     canApproveRelease: false,
     canOverridePolicy: false,
@@ -36,6 +38,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     roleTitle: "Cryptographic Assurance Auditor",
     description: "Inspect SHA-256 Merkle chain, simulate tamper vectors, export audit packs.",
     badgeColor: "#38BDF8",
+    defaultPath: "/auditor",
     canAccessStudio: false,
     canApproveRelease: false,
     canOverridePolicy: false,
@@ -46,6 +49,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     roleTitle: "DevSecOps Infrastructure Admin",
     description: "Manage token quotas, monitor microVM pools, and triage findings.",
     badgeColor: "#818CF8",
+    defaultPath: "/admin",
     canAccessStudio: true,
     canApproveRelease: true,
     canOverridePolicy: false,
@@ -56,6 +60,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     roleTitle: "Chief Information Security Officer",
     description: "Full control plane authority, root signing key, emergency policy override.",
     badgeColor: "#F59E0B",
+    defaultPath: "/ciso",
     canAccessStudio: true,
     canApproveRelease: true,
     canOverridePolicy: true,
@@ -64,13 +69,13 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 };
 
 export const PRESET_USERS: Array<{ email: string; role: UserRole; name: string }> = [
-  { email: "developer@proofstack.internal", role: "developer", name: "Alex Chen (Staff Dev)" },
-  { email: "auditor@proofstack.internal", role: "auditor", name: "Elena Rostova (Lead Auditor)" },
-  { email: "admin@proofstack.internal", role: "admin", name: "Marcus Vance (Ops Admin)" },
-  { email: "ciso@proofstack.internal", role: "super_admin", name: "Dr. Sarah Lin (CISO)" },
+  { email: "developer@sentinel.internal", role: "developer", name: "Alex Chen (Staff Dev)" },
+  { email: "auditor@sentinel.internal", role: "auditor", name: "Elena Rostova (Lead Auditor)" },
+  { email: "admin@sentinel.internal", role: "admin", name: "Marcus Vance (Ops Admin)" },
+  { email: "ciso@sentinel.internal", role: "super_admin", name: "Dr. Sarah Lin (CISO)" },
 ];
 
-const STORAGE_KEY = "proofstack_session";
+const STORAGE_KEY = "sentinel_session";
 
 export function getStoredSession(): UserSession | null {
   if (typeof window === "undefined") return null;
