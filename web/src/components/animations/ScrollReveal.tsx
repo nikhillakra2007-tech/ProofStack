@@ -19,11 +19,13 @@ export default function ScrollReveal() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-in");
-            observer.unobserve(entry.target);
+          } else {
+            // Reverse transition when scrolling away
+            entry.target.classList.remove("is-in");
           }
         });
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 }
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 }
     );
 
     nodes.forEach((node) => observer.observe(node));

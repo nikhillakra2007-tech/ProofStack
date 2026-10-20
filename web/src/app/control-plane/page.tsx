@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@/lib/roles";
+import MainLayout from "@/components/layout/MainLayout";
 
 interface TeamMember {
   id: string;
@@ -146,8 +147,9 @@ export default function ControlPlanePage() {
   };
 
   return (
-    <div style={{ paddingBottom: "32px" }}>
-      {/* Header (PDF p. 30) */}
+    <MainLayout>
+      <div style={{ paddingBottom: "32px" }}>
+        {/* Header (PDF p. 30) */}
       <div className="pagehead">
         <div>
           <div className="eyebrow">Enterprise Governance</div>
@@ -837,5 +839,6 @@ export default function ControlPlanePage() {
         </div>
       )}
     </div>
+    </MainLayout>
   );
 }

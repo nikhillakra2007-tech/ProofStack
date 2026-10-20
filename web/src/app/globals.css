@@ -55,7 +55,63 @@ button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visib
 @keyframes sphereIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes headerIn { from { transform: translate3d(0, -120%, 0); } to { transform: none; } }
 @keyframes loaderSpin { to { transform: rotate(360deg); } }
-@keyframes flowDash { to { stroke-dashoffset: -20; } }
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -30px) scale(1.12); }
+}
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, 40px) scale(1.15); }
+}
+@keyframes floatOrb3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 50px) scale(0.92); }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.45; filter: blur(75px); }
+  50% { opacity: 0.8; filter: blur(95px); }
+}
+
+.ambient-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.orb-glow-1 {
+  position: absolute;
+  top: -10%;
+  left: 20%;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 70%);
+  filter: blur(80px);
+  animation: floatOrb1 18s ease-in-out infinite, glowPulse 8s ease-in-out infinite;
+}
+.orb-glow-2 {
+  position: absolute;
+  top: 40%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.18) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 70%);
+  filter: blur(90px);
+  animation: floatOrb2 22s ease-in-out infinite, glowPulse 10s ease-in-out infinite 2s;
+}
+.orb-glow-3 {
+  position: absolute;
+  bottom: -15%;
+  left: 10%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(6, 182, 212, 0.09) 50%, transparent 70%);
+  filter: blur(85px);
+  animation: floatOrb3 20s ease-in-out infinite, glowPulse 9s ease-in-out infinite 4s;
+}
 
 /* ---------- type scale ---------- */
 .label {
@@ -120,12 +176,16 @@ button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visib
 .mk__in { display: block; transform: translate3d(0, calc(100% + .4em), 0); transition: transform 1.25s cubic-bezier(.2, .75, .1, 1) var(--hero-d); }
 .is-in .mk__in { transform: none; }
 
-/* ---------- scroll reveal ---------- */
-[data-rv] { opacity: 0; transform: translate3d(0, 16px, 0); }
+/* ---------- scroll reveal (bidirectional with reverse transitions) ---------- */
+[data-rv] {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out);
+  will-change: opacity, transform;
+}
 [data-rv].is-in {
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  animation: contentFadeUp 1s var(--ease-out) both;
 }
 
 /* ---------- fixed header w/ blend mode ---------- */
@@ -149,15 +209,15 @@ button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visib
 /* ---------- hero ---------- */
 .hero {
   position: relative;
-  height: 100vh;
-  height: 100svh;
-  min-height: calc(620 * var(--u));
-  max-height: calc(1100 * var(--u));
-  overflow: hidden;
+  min-height: 100vh;
+  padding-top: calc(96 * var(--u));
+  padding-bottom: calc(64 * var(--u));
+  overflow: visible;
   isolation: isolate;
   background: #050504;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 .hero__inner { width: 100%; max-width: calc(1280 * var(--u)); margin-inline: auto; padding-inline: var(--gut); }
 .hero__kicker {
@@ -208,9 +268,12 @@ button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visib
 
 /* ---------- hero foot ---------- */
 .hero__foot {
-  position: absolute;
-  left: var(--gut); right: var(--gut); bottom: calc(28 * var(--u));
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+  position: relative;
+  left: auto; right: auto; bottom: auto;
+  margin-top: calc(36 * var(--u));
+  width: 100%; max-width: calc(1280 * var(--u));
+  margin-inline: auto; padding-inline: var(--gut);
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
   opacity: 0;
 }
 .hero__foot.is-in { animation: heroIn 1.25s var(--ease) calc(var(--hero-d) + .3s) both; }

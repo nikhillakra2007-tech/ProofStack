@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES, TENANT_UUID } from "@/lib/roles";
 import { MOCK_CATALOG } from "@/lib/mockData";
+import MainLayout from "@/components/layout/MainLayout";
 
 interface FindingRecord {
   id: string;
@@ -1057,8 +1058,10 @@ function FindingsContent() {
 
 export default function FindingsPage() {
   return (
-    <Suspense fallback={<div className="card">Loading Findings...</div>}>
-      <FindingsContent />
-    </Suspense>
+    <MainLayout>
+      <Suspense fallback={<div className="card">Loading Findings...</div>}>
+        <FindingsContent />
+      </Suspense>
+    </MainLayout>
   );
 }

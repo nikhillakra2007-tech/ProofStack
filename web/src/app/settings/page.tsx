@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme, PALETTES } from "@/lib/theme";
 import { ROLES, TENANT_UUID } from "@/lib/roles";
+import MainLayout from "@/components/layout/MainLayout";
 
 export default function SettingsPage() {
   const { session, role } = useAuth();
@@ -93,8 +94,9 @@ export default function SettingsPage() {
   };
 
   return (
-    <div>
-      {/* Page Header (PDF p. 32) */}
+    <MainLayout>
+      <div>
+        {/* Page Header (PDF p. 32) */}
       <div className="pagehead">
         <div>
           <div className="eyebrow">Administration</div>
@@ -920,5 +922,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </MainLayout>
   );
 }

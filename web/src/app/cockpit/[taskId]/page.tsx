@@ -7,6 +7,7 @@ import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
 import { MOCK_GATES, MOCK_HYPOTHESES, MOCK_IDENTITY_CHECKS } from "@/lib/mockData";
 import type { IdentityCheck } from "@/lib/types";
+import MainLayout from "@/components/layout/MainLayout";
 
 const pct = (value: number) => Math.round(value * 100);
 
@@ -1456,8 +1457,10 @@ function CockpitContent() {
 
 export default function CockpitPage() {
   return (
-    <Suspense fallback={<div className="card">Loading Cockpit...</div>}>
-      <CockpitContent />
-    </Suspense>
+    <MainLayout>
+      <Suspense fallback={<div className="card">Loading Cockpit...</div>}>
+        <CockpitContent />
+      </Suspense>
+    </MainLayout>
   );
 }

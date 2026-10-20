@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MOCK_CATALOG } from "@/lib/mockData";
 import { CatalogProblem } from "@/lib/types";
+import MainLayout from "@/components/layout/MainLayout";
 
 const ALL = "All";
 
@@ -65,8 +66,9 @@ export default function CatalogPage() {
   };
 
   return (
-    <div>
-      {/* Header (PDF p. 29) */}
+    <MainLayout>
+      <div>
+        {/* Header (PDF p. 29) */}
       <div className="pagehead">
         <div>
           <div className="eyebrow">Reference</div>
@@ -340,5 +342,6 @@ export default function CatalogPage() {
         </div>
       )}
     </div>
+    </MainLayout>
   );
 }

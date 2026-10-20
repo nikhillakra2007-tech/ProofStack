@@ -1,11 +1,16 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { MOCK_CATALOG } from "@/lib/mockData";
-import Chatbot from "@/components/chatbot/Chatbot";
+import HorizonNav from "@/components/horizon-nav/HorizonNav";
+import { useCurtain } from "@/components/layout/CurtainTransition";
 import ScrollReveal from "@/components/animations/ScrollReveal";
+import HeroVisual from "@/components/hero-visual/HeroVisual";
+import PhilosophyVisual from "@/components/philosophy-visual/PhilosophyVisual";
+import PipelineVisual from "@/components/pipeline-visual/PipelineVisual";
+import LedgerVisual from "@/components/ledger-visual/LedgerVisual";
 
 const NAV = [
   { label: "Philosophy", href: "#philosophy" },
@@ -40,7 +45,7 @@ const TIERS = [
 export default function PublicHomePage() {
   const router = useRouter();
   const { loginAs } = useAuth();
-  const [isMenu, setIsMenu] = useState(false);
+  const { navigateWithCurtain } = useCurtain();
   const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
@@ -50,7 +55,7 @@ export default function PublicHomePage() {
 
   const launch = () => {
     loginAs("developer");
-    router.push("/cockpit/TASK9142");
+    navigateWithCurtain("/cockpit/TASK9142", "Remediation Cockpit");
   };
 
   const detectors = useMemo(() => MOCK_CATALOG, []);
@@ -59,40 +64,8 @@ export default function PublicHomePage() {
     <div className="ac-site" style={{ background: "var(--bg)", color: "var(--ink)" }}>
       <ScrollReveal />
 
-      {/* ============ FIXED BLEND HEADER ============ */}
-      <header className={`blend-header ${isMenu ? "is-menu" : ""}`}>
-        <div className="blend-header__inner wrap">
-          <a href="#top" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <polygon points="12 2 2 7 12 12 22 7 12 2" />
-              <polyline points="2 17 12 22 22 17" />
-              <polyline points="2 12 12 17 22 12" />
-            </svg>
-            <span style={{ fontSize: "14px", letterSpacing: ".04em" }}>ProofStack</span>
-          </a>
-
-          <nav style={{ display: "flex", gap: "28px", alignItems: "center" }}>
-            {NAV.map((n) => (
-              <a key={n.href} href={n.href} style={{ fontSize: "13px" }}>
-                {n.label}
-              </a>
-            ))}
-            <button
-              onClick={launch}
-              style={{ fontSize: "13px", borderBottom: "1px solid currentColor", paddingBottom: "3px" }}
-            >
-              Live demo
-            </button>
-            <button
-              onClick={() => setIsMenu((m) => !m)}
-              style={{ display: "none", fontSize: "13px" }}
-              aria-label="Menu"
-            >
-              Menu
-            </button>
-          </nav>
-        </div>
-      </header>
+      {/* Horizon Navigation Bar with Curtain Transitions */}
+      <HorizonNav />
 
       {/* ============ HERO ============ */}
       <section className="hero" id="top">
@@ -125,6 +98,8 @@ export default function PublicHomePage() {
           <p className={`hero__sub ${heroReady ? "is-in" : ""}`}>
             AI writes the patch. ProofStack decides whether it ships.
           </p>
+
+          <HeroVisual />
         </div>
 
         {/* spinning mark */}
@@ -169,6 +144,7 @@ export default function PublicHomePage() {
               Deterministic code decides. The model only proposes.
             </p>
           </div>
+          <PhilosophyVisual />
         </div>
       </section>
 
@@ -181,6 +157,7 @@ export default function PublicHomePage() {
           <h2 className="h-xl" data-rv style={{ maxWidth: "20em" }}>
             Five steps from a slow endpoint to a signed verdict.
           </h2>
+          <PipelineVisual />
         </div>
         <ol className="flow">
           {[
@@ -271,11 +248,11 @@ export default function PublicHomePage() {
         </div>
         <ul className="topics">
           {[
-            { no: "Block 0", label: "Task Intake", hash: "8f4b238e89c13289â€¦", status: "Sealed" },
-            { no: "Block 1", label: "Baseline Profile", hash: "318cb92931ea789dâ€¦", status: "Sealed" },
-            { no: "Block 2", label: "Candidate Patch", hash: "45a89df0123bc890â€¦", status: "Sealed" },
-            { no: "Block 3", label: "Gate Results", hash: "e890123890123890â€¦", status: "Sealed" },
-            { no: "Block 4", label: "Final Verdict", hash: "d4e1529a1b2c3d4eâ€¦", status: "Head" },
+            { no: "Block 0", label: "Task Intake", hash: "8f4b238e89c13289…", status: "Sealed" },
+            { no: "Block 1", label: "Baseline Profile", hash: "318cb92931ea789d…", status: "Sealed" },
+            { no: "Block 2", label: "Candidate Patch", hash: "45a89df0123bc890…", status: "Sealed" },
+            { no: "Block 3", label: "Gate Results", hash: "e890123890123890…", status: "Sealed" },
+            { no: "Block 4", label: "Final Verdict", hash: "d4e1529a1b2c3d4e…", status: "Head" },
           ].map((b) => (
             <li key={b.no} data-rv>
               <span className="topics__no">{b.no}</span>
@@ -285,6 +262,9 @@ export default function PublicHomePage() {
             </li>
           ))}
         </ul>
+        <div className="sec__body">
+          <LedgerVisual />
+        </div>
       </section>
 
       {/* ============ DETECTORS ============ */}
@@ -553,8 +533,6 @@ export default function PublicHomePage() {
           </div>
         </div>
       </footer>
-
-      <Chatbot />
     </div>
   );
 }

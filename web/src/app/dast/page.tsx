@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MOCK_DAST_FINDINGS } from "@/lib/mockData";
 import { useAuth } from "@/context/AuthContext";
+import MainLayout from "@/components/layout/MainLayout";
 
 /** The 12 active OWASP telemetry checks the scanner runs. */
 const CHECKS = [
@@ -102,8 +103,9 @@ export default function DastScannerPage() {
   };
 
   return (
-    <div>
-      {/* ===== Header + dispatch ===== */}
+    <MainLayout>
+      <div>
+        {/* ===== Header + dispatch ===== */}
       <div className="pagehead">
         <div>
           <div className="eyebrow">Module M8 · Live Telemetry</div>
@@ -327,5 +329,6 @@ export default function DastScannerPage() {
         )}
       </div>
     </div>
+    </MainLayout>
   );
 }

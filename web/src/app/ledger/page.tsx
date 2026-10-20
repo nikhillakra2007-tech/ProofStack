@@ -6,6 +6,7 @@ import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
 import { MOCK_LEDGER_CHAIN } from "@/lib/mockData";
 import type { LedgerBlock } from "@/lib/types";
+import MainLayout from "@/components/layout/MainLayout";
 
 const ZERO_HASH = "0".repeat(64);
 const SHA256_HEX = /^[0-9a-f]{64}$/i;
@@ -109,8 +110,9 @@ export default function LedgerPage() {
   };
 
   return (
-    <div>
-      {/* Header Card (PDF pp. 27-28) */}
+    <MainLayout>
+      <div>
+        {/* Header Card (PDF pp. 27-28) */}
       <div
         className="card"
         style={{
@@ -417,5 +419,6 @@ export default function LedgerPage() {
         })}
       </div>
     </div>
+    </MainLayout>
   );
 }

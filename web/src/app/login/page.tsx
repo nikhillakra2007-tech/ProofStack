@@ -2,17 +2,70 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
 import { UserRole } from "@/lib/types";
-import ScrollReveal from "@/components/animations/ScrollReveal";
 
-const ROLE_UI: Record<UserRole, { title: string; desc: string; route: string; no: string }> = {
-  super_admin: { title: "Super Admin", desc: "Full control plane, token budgets, policy override", route: "/cockpit/TASK9142", no: "01" },
-  admin: { title: "Admin", desc: "Team quotas, microVM telemetry, findings triage", route: "/control-plane", no: "02" },
-  developer: { title: "Lead Developer", desc: "Studio, patch synthesis, DAST scanning", route: "/studio", no: "03" },
-  auditor: { title: "Security Auditor", desc: "Read-only ledger verification, tamper audit", route: "/ledger", no: "04" },
+const ROLE_UI: Record<
+  UserRole,
+  { title: string; desc: string; route: string; no: string; color: string; icon: React.ReactNode }
+> = {
+  super_admin: {
+    title: "Super Admin",
+    desc: "Full control plane, token budgets, policy override",
+    route: "/cockpit/TASK9142",
+    no: "01",
+    color: "#38BDF8",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+        <path d="M2 17l10 5 10-5" />
+        <path d="M2 12l10 5 10-5" />
+      </svg>
+    ),
+  },
+  admin: {
+    title: "Admin",
+    desc: "Team quotas, microVM telemetry, findings triage",
+    route: "/control-plane",
+    no: "02",
+    color: "#818CF8",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="21" x2="9" y2="9" />
+      </svg>
+    ),
+  },
+  developer: {
+    title: "Lead Developer",
+    desc: "Studio, patch synthesis, DAST scanning",
+    route: "/studio",
+    no: "03",
+    color: "#10B981",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    ),
+  },
+  auditor: {
+    title: "Security Auditor",
+    desc: "Read-only ledger verification, tamper audit",
+    route: "/ledger",
+    no: "04",
+    color: "#F59E0B",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </svg>
+    ),
+  },
 };
 
 export default function LoginPage() {
@@ -23,12 +76,6 @@ export default function LoginPage() {
   const [role, setRole] = useState<UserRole>("super_admin");
   const [email, setEmail] = useState(ROLES.super_admin.email);
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setReady(true), 120);
-    return () => clearTimeout(t);
-  }, []);
 
   const pick = (r: UserRole) => {
     setRole(r);
@@ -49,174 +96,352 @@ export default function LoginPage() {
         canOverridePolicy: def.canOverridePolicy,
       });
       router.push("/");
-    }, 500);
+    }, 550);
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)", display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-      <ScrollReveal />
-
-      {/* ===== LEFT: hero-style brand ===== */}
-      <section style={{ position: "relative", background: "#050504", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "calc(40 * var(--u)) calc(48 * var(--u))", overflow: "hidden" }}>
-        <div aria-hidden style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
-          <div style={{ width: "min(60vh,60vw)", height: "min(60vh,60vw)", borderRadius: "50%", background: "radial-gradient(circle at 32% 28%, rgba(233,229,218,.16) 0%, rgba(142,90,54,.14) 40%, rgba(5,5,4,0) 70%)", animation: "markSpin 24s cubic-bezier(.45,0,.55,1) infinite" }} />
-        </div>
-
-        <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "10px" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" />
-            <polyline points="2 17 12 22 22 17" />
-            <polyline points="2 12 12 17 22 12" />
-          </svg>
-          <span style={{ fontSize: "14px", letterSpacing: ".04em" }}>ProofStack</span>
-        </div>
-
-        <div style={{ position: "relative" }}>
-          <div className={`hero__kicker ${ready ? "is-in" : ""}`} style={ready ? undefined : { opacity: 0 }}>
-            <span className={ready ? "is-in" : ""}>Judge Access · 2026</span>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+        position: "relative",
+        zIndex: 1,
+        color: "var(--ink)",
+      }}
+    >
+      {/* ===== LEFT: BRAND SHOWCASE WITH EVIDENCE CHAIN ===== */}
+      <motion.section
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "clamp(32px, 5vw, 64px)",
+          borderRight: "1px solid var(--line)",
+          background: "linear-gradient(135deg, rgba(14, 19, 31, 0.85) 0%, rgba(7, 9, 14, 0.95) 100%)",
+          backdropFilter: "blur(20px)",
+        }}
+      >
+        {/* Brand Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              background: "linear-gradient(135deg, var(--brand), var(--accent))",
+              display: "grid",
+              placeItems: "center",
+              color: "#07090E",
+              boxShadow: "0 0 20px rgba(56, 189, 248, 0.4)",
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
           </div>
-          <h1 className="hero__title" style={{ fontSize: "clamp(calc(38 * var(--u)), 5.4vw, calc(70 * var(--u)))" }}>
-            <span className="ln"><span className={`ln__in ${ready ? "is-in" : ""}`} style={{ "--li": 0 } as React.CSSProperties}>Verify.</span></span>
-            <span className="ln"><span className={`ln__in ${ready ? "is-in" : ""}`} style={{ "--li": 1 } as React.CSSProperties}>Protect.</span></span>
-            <span className="ln"><span className={`ln__in ${ready ? "is-in" : ""}`} style={{ "--li": 2 } as React.CSSProperties}>Prove.</span></span>
+          <div>
+            <span style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em", display: "block" }}>
+              ProofStack
+            </span>
+            <span style={{ fontSize: "10.5px", color: "var(--brand)", fontFamily: "var(--f-mono)", letterSpacing: "0.08em" }}>
+              Autonomous Verification
+            </span>
+          </div>
+        </div>
+
+        {/* Hero Copy */}
+        <div style={{ margin: "clamp(40px, 8vh, 80px) 0" }}>
+          <span
+            style={{
+              display: "inline-block",
+              padding: "4px 10px",
+              borderRadius: "20px",
+              background: "rgba(56, 189, 248, 0.1)",
+              border: "1px solid rgba(56, 189, 248, 0.25)",
+              color: "var(--brand)",
+              fontSize: "11px",
+              fontFamily: "var(--f-mono)",
+              letterSpacing: "0.08em",
+              marginBottom: "18px",
+            }}
+          >
+            JUDGE CONSOLE · 2026
+          </span>
+
+          <h1
+            style={{
+              fontSize: "clamp(34px, 4.5vw, 56px)",
+              fontWeight: 400,
+              lineHeight: 1.05,
+              letterSpacing: "-0.03em",
+              margin: "0 0 16px",
+              color: "var(--ink)",
+            }}
+          >
+            Verify. Protect. Prove.
           </h1>
-          <p className={`hero__sub ${ready ? "is-in" : ""}`}>
-            Deterministic code decides. The model only proposes.
+
+          <p style={{ fontSize: "15px", color: "var(--ink2)", maxWidth: "440px", lineHeight: 1.6, margin: 0 }}>
+            Deterministic code decides. The model only proposes. Every candidate patch is tested against 8 Zero-Compromise Invariants.
           </p>
         </div>
 
-        <div style={{ position: "relative" }}>
-          <div className="label is-muted" style={{ marginBottom: "calc(18 * var(--u))" }}>Evidence chain</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "calc(10 * var(--u))" }}>
-            {["8f4b238e89c13289…", "318cb92931ea789d…", "45a89df0123bc890…"].map((h, i) => (
-              <div key={h} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(233,229,218,.24)", paddingTop: "calc(12 * var(--u))", fontSize: "calc(11.5 * var(--u))" }} data-rv>
-                <span style={{ color: "var(--ink2)", letterSpacing: ".08em" }}>BLOCK {i}</span>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--ink3)" }}>{h}</span>
-                <span style={{ color: "var(--pass)", fontSize: "calc(10 * var(--u))", letterSpacing: ".1em" }}>SEALED</span>
+        {/* Live Cryptographic Hash Chain Preview */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", letterSpacing: "0.1em" }}>
+              CRYPTOGRAPHIC EVIDENCE ANCHOR
+            </span>
+            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", color: "var(--pass)" }}>
+              ● 5 BLOCKS SEALED
+            </span>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {[
+              { index: "04", label: "VERDICT SEAL", hash: "d4e1529a1b2c…", status: "HEAD" },
+              { index: "03", label: "8-GATE AUDIT", hash: "e89012389012…", status: "SEALED" },
+              { index: "02", label: "MICROVM PROBE", hash: "45a89df0123b…", status: "SEALED" },
+            ].map((block) => (
+              <div
+                key={block.index}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid var(--line)",
+                  fontSize: "11.5px",
+                  fontFamily: "var(--f-mono)",
+                }}
+              >
+                <span style={{ color: "var(--ink2)" }}>BLOCK #{block.index}</span>
+                <span style={{ color: "var(--brand)" }}>{block.label}</span>
+                <span style={{ color: "var(--ink3)" }}>{block.hash}</span>
+                <span style={{ color: "var(--pass)", fontSize: "10px" }}>{block.status}</span>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ===== RIGHT: form ===== */}
-      <section style={{ display: "flex", flexDirection: "column", padding: "calc(40 * var(--u)) calc(48 * var(--u)) 0" }}>
+      {/* ===== RIGHT: AUTHENTICATION FORM & ROLE PICKER ===== */}
+      <motion.section
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "clamp(32px, 5vw, 64px)",
+          background: "rgba(7, 9, 14, 0.6)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        {/* Top Utility Links */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <button className="link-arrow" style={{ fontSize: "calc(12.5 * var(--u))", paddingBottom: "calc(6 * var(--u))" }} onClick={() => router.push("/home")}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
-            Public site
+          <button
+            type="button"
+            onClick={() => router.push("/home")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "13px",
+              color: "var(--ink2)",
+              cursor: "pointer",
+            }}
+          >
+            <span>←</span> Public Marketing Site
           </button>
-          <button onClick={toggleTheme} aria-label="Toggle theme" style={{ color: "var(--ink2)" }}>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            style={{
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              color: "var(--ink2)",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+            }}
+          >
             {resolvedTheme === "light" ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="4" /><line x1="12" y1="2" x2="12" y2="4" /><line x1="12" y1="20" x2="12" y2="22" /><line x1="4.9" y1="4.9" x2="6.3" y2="6.3" /><line x1="17.7" y1="17.7" x2="19.1" y2="19.1" /><line x1="2" y1="12" x2="4" y2="12" /><line x1="20" y1="12" x2="22" y2="12" /><line x1="4.9" y1="19.1" x2="6.3" y2="17.7" /><line x1="17.7" y1="6.3" x2="19.1" y2="4.9" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="4" />
+                <line x1="12" y1="2" x2="12" y2="4" />
+                <line x1="12" y1="20" x2="12" y2="22" />
+              </svg>
             )}
           </button>
         </div>
 
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: "calc(470 * var(--u))", width: "100%", margin: "0 auto" }}>
-          <div className="label" data-rv>Sign in</div>
-          <h2 className="h-xl" data-rv style={{ marginTop: "calc(16 * var(--u))" }}>
-            Choose your workspace.
-          </h2>
-          <p className="prose" data-rv style={{ marginTop: "calc(24 * var(--u))", maxWidth: "40em" }}>
-            Every role is pre-seeded with a tenant boundary and its own permission set.
-          </p>
+        {/* Center Auth Card */}
+        <div style={{ maxWidth: "480px", width: "100%", margin: "clamp(24px, 4vh, 48px) auto" }}>
+          <div>
+            <div className="label" style={{ color: "var(--brand)" }}>
+              AUTHENTICATION
+            </div>
+            <h2 style={{ fontSize: "28px", fontWeight: 400, color: "var(--ink)", margin: "8px 0 6px", letterSpacing: "-0.02em" }}>
+              Select your workspace role
+            </h2>
+            <p style={{ fontSize: "13px", color: "var(--ink2)", margin: 0 }}>
+              Each role enforces an isolated tenant boundary and specific privileges.
+            </p>
+          </div>
 
-          <form onSubmit={submit} style={{ marginTop: "calc(40 * var(--u))" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "calc(8 * var(--u))" }}>
+          <form onSubmit={submit} style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            {/* Role Cards Grid */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {(Object.keys(ROLE_UI) as UserRole[]).map((r) => {
                 const ui = ROLE_UI[r];
                 const active = role === r;
                 return (
-                  <button
+                  <motion.button
                     key={r}
                     type="button"
                     onClick={() => pick(r)}
-                    data-rv
+                    whileHover={{ x: 3 }}
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "calc(38 * var(--u)) minmax(0,1fr) auto",
+                      display: "flex",
                       alignItems: "center",
-                      gap: "calc(14 * var(--u))",
+                      gap: "14px",
+                      padding: "12px 14px",
+                      borderRadius: "10px",
+                      background: active ? "rgba(56, 189, 248, 0.08)" : "rgba(14, 19, 31, 0.6)",
+                      border: `1px solid ${active ? "var(--brand)" : "var(--line)"}`,
+                      boxShadow: active ? "0 0 16px rgba(56, 189, 248, 0.18)" : "none",
+                      cursor: "pointer",
                       textAlign: "left",
-                      padding: "calc(16 * var(--u)) calc(18 * var(--u))",
-                      background: active ? "var(--surface)" : "transparent",
-                      border: `1px solid ${active ? "var(--ink3)" : "var(--line)"}`,
-                      transition: "border-color .35s var(--ease), background .35s var(--ease)",
+                      transition: "all 0.2s ease",
+                      width: "100%",
                     }}
                   >
-                    <span style={{ fontSize: "calc(12 * var(--u))", color: "var(--ink2)", letterSpacing: ".08em" }}>{ui.no}</span>
-                    <span>
-                      <span style={{ display: "block", fontSize: "calc(15 * var(--u))", fontWeight: 400 }}>{ui.title}</span>
-                      <span style={{ display: "block", marginTop: "calc(4 * var(--u))", fontSize: "calc(12.5 * var(--u))", color: "var(--ink2)" }}>{ui.desc}</span>
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "8px",
+                        background: active ? "rgba(56, 189, 248, 0.2)" : "rgba(255, 255, 255, 0.04)",
+                        color: active ? "var(--brand)" : "var(--ink2)",
+                        display: "grid",
+                        placeItems: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {ui.icon}
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "13.5px", fontWeight: 600, color: active ? "var(--ink)" : "var(--ink2)" }}>
+                          {ui.title}
+                        </span>
+                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--ink3)" }}>
+                          ({ui.no})
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "11.5px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {ui.desc}
+                      </div>
+                    </div>
+
+                    <span style={{ fontFamily: "var(--f-mono)", fontSize: "11px", color: active ? "var(--brand)" : "var(--ink3)" }}>
+                      {ui.route}
                     </span>
-                    <span style={{ fontSize: "calc(11.5 * var(--u))", color: "var(--ink3)", fontFamily: "'JetBrains Mono', monospace" }}>{ui.route}</span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
 
-            <div style={{ marginTop: "calc(32 * var(--u))", display: "flex", flexDirection: "column", gap: "calc(20 * var(--u))" }}>
-              <div>
-                <div className="label is-muted" style={{ fontSize: "calc(11 * var(--u))", marginBottom: "calc(8 * var(--u))" }}>Tenant boundary (UUID)</div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "calc(12 * var(--u)) calc(14 * var(--u))", border: "1px solid var(--line)", background: "var(--surface)", fontFamily: "'JetBrains Mono', monospace", fontSize: "calc(12 * var(--u))" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                  {ROLES[role].tenantUuid}
-                </div>
-              </div>
-
-              <div>
-                <div className="label is-muted" style={{ fontSize: "calc(11 * var(--u))", marginBottom: "calc(8 * var(--u))" }}>Principal identity</div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "0 calc(14 * var(--u))", height: "calc(44 * var(--u))", border: "1px solid var(--line)", background: "var(--surface)" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" strokeWidth="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                  <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type="email"
-                    style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: "var(--ink)", fontSize: "calc(13.5 * var(--u))", fontFamily: "inherit" }}
-                  />
-                </div>
-              </div>
+            {/* Tenant Boundary Details */}
+            <div style={{ padding: "12px 14px", borderRadius: "10px", background: "rgba(14, 19, 31, 0.5)", border: "1px solid var(--line)", fontSize: "12px", display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "var(--ink2)" }}>Tenant Boundary UUID:</span>
+              <span style={{ fontFamily: "var(--f-mono)", color: "var(--brand)" }}>{ROLES[role].tenantUuid}</span>
             </div>
 
+            {/* Email / Principal Input */}
+            <div>
+              <label style={{ display: "block", fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", marginBottom: "6px" }}>
+                PRINCIPAL IDENTITY
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "40px",
+                  padding: "0 12px",
+                  borderRadius: "8px",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  fontFamily: "var(--f-mono)",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+              />
+            </div>
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
               style={{
-                marginTop: "calc(36 * var(--u))",
-                width: "100%",
-                padding: "calc(16 * var(--u)) calc(24 * var(--u))",
-                background: "var(--ink)",
-                color: "var(--bg)",
-                fontSize: "calc(14 * var(--u))",
-                fontWeight: 500,
-                letterSpacing: ".04em",
+                height: "46px",
+                borderRadius: "10px",
+                background: "linear-gradient(135deg, var(--brand), var(--accent))",
+                color: "#07090E",
+                fontSize: "14px",
+                fontWeight: 600,
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 0 24px rgba(56, 189, 248, 0.35)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "10px",
-                transition: "opacity .3s, transform .3s var(--ease)",
-                opacity: loading ? 0.6 : 1,
+                gap: "8px",
+                transition: "opacity 0.2s ease, transform 0.2s ease",
+                opacity: loading ? 0.7 : 1,
               }}
             >
-              {loading ? "Authenticating…" : "Authenticate"}
-              {!loading && <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>}
+              {loading ? (
+                <span>Authorizing Identity…</span>
+              ) : (
+                <>
+                  <span>Enter Workspace as {ROLE_UI[role].title}</span>
+                  <span>→</span>
+                </>
+              )}
             </button>
-
-            <p style={{ marginTop: "calc(20 * var(--u))", fontSize: "calc(12 * var(--u))", color: "var(--ink3)", display: "flex", gap: "8px", alignItems: "center" }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-              Locked Decision D13 — cross-tenant access returns HTTP 404.
-            </p>
           </form>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBlock: "calc(16 * var(--u))", borderTop: "1px solid var(--line)", fontSize: "calc(11 * var(--u))", color: "var(--ink3)" }}>
-          <span>ProofStack v1.0</span>
-          <span>Nemotron-3 Super 120B · Nebius Token Factory</span>
+        {/* Footer Meta */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "var(--ink3)", fontFamily: "var(--f-mono)" }}>
+          <span>ProofStack v2.0 · Quantum Aurora</span>
+          <span>NVIDIA Nemotron · Nebius Sandbox</span>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }

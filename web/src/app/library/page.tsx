@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MOCK_CATALOG } from "@/lib/mockData";
 import { CatalogProblem } from "@/lib/types";
+import MainLayout from "@/components/layout/MainLayout";
 
 const ALL = "All";
 
@@ -70,8 +71,9 @@ export default function ProblemLibraryPage() {
   const hasResults = filteredProblems.length > 0;
 
   return (
-    <div>
-      {/* Page Header */}
+    <MainLayout>
+      <div>
+        {/* Page Header */}
       <div className="pagehead">
         <div>
           <div className="eyebrow">Reference</div>
@@ -716,5 +718,6 @@ export default function ProblemLibraryPage() {
         </div>
       </div>
     </div>
+    </MainLayout>
   );
 }

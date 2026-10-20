@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { MOCK_CATALOG, MOCK_GATES, MOCK_LEDGER_CHAIN } from "@/lib/mockData";
 import { CatalogProblem, GateStatus } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
+import MainLayout from "@/components/layout/MainLayout";
 
 function StudioContent() {
   const router = useRouter();
@@ -694,14 +695,16 @@ function StudioContent() {
 
 export default function StudioPage() {
   return (
-    <Suspense
-      fallback={
-        <div style={{ padding: "20px", textAlign: "center" }}>
-          Loading Studio Environment...
-        </div>
-      }
-    >
-      <StudioContent />
-    </Suspense>
+    <MainLayout>
+      <Suspense
+        fallback={
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            Loading Studio Environment...
+          </div>
+        }
+      >
+        <StudioContent />
+      </Suspense>
+    </MainLayout>
   );
 }
