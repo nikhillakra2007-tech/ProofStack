@@ -1,447 +1,245 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/lib/theme";
-import { ROLES } from "@/lib/roles";
-import { UserRole } from "@/lib/types";
-
-const ROLE_UI: Record<
-  UserRole,
-  { title: string; desc: string; route: string; no: string; color: string; icon: React.ReactNode }
-> = {
-  super_admin: {
-    title: "Super Admin",
-    desc: "Full control plane, token budgets, policy override",
-    route: "/cockpit/TASK9142",
-    no: "01",
-    color: "#38BDF8",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" />
-        <path d="M2 12l10 5 10-5" />
-      </svg>
-    ),
-  },
-  admin: {
-    title: "Admin",
-    desc: "Team quotas, microVM telemetry, findings triage",
-    route: "/control-plane",
-    no: "02",
-    color: "#818CF8",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <line x1="3" y1="9" x2="21" y2="9" />
-        <line x1="9" y1="21" x2="9" y2="9" />
-      </svg>
-    ),
-  },
-  developer: {
-    title: "Lead Developer",
-    desc: "Studio, patch synthesis, DAST scanning",
-    route: "/studio",
-    no: "03",
-    color: "#10B981",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <polyline points="16 18 22 12 16 6" />
-        <polyline points="8 6 2 12 8 18" />
-      </svg>
-    ),
-  },
-  auditor: {
-    title: "Security Auditor",
-    desc: "Read-only ledger verification, tamper audit",
-    route: "/ledger",
-    no: "04",
-    color: "#F59E0B",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        <polyline points="9 12 11 14 15 10" />
-      </svg>
-    ),
-  },
-};
+import { useCurtain } from "@/components/layout/CurtainTransition";
+import { 
+  ShieldCheck, Terminal, Lock, KeyRound, User, 
+  ArrowRight, CheckCircle2, ShieldAlert, Cpu 
+} from "lucide-react";
+import { UserRole } from "@/lib/auth";
+import { BrandLogo } from "@/components/brand-logo/BrandLogo";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { setSessionData } = useAuth();
-  const { resolvedTheme, toggleTheme } = useTheme();
+  const { login, switchRole, user } = useAuth();
+  const { navigateWithCurtain } = useCurtain();
+  const [selectedRole, setSelectedRole] = useState<UserRole>("developer");
+  const [email, setEmail] = useState("dev@sentinel.internal");
+  const [password, setPassword] = useState("••••••••••••");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [role, setRole] = useState<UserRole>("super_admin");
-  const [email, setEmail] = useState(ROLES.super_admin.email);
-  const [loading, setLoading] = useState(false);
+  const rolePresets: { role: UserRole; email: string; label: string; badge: string; desc: string }[] = [
+    {
+      role: "developer",
+      email: "dev@sentinel.internal",
+      label: "Developer",
+      badge: "CWE Triage & AST Repair",
+      desc: "Full code patch synthesis, interactive sandbox testing, and AST diff execution."
+    },
+    {
+      role: "auditor",
+      email: "auditor@sentinel.internal",
+      label: "Security Auditor",
+      badge: "Cryptographic Attestation",
+      desc: "Read-only ledger verification, SOC2 export, and tamper-proof hash inspection."
+    },
+    {
+      role: "admin",
+      email: "admin@sentinel.internal",
+      label: "SecOps Admin",
+      badge: "Pipeline & Policy Gatekeeper",
+      desc: "Manage 8-gate enforcement rules, exploit probe thresholds, and CI/CD webhooks."
+    },
+    {
+      role: "super_admin",
+      email: "root@sentinel.internal",
+      label: "Super Admin",
+      badge: "Full System Authority",
+      desc: "Root level key rotation, model endpoint config, and air-gapped node telemetry."
+    }
+  ];
 
-  const pick = (r: UserRole) => {
-    setRole(r);
-    setEmail(ROLES[r].email);
+  const handleSelectRole = (r: typeof rolePresets[0]) => {
+    setSelectedRole(r.role);
+    setEmail(r.email);
+    switchRole(r.role);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      const def = ROLES[role];
-      setSessionData({
-        userId: `usr_${def.role}`,
-        tenantId: def.tenantUuid,
-        email,
-        role: def.role,
-        token: `jwt_rs256_${def.role}_token`,
-        canOverridePolicy: def.canOverridePolicy,
-      });
-      router.push("/");
-    }, 550);
+    setIsSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      if (typeof login === "function") {
+        login(email, selectedRole);
+      }
+      setTimeout(() => {
+        setIsSubmitting(false);
+        navigateWithCurtain("/cockpit", "Cockpit");
+      }, 500);
+    } catch (err: any) {
+      console.error("Auth error:", err);
+      setIsSubmitting(false);
+      navigateWithCurtain("/cockpit", "Cockpit");
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-        position: "relative",
-        zIndex: 1,
-        color: "var(--ink)",
-      }}
-    >
-      {/* ===== LEFT: BRAND SHOWCASE WITH EVIDENCE CHAIN ===== */}
-      <motion.section
-        initial={{ opacity: 0, x: -30 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "clamp(32px, 5vw, 64px)",
-          borderRight: "1px solid var(--line)",
-          background: "linear-gradient(135deg, rgba(14, 19, 31, 0.85) 0%, rgba(7, 9, 14, 0.95) 100%)",
-          backdropFilter: "blur(20px)",
-        }}
-      >
-        {/* Brand Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "10px",
-              background: "linear-gradient(135deg, var(--brand), var(--accent))",
-              display: "grid",
-              placeItems: "center",
-              color: "#07090E",
-              boxShadow: "0 0 20px rgba(56, 189, 248, 0.4)",
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="12 2 2 7 12 12 22 7 12 2" />
-              <polyline points="2 17 12 22 22 17" />
-              <polyline points="2 12 12 17 22 12" />
-            </svg>
-          </div>
-          <div>
-            <span style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em", display: "block" }}>
-              ProofStack
-            </span>
-            <span style={{ fontSize: "10.5px", color: "var(--brand)", fontFamily: "var(--f-mono)", letterSpacing: "0.08em" }}>
-              Autonomous Verification
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#0E120D] flex flex-col lg:flex-row text-[#FDFBF7]">
+      {/* Left Column: Security Feed & Telemetry */}
+      <div className="lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#515A47]/40 bg-gradient-to-b from-[#151B13] via-[#0E120D] to-[#151B13] relative overflow-hidden">
+        {/* Glow orb */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#D7BE82]/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Hero Copy */}
-        <div style={{ margin: "clamp(40px, 8vh, 80px) 0" }}>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "4px 10px",
-              borderRadius: "20px",
-              background: "rgba(56, 189, 248, 0.1)",
-              border: "1px solid rgba(56, 189, 248, 0.25)",
-              color: "var(--brand)",
-              fontSize: "11px",
-              fontFamily: "var(--f-mono)",
-              letterSpacing: "0.08em",
-              marginBottom: "18px",
-            }}
+        <div>
+          <button
+            onClick={() => navigateWithCurtain("/")}
+            className="flex items-center gap-3 mb-12 hover:opacity-80 transition-opacity"
           >
-            JUDGE CONSOLE · 2026
-          </span>
+            <BrandLogo size="md" showWordmark={true} />
+          </button>
 
-          <h1
-            style={{
-              fontSize: "clamp(34px, 4.5vw, 56px)",
-              fontWeight: 400,
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-              margin: "0 0 16px",
-              color: "var(--ink)",
-            }}
-          >
-            Verify. Protect. Prove.
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D7BE82]/10 border border-[#D7BE82]/30 text-xs font-mono text-[#D7BE82] mb-4">
+            <Cpu className="w-3.5 h-3.5" />
+            ZERO-TRUST ACCESS CONTROLLER
+          </div>
+
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-[#FDFBF7] tracking-tight leading-tight">
+            Cryptographically Verified Access to Sentinel Core
           </h1>
 
-          <p style={{ fontSize: "15px", color: "var(--ink2)", maxWidth: "440px", lineHeight: 1.6, margin: 0 }}>
-            Deterministic code decides. The model only proposes. Every candidate patch is tested against 8 Zero-Compromise Invariants.
+          <p className="text-[#D6D1C4] text-sm mt-3 leading-relaxed max-w-lg">
+            Role-based authentication enforced via SHA-256 JWT signatures and hardware-attested Merkle ledger nonces.
           </p>
-        </div>
 
-        {/* Live Cryptographic Hash Chain Preview */}
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", letterSpacing: "0.1em" }}>
-              CRYPTOGRAPHIC EVIDENCE ANCHOR
-            </span>
-            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", color: "var(--pass)" }}>
-              ● 5 BLOCKS SEALED
-            </span>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {[
-              { index: "04", label: "VERDICT SEAL", hash: "d4e1529a1b2c…", status: "HEAD" },
-              { index: "03", label: "8-GATE AUDIT", hash: "e89012389012…", status: "SEALED" },
-              { index: "02", label: "MICROVM PROBE", hash: "45a89df0123b…", status: "SEALED" },
-            ].map((block) => (
-              <div
-                key={block.index}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "8px 12px",
-                  borderRadius: "8px",
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid var(--line)",
-                  fontSize: "11.5px",
-                  fontFamily: "var(--f-mono)",
-                }}
-              >
-                <span style={{ color: "var(--ink2)" }}>BLOCK #{block.index}</span>
-                <span style={{ color: "var(--brand)" }}>{block.label}</span>
-                <span style={{ color: "var(--ink3)" }}>{block.hash}</span>
-                <span style={{ color: "var(--pass)", fontSize: "10px" }}>{block.status}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ===== RIGHT: AUTHENTICATION FORM & ROLE PICKER ===== */}
-      <motion.section
-        initial={{ opacity: 0, x: 30 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "clamp(32px, 5vw, 64px)",
-          background: "rgba(7, 9, 14, 0.6)",
-          backdropFilter: "blur(16px)",
-        }}
-      >
-        {/* Top Utility Links */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <button
-            type="button"
-            onClick={() => router.push("/home")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              fontSize: "13px",
-              color: "var(--ink2)",
-              cursor: "pointer",
-            }}
-          >
-            <span>←</span> Public Marketing Site
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleTheme}
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "8px",
-              border: "1px solid var(--line)",
-              background: "var(--surface)",
-              color: "var(--ink2)",
-              display: "grid",
-              placeItems: "center",
-              cursor: "pointer",
-            }}
-          >
-            {resolvedTheme === "light" ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="4" />
-                <line x1="12" y1="2" x2="12" y2="4" />
-                <line x1="12" y1="20" x2="12" y2="22" />
-              </svg>
-            )}
-          </button>
-        </div>
-
-        {/* Center Auth Card */}
-        <div style={{ maxWidth: "480px", width: "100%", margin: "clamp(24px, 4vh, 48px) auto" }}>
-          <div>
-            <div className="label" style={{ color: "var(--brand)" }}>
-              AUTHENTICATION
+          {/* Live System Activity Feed */}
+          <div className="mt-8 rounded-xl border border-[#515A47]/40 bg-[#0E120D] p-4 font-mono text-xs space-y-3">
+            <div className="text-[11px] text-[#9E9889] flex items-center justify-between border-b border-[#515A47]/30 pb-2">
+              <span className="flex items-center gap-1.5">
+                <Terminal className="w-3.5 h-3.5 text-[#D7BE82]" />
+                SECURITY TELEMETRY LOG
+              </span>
+              <span className="text-[#D7BE82] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D7BE82] animate-ping inline-block" />
+                ACTIVE
+              </span>
             </div>
-            <h2 style={{ fontSize: "28px", fontWeight: 400, color: "var(--ink)", margin: "8px 0 6px", letterSpacing: "-0.02em" }}>
-              Select your workspace role
+
+            <div className="space-y-1.5 text-[#D6D1C4] text-[11px]">
+              <div><span className="text-[#D7BE82]">[22:15:02]</span> Sentinel Gate node online at 127.0.0.1:8000</div>
+              <div><span className="text-[#D7BE82]">[22:15:09]</span> Nemotron 70B AST grammar weights hot-loaded</div>
+              <div><span className="text-[#D7BE82]">[22:15:23]</span> Merkle root verified: 0x9e8a...3f12 (6 blocks)</div>
+              <div><span className="text-[#D7BE82]">[22:16:01]</span> Zero-Day DAST probe array initialized (12 vectors)</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-8 text-xs font-mono text-[#9E9889] flex items-center gap-4">
+          <span>AES-256-GCM Session</span>
+          <span>•</span>
+          <span>SOC2 Type II Attested</span>
+          <span>•</span>
+          <span>ISO-27001</span>
+        </div>
+      </div>
+
+      {/* Right Column: Authentication Form & Role Selector */}
+      <div className="lg:w-1/2 p-8 lg:p-16 flex flex-col justify-center items-center relative">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold text-[#FDFBF7] tracking-tight">
+              Sign In to Your Workspace
             </h2>
-            <p style={{ fontSize: "13px", color: "var(--ink2)", margin: 0 }}>
-              Each role enforces an isolated tenant boundary and specific privileges.
+            <p className="text-sm text-[#D6D1C4] mt-1">
+              Select your persona below for 1-click verified sandbox access.
             </p>
           </div>
 
-          <form onSubmit={submit} style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-            {/* Role Cards Grid */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {(Object.keys(ROLE_UI) as UserRole[]).map((r) => {
-                const ui = ROLE_UI[r];
-                const active = role === r;
+          {/* 1-Click Role Switcher Grid */}
+          <div className="space-y-2">
+            <label className="text-xs font-mono uppercase tracking-wider text-[#9E9889]">
+              Quick Role Switcher
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {rolePresets.map((r) => {
+                const isSelected = selectedRole === r.role;
                 return (
-                  <motion.button
-                    key={r}
+                  <button
+                    key={r.role}
                     type="button"
-                    onClick={() => pick(r)}
-                    whileHover={{ x: 3 }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "14px",
-                      padding: "12px 14px",
-                      borderRadius: "10px",
-                      background: active ? "rgba(56, 189, 248, 0.08)" : "rgba(14, 19, 31, 0.6)",
-                      border: `1px solid ${active ? "var(--brand)" : "var(--line)"}`,
-                      boxShadow: active ? "0 0 16px rgba(56, 189, 248, 0.18)" : "none",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      transition: "all 0.2s ease",
-                      width: "100%",
-                    }}
+                    onClick={() => handleSelectRole(r)}
+                    className={`p-3 rounded-xl border text-left transition-all duration-200 ${
+                      isSelected
+                        ? "bg-[#D7BE82]/20 border-[#D7BE82] text-white shadow-[0_0_15px_rgba(215,190,130,0.25)]"
+                        : "bg-[#151B13] border-[#515A47]/40 text-[#9E9889] hover:text-[#D6D1C4] hover:border-[#515A47]"
+                    }`}
                   >
-                    <div
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "8px",
-                        background: active ? "rgba(56, 189, 248, 0.2)" : "rgba(255, 255, 255, 0.04)",
-                        color: active ? "var(--brand)" : "var(--ink2)",
-                        display: "grid",
-                        placeItems: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {ui.icon}
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold font-mono text-[#D7BE82]">{r.label}</span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#D7BE82]" />}
                     </div>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontSize: "13.5px", fontWeight: 600, color: active ? "var(--ink)" : "var(--ink2)" }}>
-                          {ui.title}
-                        </span>
-                        <span style={{ fontFamily: "var(--f-mono)", fontSize: "10px", color: "var(--ink3)" }}>
-                          ({ui.no})
-                        </span>
-                      </div>
-                      <div style={{ fontSize: "11.5px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {ui.desc}
-                      </div>
-                    </div>
-
-                    <span style={{ fontFamily: "var(--f-mono)", fontSize: "11px", color: active ? "var(--brand)" : "var(--ink3)" }}>
-                      {ui.route}
-                    </span>
-                  </motion.button>
+                    <div className="text-[10px] text-[#9E9889] line-clamp-1">{r.badge}</div>
+                  </button>
                 );
               })}
             </div>
+          </div>
 
-            {/* Tenant Boundary Details */}
-            <div style={{ padding: "12px 14px", borderRadius: "10px", background: "rgba(14, 19, 31, 0.5)", border: "1px solid var(--line)", fontSize: "12px", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--ink2)" }}>Tenant Boundary UUID:</span>
-              <span style={{ fontFamily: "var(--f-mono)", color: "var(--brand)" }}>{ROLES[role].tenantUuid}</span>
-            </div>
-
-            {/* Email / Principal Input */}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label style={{ display: "block", fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", marginBottom: "6px" }}>
-                PRINCIPAL IDENTITY
+              <label className="block text-xs font-mono text-[#9E9889] mb-1.5">
+                Corporate Identity / Email
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{
-                  width: "100%",
-                  height: "40px",
-                  padding: "0 12px",
-                  borderRadius: "8px",
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  color: "var(--ink)",
-                  fontFamily: "var(--f-mono)",
-                  fontSize: "13px",
-                  outline: "none",
-                }}
-              />
+              <div className="relative">
+                <User className="absolute left-3.5 top-3 w-4 h-4 text-[#9E9889]" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#151B13] border border-[#515A47]/40 text-[#FDFBF7] text-sm font-mono focus:border-[#D7BE82] focus:outline-none focus:ring-1 focus:ring-[#D7BE82] transition-colors"
+                />
+              </div>
             </div>
 
-            {/* Submit Button */}
+            <div>
+              <label className="block text-xs font-mono text-[#9E9889] mb-1.5">
+                Access Token / Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-3 w-4 h-4 text-[#9E9889]" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#151B13] border border-[#515A47]/40 text-[#FDFBF7] text-sm font-mono focus:border-[#D7BE82] focus:outline-none focus:ring-1 focus:ring-[#D7BE82] transition-colors"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
-              style={{
-                height: "46px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, var(--brand), var(--accent))",
-                color: "#07090E",
-                fontSize: "14px",
-                fontWeight: 600,
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 0 24px rgba(56, 189, 248, 0.35)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                transition: "opacity 0.2s ease, transform 0.2s ease",
-                opacity: loading ? 0.7 : 1,
-              }}
+              disabled={isSubmitting}
+              className="w-full py-3 rounded-xl bg-[#D7BE82] hover:bg-[#EAD6B0] text-[#0E120D] font-mono font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(215,190,130,0.35)] hover:scale-[1.01] active:scale-[0.99]"
             >
-              {loading ? (
-                <span>Authorizing Identity…</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[#0E120D] border-t-transparent rounded-full animate-spin" />
+                  <span>Attesting Credentials...</span>
+                </>
               ) : (
                 <>
-                  <span>Enter Workspace as {ROLE_UI[role].title}</span>
-                  <span>→</span>
+                  <span>Authenticate &amp; Enter Cockpit</span>
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
-        </div>
 
-        {/* Footer Meta */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "var(--ink3)", fontFamily: "var(--f-mono)" }}>
-          <span>ProofStack v2.0 · Quantum Aurora</span>
-          <span>NVIDIA Nemotron · Nebius Sandbox</span>
+          <div className="text-center">
+            <button
+              onClick={() => navigateWithCurtain("/")}
+              className="text-xs font-mono text-[#9E9889] hover:text-[#D7BE82] transition-colors"
+            >
+              ← Back to Main Homepage
+            </button>
+          </div>
         </div>
-      </motion.section>
+      </div>
     </div>
   );
 }

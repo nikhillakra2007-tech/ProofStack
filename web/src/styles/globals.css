@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0E120D;
+  --surface: #151B13;
+  --surface-raised: rgba(21, 27, 19, 0.85);
+  --card-bg: #151B13;
+  --ebony: #515A47;
+  --fawn: #D7BE82;
+  --saddle: #7A4419;
+  
+  --line: rgba(81, 90, 71, 0.35);
+  --line-strong: rgba(215, 190, 130, 0.35);
+  
+  --ink: #FDFBF7;
+  --ink-secondary: #D7BE82;
+  --ink-body: #D6D1C4;
+  --ink-muted: #9E9889;
+}
+
+html.light, [data-theme="light"] {
+  --bg: #FAF8F5;
+  --surface: #FFFFFF;
+  --surface-raised: rgba(255, 255, 255, 0.95);
+  --card-bg: #FFFFFF;
+  --ebony: #515A47;
+  --fawn: #B8974D;
+  --saddle: #7A4419;
+  
+  --line: rgba(81, 90, 71, 0.18);
+  --line-strong: rgba(184, 151, 77, 0.35);
+  
+  --ink: #1B2219;
+  --ink-secondary: #7A4419;
+  --ink-body: #384033;
+  --ink-muted: #6B7264;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background: rgba(215, 190, 130, 0.3);
+  color: var(--ink);
+}
+
+/* Custom Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(81, 90, 71, 0.5);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fawn);
+}
+
+/* Natural Modern Glass Panels */
+.glass-panel {
+  background: var(--surface-raised);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.glass-panel-glow {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 10px 30px rgba(215, 190, 130, 0.08);
+}
+
+/* Interactive Clean Hover */
+.interactive-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.interactive-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+/* Natural Heading Gradient */
+.text-gradient {
+  background: linear-gradient(135deg, var(--ink) 30%, var(--fawn) 80%, var(--saddle) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle Glowing Orbs in Palette Colors */
+@keyframes orbFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-24px) scale(1.05);
+  }
+}
+
+.orb-ambient-1 {
+  animation: orbFloat 16s ease-in-out infinite;
+}
+
+.orb-ambient-2 {
+  animation: orbFloat 20s ease-in-out infinite reverse;
+}

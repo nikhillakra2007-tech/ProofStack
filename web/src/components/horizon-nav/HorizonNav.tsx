@@ -1,41 +1,57 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/lib/theme";
-import { ROLES } from "@/lib/roles";
-import { UserRole } from "@/lib/types";
+import { ROLES, UserRole } from "@/lib/auth";
 import { useCurtain } from "@/components/layout/CurtainTransition";
-import BootSequence from "@/components/boot-sequence/BootSequence";
+import { BrandLogo } from "@/components/brand-logo/BrandLogo";
+import { Sun, Moon, LogIn, ChevronDown, Check } from "lucide-react";
 
-interface HorizonNavProps {
-  onOpenCommandPalette?: () => void;
-  onOpenNewTaskModal?: () => void;
-  onToggleCopilot?: () => void;
-}
-
-export default function HorizonNav({
-  onOpenCommandPalette,
-  onOpenNewTaskModal,
-  onToggleCopilot,
-}: HorizonNavProps) {
+export function HorizonNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { session, role, loginAs, logout, isAuthenticated } = useAuth();
-  const { resolvedTheme, toggleTheme } = useTheme();
   const { navigateWithCurtain } = useCurtain();
   const roleDef = ROLES[role] || ROLES.developer;
 
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showBootSequence, setShowBootSequence] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [scrollProgress, setScrollProgress] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Dynamic Scroll Progress listener
+  // Initialize theme from storage
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? (localStorage.getItem("sentinel_theme") as "dark" | "light" | null) : null;
+    if (saved) {
+      setTheme(saved);
+      if (saved === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.setAttribute("data-theme", "light");
+      } else {
+        document.documentElement.classList.remove("light");
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sentinel_theme", next);
+      if (next === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.setAttribute("data-theme", "light");
+      } else {
+        document.documentElement.classList.remove("light");
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -48,7 +64,6 @@ export default function HorizonNav({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close role menu on outside click
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -62,12 +77,13 @@ export default function HorizonNav({
   }, [roleMenuOpen]);
 
   const navItems = [
-    { label: "Dashboard", href: "/", pageName: "Dashboard" },
-    { label: "Cockpit", href: "/cockpit/TASK9142", pageName: "Remediation Cockpit", tag: "TASK9142" },
-    { label: "Studio", href: "/studio", pageName: "AST Studio" },
-    { label: "Findings", href: "/findings", pageName: "Security Findings", badge: "6" },
-    { label: "DAST", href: "/dast", pageName: "DAST Testing" },
-    { label: "Ledger", href: "/ledger", pageName: "Cryptographic Ledger" },
+    { label: "Overview", href: "/", pageName: "Dashboard Overview" },
+    { label: "Cockpit", href: "/cockpit", pageName: "Remediation Cockpit" },
+    { label: "AST Studio", href: "/studio", pageName: "AST Studio" },
+    { label: "Findings", href: "/findings", pageName: "Security Findings" },
+    { label: "DAST", href: "/dast", pageName: "DAST Scanner" },
+    { label: "Ledger", href: "/ledger", pageName: "Merkle Ledger" },
+    { label: "Settings", href: "/settings", pageName: "Model Settings" },
   ];
 
   const handleNavClick = (e: React.MouseEvent, href: string, label: string) => {
@@ -83,225 +99,135 @@ export default function HorizonNav({
   };
 
   return (
-    <>
-      <BootSequence forceOpen={showBootSequence} onComplete={() => setShowBootSequence(false)} />
-
-      <header
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        width: "100%",
+        background: theme === "light" ? "rgba(250, 248, 245, 0.92)" : "rgba(14, 18, 13, 0.92)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: theme === "light" ? "1px solid rgba(81, 90, 71, 0.15)" : "1px solid rgba(81, 90, 71, 0.35)",
+        transition: "background 0.25s ease, border-color 0.25s ease",
+      }}
+    >
+      {/* Subtle Top Scroll Progress Bar */}
+      <div
         style={{
-          position: "sticky",
+          position: "absolute",
           top: 0,
-          zIndex: 50,
-          width: "100%",
-          background: "rgba(7, 9, 14, 0.82)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(56, 189, 248, 0.12)",
-          transition: "background 0.3s ease, border-color 0.3s ease",
+          left: 0,
+          width: `${scrollProgress}%`,
+          height: "2px",
+          background: "linear-gradient(90deg, #7A4419 0%, #D7BE82 50%, #515A47 100%)",
+          transition: "width 0.1s linear",
+          zIndex: 60,
+        }}
+      />
+
+      <div
+        style={{
+          maxWidth: "1350px",
+          margin: "0 auto",
+          padding: "0 24px",
+          height: "64px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "24px",
         }}
       >
-        {/* Glowing Scroll Progress Bar */}
-        <div
+        {/* Brand Identity - Natural, Uncluttered with High-End Logo */}
+        <a
+          href="/"
+          onClick={(e) => handleNavClick(e, "/", "Sentinel Gate")}
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: `${scrollProgress}%`,
-            height: "2.5px",
-            background: "linear-gradient(90deg, #00F0FF 0%, #818CF8 50%, #10B981 100%)",
-            boxShadow: "0 0 10px rgba(0, 240, 255, 0.9)",
-            transition: "width 0.1s linear",
-            zIndex: 60,
-          }}
-        />
-
-        <div
-          style={{
-            maxWidth: "1400px",
-            margin: "0 auto",
-            padding: "0 24px",
-            height: "64px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: "20px",
+            textDecoration: "none",
+            flexShrink: 0,
           }}
         >
-          {/* Brand Identity */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <a
-              href="/"
-              onClick={(e) => handleNavClick(e, "/", "ProofStack")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                textDecoration: "none",
-                color: "#F8FAFC",
-              }}
-            >
-              <div
+          <BrandLogo size="md" showWordmark={true} />
+        </a>
+
+        {/* Desktop Navigation Links - Clean, Natural, No Heavy Pills */}
+        <nav
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+          className="hidden md:flex"
+        >
+          {navItems.map((item) => {
+            const active = isNavActive(item.href);
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(e) => handleNavClick(e, item.href, item.pageName)}
                 style={{
-                  width: "34px",
-                  height: "34px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #00F0FF 0%, #6366F1 100%)",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "#07090E",
-                  boxShadow: "0 0 18px rgba(0, 240, 255, 0.4)",
-                  flexShrink: 0,
+                  position: "relative",
+                  padding: "7px 12px",
+                  borderRadius: "8px",
+                  fontSize: "13.5px",
+                  fontWeight: active ? 600 : 500,
+                  color: active ? "var(--fawn)" : "var(--ink-muted)",
+                  textDecoration: "none",
+                  transition: "all 0.15s ease",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <div>
-                <b style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.02em", display: "block", lineHeight: 1.1 }}>
-                  ProofStack
-                </b>
-                <span style={{ fontSize: "10px", color: "rgba(148, 163, 184, 0.8)", fontFamily: "var(--font-mono, monospace)", letterSpacing: "0.06em" }}>
-                  Autonomous VeriFix
-                </span>
-              </div>
-            </a>
+                {active && (
+                  <motion.div
+                    layoutId="horizonIndicator"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    style={{
+                      position: "absolute",
+                      bottom: "2px",
+                      left: "12px",
+                      right: "12px",
+                      height: "2px",
+                      borderRadius: "2px",
+                      background: "var(--fawn)",
+                    }}
+                  />
+                )}
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </nav>
 
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "3px 10px",
-                borderRadius: "999px",
-                background: "rgba(16, 185, 129, 0.12)",
-                border: "1px solid rgba(16, 185, 129, 0.3)",
-                fontSize: "11px",
-                fontFamily: "var(--font-mono, monospace)",
-                color: "#10B981",
-              }}
-              className="hidden lg:inline-flex"
-            >
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px #10B981" }} />
-              8/8 Gates Enforced
-            </span>
-          </div>
-
-          {/* Desktop Navigation Links */}
-          <nav
+        {/* Right Controls: Theme Toggle + Role Switcher (App Only) + Sign In */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+          {/* Light / Dark Mode Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
             style={{
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              padding: "4px",
-              borderRadius: "30px",
-              background: "rgba(15, 23, 42, 0.6)",
-              border: "1px solid rgba(56, 189, 248, 0.15)",
-              boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+              justifyContent: "center",
+              width: "36px",
+              height: "36px",
+              borderRadius: "9px",
+              background: theme === "light" ? "rgba(81, 90, 71, 0.08)" : "rgba(215, 190, 130, 0.12)",
+              border: theme === "light" ? "1px solid rgba(81, 90, 71, 0.2)" : "1px solid rgba(215, 190, 130, 0.3)",
+              color: "var(--fawn)",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
             }}
-            className="hidden md:flex"
+            title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+            aria-label="Toggle theme"
           >
-            {navItems.map((item) => {
-              const active = isNavActive(item.href);
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href, item.pageName)}
-                  style={{
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "6px 14px",
-                    borderRadius: "20px",
-                    fontSize: "12.5px",
-                    fontWeight: active ? 600 : 500,
-                    color: active ? "#F8FAFC" : "#94A3B8",
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {active && (
-                    <motion.div
-                      layoutId="horizonActivePill"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        borderRadius: "20px",
-                        background: "rgba(56, 189, 248, 0.18)",
-                        border: "1px solid rgba(56, 189, 248, 0.35)",
-                        boxShadow: "0 0 12px rgba(56, 189, 248, 0.2)",
-                        zIndex: -1,
-                      }}
-                    />
-                  )}
-                  <span>{item.label}</span>
-                  {item.tag && (
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono, monospace)",
-                        fontSize: "9px",
-                        padding: "1px 5px",
-                        borderRadius: "4px",
-                        background: "rgba(255, 255, 255, 0.08)",
-                        color: "#38BDF8",
-                      }}
-                    >
-                      {item.tag}
-                    </span>
-                  )}
-                  {item.badge && (
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono, monospace)",
-                        fontSize: "9px",
-                        padding: "1px 5px",
-                        borderRadius: "10px",
-                        background: "rgba(244, 63, 94, 0.18)",
-                        color: "#F43F5E",
-                        border: "1px solid rgba(244, 63, 94, 0.3)",
-                      }}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </a>
-              );
-            })}
-          </nav>
+            {theme === "dark" ? <Sun style={{ width: "16px", height: "16px" }} /> : <Moon style={{ width: "16px", height: "16px" }} />}
+          </button>
 
-          {/* Right Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {/* Cinematic Boot Re-trigger */}
-            <button
-              type="button"
-              onClick={() => setShowBootSequence(true)}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "6px 10px",
-                borderRadius: "8px",
-                fontSize: "11px",
-                fontFamily: "var(--font-mono, monospace)",
-                fontWeight: 500,
-                background: "rgba(56, 189, 248, 0.08)",
-                color: "#38BDF8",
-                border: "1px solid rgba(56, 189, 248, 0.25)",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              title="Re-run telemetry boot simulation"
-              className="hidden sm:inline-flex"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-              <span>Boot Telemetry</span>
-            </button>
-
-            {/* Role Switcher Dropdown */}
+          {/* Role Switcher Dropdown - ONLY shown on application views, NEVER on public landing page! */}
+          {pathname !== "/" && (
             <div style={{ position: "relative" }} ref={menuRef}>
               <button
                 type="button"
@@ -310,21 +236,23 @@ export default function HorizonNav({
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
-                  padding: "5px 10px 5px 6px",
-                  borderRadius: "20px",
-                  background: "rgba(15, 23, 42, 0.8)",
-                  border: "1px solid rgba(56, 189, 248, 0.2)",
+                  padding: "6px 12px 6px 8px",
+                  borderRadius: "9px",
+                  background: theme === "light" ? "rgba(255, 255, 255, 0.9)" : "rgba(21, 27, 19, 0.9)",
+                  border: theme === "light" ? "1px solid rgba(81, 90, 71, 0.2)" : "1px solid rgba(81, 90, 71, 0.4)",
                   cursor: "pointer",
-                  color: "#F8FAFC",
+                  color: "var(--ink)",
+                  fontSize: "12.5px",
+                  fontWeight: 500,
                 }}
               >
                 <div
                   style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)",
-                    color: "#07090E",
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "#D7BE82",
+                    color: "#0E120D",
                     fontSize: "10px",
                     fontWeight: 700,
                     display: "grid",
@@ -333,220 +261,180 @@ export default function HorizonNav({
                 >
                   {role.slice(0, 2).toUpperCase()}
                 </div>
-                <span style={{ fontSize: "11.5px", fontWeight: 500 }}>
-                  {roleDef.label}
-                </span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
+                <span className="hidden sm:inline">{roleDef.label}</span>
+                <ChevronDown style={{ width: "12px", height: "12px", opacity: 0.6 }} />
               </button>
 
-              <AnimatePresence>
-                {roleMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 4, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      top: "calc(100% + 8px)",
-                      width: "250px",
-                      borderRadius: "14px",
-                      background: "rgba(15, 23, 42, 0.95)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(56, 189, 248, 0.25)",
-                      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.6)",
-                      padding: "10px",
-                      zIndex: 100,
-                    }}
-                  >
-                    <div style={{ padding: "6px 8px 10px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", marginBottom: "8px" }}>
-                      <div style={{ fontSize: "10px", color: "#38BDF8", fontFamily: "var(--font-mono, monospace)", letterSpacing: "0.08em" }}>
-                        CURRENT OPERATOR
-                      </div>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF", marginTop: "2px" }}>
-                        {roleDef.roleTitle}
-                      </div>
-                      <div style={{ fontSize: "10.5px", color: "#94A3B8", marginTop: "1px" }}>
-                        {session?.email || "architect@proofstack.internal"}
-                      </div>
+            <AnimatePresence>
+              {roleMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                  transition={{ duration: 0.12 }}
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "calc(100% + 8px)",
+                    width: "240px",
+                    borderRadius: "12px",
+                    background: theme === "light" ? "#FFFFFF" : "rgba(21, 27, 19, 0.98)",
+                    backdropFilter: "blur(20px)",
+                    border: theme === "light" ? "1px solid rgba(81, 90, 71, 0.2)" : "1px solid rgba(215, 190, 130, 0.3)",
+                    boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)",
+                    padding: "8px",
+                    zIndex: 100,
+                  }}
+                >
+                  <div style={{ padding: "6px 8px 8px", borderBottom: "1px solid var(--line)", marginBottom: "6px" }}>
+                    <div style={{ fontSize: "10px", color: "var(--fawn)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                      Active Operator
                     </div>
-
-                    <div style={{ fontSize: "10px", fontFamily: "var(--font-mono, monospace)", color: "#64748B", padding: "4px 8px" }}>
-                      SWITCH OPERATIONAL ROLE
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", marginTop: "2px" }}>
+                      {roleDef.roleTitle}
                     </div>
-
-                    {(Object.keys(ROLES) as UserRole[]).map((r) => {
-                      const rDef = ROLES[r];
-                      const active = role === r;
-                      return (
-                        <button
-                          key={r}
-                          type="button"
-                          onClick={() => {
-                            loginAs(r);
-                            setRoleMenuOpen(false);
-                          }}
-                          style={{
-                            width: "100%",
-                            textAlign: "left",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "7px 10px",
-                            borderRadius: "8px",
-                            fontSize: "12px",
-                            color: active ? "#38BDF8" : "#E2E8F0",
-                            background: active ? "rgba(56, 189, 248, 0.12)" : "transparent",
-                            cursor: "pointer",
-                            border: "none",
-                            marginBottom: "2px",
-                          }}
-                        >
-                          <span style={{ fontWeight: active ? 600 : 400 }}>{rDef.label}</span>
-                          {active && <span style={{ color: "#10B981", fontSize: "12px" }}>✓</span>}
-                        </button>
-                      );
-                    })}
-
-                    <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", marginTop: "8px", paddingTop: "8px" }}>
-                      {isAuthenticated ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRoleMenuOpen(false);
-                            logout();
-                            navigateWithCurtain("/login", "Sign In");
-                          }}
-                          style={{
-                            width: "100%",
-                            textAlign: "left",
-                            padding: "7px 10px",
-                            fontSize: "12px",
-                            color: "#F43F5E",
-                            cursor: "pointer",
-                            background: "transparent",
-                            border: "none",
-                            borderRadius: "6px",
-                          }}
-                        >
-                          Sign Out
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRoleMenuOpen(false);
-                            navigateWithCurtain("/login", "Sign In");
-                          }}
-                          style={{
-                            width: "100%",
-                            textAlign: "left",
-                            padding: "7px 10px",
-                            fontSize: "12px",
-                            color: "#38BDF8",
-                            cursor: "pointer",
-                            background: "transparent",
-                            border: "none",
-                            borderRadius: "6px",
-                          }}
-                        >
-                          Sign In / Enter
-                        </button>
-                      )}
+                    <div style={{ fontSize: "11px", color: "var(--ink-muted)", marginTop: "1px" }}>
+                      {session?.email || "developer@sentinel.internal"}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                  </div>
 
-            {/* Mobile Hamburger Button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "8px",
-                background: "rgba(15, 23, 42, 0.8)",
-                border: "1px solid rgba(56, 189, 248, 0.2)",
-                color: "#F8FAFC",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-              className="md:hidden"
-              aria-label="Toggle navigation"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                {mobileMenuOpen ? (
-                  <path d="M18 6L6 18M6 6l12 12" />
-                ) : (
-                  <path d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
+                  <div style={{ fontSize: "10px", color: "var(--ink-muted)", padding: "4px 8px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Switch Role
+                  </div>
 
-        {/* Mobile Navigation Drawer */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              style={{
-                overflow: "hidden",
-                background: "rgba(7, 9, 14, 0.95)",
-                borderTop: "1px solid rgba(56, 189, 248, 0.15)",
-                padding: "16px 24px",
-              }}
-              className="md:hidden"
-            >
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {navItems.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href, item.pageName)}
-                    style={{
-                      padding: "10px 14px",
-                      borderRadius: "10px",
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      color: isNavActive(item.href) ? "#38BDF8" : "#E2E8F0",
-                      background: isNavActive(item.href) ? "rgba(56, 189, 248, 0.12)" : "transparent",
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>{item.label}</span>
-                    {item.badge && (
-                      <span
+                  {(Object.keys(ROLES) as UserRole[]).map((r) => {
+                    const rDef = ROLES[r];
+                    const active = role === r;
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => {
+                          loginAs(r);
+                          setRoleMenuOpen(false);
+                        }}
                         style={{
-                          fontSize: "10px",
-                          padding: "2px 6px",
-                          borderRadius: "10px",
-                          background: "rgba(244, 63, 94, 0.2)",
-                          color: "#F43F5E",
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "7px 8px",
+                          borderRadius: "7px",
+                          background: active ? "rgba(215, 190, 130, 0.15)" : "transparent",
+                          border: "none",
+                          color: active ? "var(--fawn)" : "var(--ink)",
+                          fontSize: "12px",
+                          fontWeight: active ? 600 : 500,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
                         }}
                       >
-                        {item.badge}
-                      </span>
-                    )}
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-    </>
+                        <span>{rDef.roleTitle}</span>
+                        {active && <Check style={{ width: "12px", height: "12px", color: "var(--fawn)" }} />}
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+          {/* Sign In / Launch Cockpit Action */}
+          <a
+            href={isAuthenticated ? "/cockpit" : "/login"}
+            onClick={(e) => handleNavClick(e, isAuthenticated ? "/cockpit" : "/login", isAuthenticated ? "Remediation Cockpit" : "Authentication")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "7px 14px",
+              borderRadius: "8px",
+              fontSize: "13px",
+              fontWeight: 600,
+              background: "var(--fawn)",
+              color: "#0E120D",
+              textDecoration: "none",
+              cursor: "pointer",
+              transition: "opacity 0.2s ease",
+            }}
+          >
+            {isAuthenticated ? (
+              <>
+                <span>Cockpit</span>
+                <ChevronDown style={{ width: "12px", height: "12px", transform: "rotate(-90deg)" }} />
+              </>
+            ) : (
+              <>
+                <LogIn style={{ width: "13px", height: "13px" }} />
+                <span>Sign In</span>
+              </>
+            )}
+          </a>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "8px",
+              background: "transparent",
+              border: "1px solid var(--line)",
+              color: "var(--ink)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+            className="md:hidden"
+            aria-label="Toggle navigation"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobileMenuOpen ? <path d="M18 6L6 18M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{
+              background: theme === "light" ? "#FFFFFF" : "#151B13",
+              borderBottom: "1px solid var(--line)",
+              padding: "16px 24px",
+            }}
+            className="md:hidden"
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href, item.pageName)}
+                  style={{
+                    padding: "10px",
+                    color: isNavActive(item.href) ? "var(--fawn)" : "var(--ink)",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                  }}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }
+
+export default HorizonNav;

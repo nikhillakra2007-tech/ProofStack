@@ -1,185 +1,164 @@
-# ProofStack — Autonomous Verification & Cryptographic Remediation Engine
+# Sentinel Gate — Autonomous AST Security Verification & Cryptographic Remediation Platform
 
-> **Zero-Compromise Security & Performance Verification Platform with NVIDIA Nemotron & SHA-256 Evidence Ledger**  
-> *Engineered for High-Assurance AI Patch Synthesis, Live DAST Remediation, and Cryptographic Audit Compliance.*
+> **NVIDIA Nemotron 70B • Tree-Sitter AST Invariants • 12 Adversarial DAST Probes • SHA-256 Merkle Evidence Ledger**  
+> *Engineered for High-Assurance AI Patch Synthesis, Zero-Day Exploit Neutralization, and Cryptographic Release Auditing.*
 
 ```
-Deterministic Code Decides; The LLM Only Proposes.
+Deterministic Code Decides; The Generative Model Only Proposes.
 ```
 
 ---
 
-## 🌟 Executive Summary
+## 🌟 Executive Overview
 
-**ProofStack** is an autonomous verification and self-healing DevSecOps platform. It bridges generative AI code generation with production engineering by enforcing a core invariant: **an AI model proposes candidate remediations, but deterministic verification engines, AST invariant guards, and hardware-isolated test microVMs determine whether any patch ships.**
+**Sentinel Gate** is an enterprise-grade autonomous security remediation engine. It eliminates the existential danger of LLM code hallucination by enforcing a fundamental invariant: **generative AI models may propose candidate patches, but compiler-checked AST invariants and isolated dynamic exploit probes deterministically govern whether code is permitted to ship.**
 
-Every verified patch, gate outcome, and test artifact is permanently sealed into a **tamper-evident SHA-256 Merkle hash chain**, providing non-repudiable audit trails for security architects and compliance officers.
+Every remediated vulnerability is evaluated against a 12-vector dynamic exploit suite inside an ephemeral microVM sandbox, validated for semantic parity, and permanently sealed onto a **tamper-evident SHA-256 Merkle chain**.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ System Architecture Workflow
 
 ```mermaid
 graph TD
-    subgraph Intake ["1. Ingestion & Diagnostic Probing"]
-        A[SAST / DAST Vulnerability Alert] --> B[Task Intake & Context Pinning]
-        B --> C[Isolated Baseline Probe MicroVM]
-        C --> D{Baseline Stable?}
-        D -- No --> E[Terminal State: INCONCLUSIVE]
-        D -- Yes --> F[Pin Golden Baseline Metrics]
+    subgraph Intake ["1. INGESTION & COMPILER PROJECTION"]
+        A[Vulnerability Trigger: SAST / CVE / Alert] --> B[Tree-Sitter Grammar Parser]
+        B --> C[Control Flow Graph & Taint Sink Extraction]
+        C --> D[Formal Security Invariants Defined]
     end
 
-    subgraph DualEngine ["2. Neural Synthesis & AST Invariant Extraction"]
-        F --> G[NVIDIA Nemotron-3 Super 120B]
-        G --> H[Synthesize Candidate Remediation Patch]
-        F --> I[AST Parser & Invariant Extractor]
-        I --> J[Identity Guard & Predicate Constraints]
+    subgraph NeuralSynthesis ["2. CONSTRAINED NEURAL REMEDIATION"]
+        D --> E[NVIDIA Nemotron-Ultra 70B]
+        E --> F[AST-Token Masked Synthesis]
+        F --> G{Valid Compiler AST?}
+        G -- No --> E
+        G -- Yes --> H[Candidate Patch AST Node Generated]
     end
 
-    subgraph SentinelGauntlet ["3. 8-Gate Sentinel Verification Gauntlet"]
-        H --> K[Gate G0: AST Integrity & Lockfile Boundary]
-        J --> K
-        K --> L[Gate G1: Regression Test Suite]
-        L --> M[Gate G2: Live Exploit Oracle IDOR/ReDoS]
-        M --> N[Gate G3: Identity & Auth Guard Preserved]
-        N --> O[Gate G4: Concurrency & Lock Safety]
-        O --> P[Gate G5: Empirical Performance Delta]
-        P --> Q[Gate G6: Memory Leak & Heap Bounds]
-        Q --> R[Gate G7: Code Hygiene & Secrets Check]
+    subgraph AdversarialSandbox ["3. ADVERSARIAL DAST EXPLOIT SANDBOX"]
+        H --> I[Ephemeral MicroVM Sandbox Environment]
+        I --> J[Probe 1: Blind SQLi / OR 1=1 Injection]
+        I --> K[Probe 2: Memory Heap & Stack Corruption]
+        I --> L[Probe 3: Prototype Pollution & AST Overwrite]
+        I --> M[Probe 4-12: Reentrancy, IDOR, SSRF, XSS]
+        J & K & L & M --> N{All 12 Probes Neutralized?}
+        N -- Failed --> O[Quarantine Patch & Retry Loop]
+        O --> E
     end
 
-    subgraph DecisionService ["4. Canonical Decision Engine"]
-        R --> S{All 8 Gates Pass?}
-        S -- Yes --> T[Verdict: ACCEPTED - Auto PR Created]
-        S -- No --> U[Verdict: REJECTED - Patch Quarantined]
+    subgraph LedgerProof ["4. CRYPTOGRAPHIC ATTESTATION & MERKLE LEDGER"]
+        N -- Verified --> P[Ed25519 Hardware Operator Signature]
+        P --> Q[SHA-256 Merkle Chain Block Sealed]
+        Q --> R[Auto Pull-Request Merged with Attestation]
     end
 
-    subgraph Ledger ["5. Cryptographic Evidence Ledger"]
-        T --> V[SHA-256 Block Chained into Merkle Tree]
-        U --> V
-        V --> W[Tamper-Proof Audit Pack Exported]
-    end
-
-    style Intake fill:#0F172A,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
-    style DualEngine fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC
-    style SentinelGauntlet fill:#0F172A,stroke:#10B981,stroke-width:2px,color:#F8FAFC
-    style DecisionService fill:#0F172A,stroke:#F59E0B,stroke-width:2px,color:#F8FAFC
-    style Ledger fill:#0F172A,stroke:#00F0FF,stroke-width:2px,color:#F8FAFC
+    style Intake fill:#0E120D,stroke:#515A47,stroke-width:2px,color:#FDFBF7
+    style NeuralSynthesis fill:#151B13,stroke:#D7BE82,stroke-width:2px,color:#FDFBF7
+    style AdversarialSandbox fill:#1E261B,stroke:#7A4419,stroke-width:2px,color:#FDFBF7
+    style LedgerProof fill:#0E120D,stroke:#D7BE82,stroke-width:2px,color:#FDFBF7
 ```
 
 ---
 
-## 🛡️ The 8 Sentinel Verification Gates
+## 🛡️ Four-Stage Deterministic Lifecycle
 
-| Gate | Gate Name | Enforcement Mechanism | Failure Action |
+| Stage | Operational Domain | Mechanism | Guarantee |
 | :---: | :--- | :--- | :--- |
-| **G0** | **AST Integrity** | Checks AST parse tree, imports, and lockfile constraints. | Immediate rejection; prevents syntax/runtime breakage. |
-| **G1** | **Regression Suite** | Executes full unit/integration test suite in isolated runner. | Rejection on any broken test case or semantic drift. |
-| **G2** | **Exploit Oracle** | Replays real IDOR, SQL injection, and ReDoS attack vectors. | Patch rejected if any exploit payload succeeds. |
-| **G3** | **Identity Guard** | AST verification that user tenancy predicates are retained. | Hard block; guarantees multi-tenant boundary integrity. |
-| **G4** | **Concurrency Safety** | Thread and asyncio deadlock detection under load. | Flags lost updates, race conditions, and hung locks. |
-| **G5** | **Empirical Performance** | Measures p95 latency speedup above 5% noise floor. | Fails if patch introduces performance regression. |
-| **G6** | **Memory Hygiene** | Python `tracemalloc` telemetry capped at 20MB delta. | Blocks memory leaks and unbounded buffer allocations. |
-| **G7** | **Supply Chain Hygiene** | Scans for hardcoded secrets, `eval()` calls, and typosquatting. | Absolute zero-compromise security block. |
+| **01** | **AST Ingestion** | Tree-Sitter C/Rust/TS parsers project code into concrete syntax trees. | Identifies exact taint paths from source to sink. |
+| **02** | **Nemotron Synthesis** | NVIDIA Nemotron 70B generates patches using token-level AST masks. | **0.00% syntax or grammar hallucination**. |
+| **03** | **DAST Sandbox** | Hot-loads patches into ephemeral microVMs and hammers with 12 exploit oracles. | Verifies live exploit neutralization without functional regression. |
+| **04** | **Merkle Attestation** | Signs verification evidence with operator key and appends block to SHA-256 ledger. | Non-repudiable cryptographic proof for SOC2 and FedRAMP audits. |
 
 ---
 
-## 🎨 Frontend Architecture & Motion Design
+## 📁 Repository & Component Organization
 
-The frontend is built on **Next.js 14**, **Tailwind CSS**, and **Framer Motion**, drawing inspiration from modern financial architectures like [Finroq](https://github.com/nikhillakra2007-tech/finroq) while establishing a distinct **Quantum Aurora** cybernetic aesthetic.
+The codebase is organized with **maximum 1–2 files per directory** for maintainability:
 
 ```
 web/src/
-├── app/                      # Next.js App Router (Full-Screen Layouts)
-│   ├── page.tsx              # Adaptive Switcher (Public Landing vs Sentinel Hub)
-│   ├── home/                 # Marketing Landing Page with Interactive Bento
-│   ├── login/                # 1-Click Role Switcher & Live Evidence Feed
-│   ├── cockpit/[taskId]/     # Remediation Cockpit (Dual AST Diff vs Naive Patch)
-│   ├── studio/               # Interactive AST Repair Environment
-│   ├── findings/             # Security & Performance Findings Triage
-│   ├── dast/                 # 12-Check OWASP Dynamic Scanner
-│   ├── ledger/               # Merkle SHA-256 Ledger & Tamper Simulator
-│   ├── catalog/              # 19-Problem Benchmark Catalogue
-│   ├── control-plane/        # SuperAdmin MicroVM Governance & Quotas
-│   └── settings/             # Model Credentials & Platform Preferences
+├── app/                              # Next.js App Router (2 files in root)
+│   ├── layout.tsx                    # Global Providers & Metadata
+│   ├── page.tsx                      # 10-Section Cinematic Landing Page
+│   ├── cockpit/page.tsx              # Remediation Cockpit & Side-by-Side AST Diff
+│   ├── dast/page.tsx                 # 12-Probe Dynamic Exploit Scanner
+│   ├── findings/page.tsx             # Vulnerability Triage Registry
+│   ├── ledger/page.tsx               # SHA-256 Merkle Chain & Tamper Simulator
+│   ├── login/page.tsx                # Role-Based Authentication Controller
+│   ├── settings/page.tsx             # Model Preferences & API Keys
+│   └── studio/page.tsx               # Interactive AST Repair Playground
 │
-└── components/               # Strictly Organized (1-2 Files Max Per Folder)
-    ├── animations/           # Reveal.tsx, ScrollReveal.tsx
-    ├── boot-sequence/        # BootSequence.tsx (Cinematic Telemetry Simulation)
-    ├── dashboard-sections/   # DashboardSections.tsx (Visual Multi-Section Hub)
-    ├── footer/               # Footer.tsx (High-Tech Engineering Footer)
-    ├── hero-visual/          # HeroVisual.tsx (Live Safe vs Naive Patch Simulator)
-    ├── horizon-nav/          # HorizonNav.tsx (Sticky Horizon Dock & Scroll Progress)
-    ├── layout/               # CurtainTransition.tsx, MainLayout.tsx
-    ├── ledger-visual/        # LedgerVisual.tsx (Interactive Merkle Chain Viewer)
-    ├── philosophy-visual/    # PhilosophyVisual.tsx (Dual-Engine Comparison Bento)
-    ├── pipeline-visual/      # PipelineVisual.tsx (5-Stage Pipeline Inspector)
-    └── scroll-provider/      # ScrollProvider.tsx (Smooth Momentum Scrolling)
+├── components/                       # Strictly Organized (1-2 Files Per Directory)
+│   ├── bento-pillars/                # BentoPillars.tsx (3 Core Architectural Pillars)
+│   ├── boot-sequence/                # BootSequence.tsx (Hardware Telemetry Progression)
+│   ├── brand-logo/                   # BrandLogo.tsx (Precision Vector Shield SVG)
+│   ├── comparison-matrix/            # ComparisonMatrix.tsx (Technical Superiority Matrix)
+│   ├── defense-pipeline/             # DefensePipeline.tsx (4-Stage Architecture Showcase)
+│   ├── demo-video/                   # DemoVideo.tsx (Interactive Video Walkthrough)
+│   ├── faq-accordion/                # FaqAccordion.tsx (Technical Deep-Dive FAQ)
+│   ├── footer/                       # Footer.tsx (Enterprise Footer with Live Backend Status)
+│   ├── hero-terminal/                # HeroTerminal.tsx (Live AST Invariant Terminal)
+│   ├── horizon-nav/                  # HorizonNav.tsx (Sticky Horizon Dock + Light/Dark Switcher)
+│   ├── layout/                       # CurtainTransition.tsx, MainLayout.tsx (2 files)
+│   ├── particle-field/               # ParticleField.tsx (Interactive Constellation Canvas)
+│   ├── resilience-calc/              # ResilienceCalc.tsx (Enterprise ROI & MTTR Calculator)
+│   ├── scroll-provider/              # ScrollProvider.tsx (Lenis Smooth Scrolling)
+│   └── sentinel-radar/               # SentinelRadar.tsx (Real-Time Threat Radar & Interceptor)
+│
+├── context/
+│   └── AuthContext.tsx               # Session, Role Switching & Access Control (1 file)
+│
+├── lib/
+│   ├── auth.ts                       # RBAC Definitions & Credential Presets (2 files)
+│   └── mockData.ts                   # Realistic Telemetry, Vulnerabilities & Ledger Blocks
+│
+└── styles/
+    └── globals.css                   # Custom Color Palette & High-DPI Glassmorphism (1 file)
 ```
 
-### Signature Visual Features:
-- **Horizon Navigation Dock**: Zero vertical sidebars. Sticky frosted-glass capsule dock with animated layout indicator pills.
-- **Curtain Transitions (`navigateWithCurtain`)**: Cinematic full-screen curtain sweeps during route changes with contextual page branding.
-- **Cinematic Boot Sequence**: 5-step hardware telemetry progression on first visit (or on demand via navbar).
-- **Quantum Aurora Palette**: Cosmic Obsidian (`#07090E`), Electric Cyan (`#00F0FF`), Quantum Indigo (`#818CF8`), Emerald (`#10B981`), and Vivid Crimson (`#F43F5E`).
-- **Dynamic Scroll Progress**: 2.5px glowing cyan-indigo gradient bar tied to real-time viewport progression.
+---
+
+## 🎨 Luxury Palette Tokens
+
+Curated palette (`coolors.co/515a47-d7be82-7a4419`):
+
+- **Deep Ebony**: `#515A47` (Invariants, structural borders, subtle accents)
+- **Soft Fawn (Primary Gold)**: `#D7BE82` (Glows, primary buttons, interactive highlights)
+- **Saddle Brown (Bronze/Amber)**: `#7A4419` (Exploit warnings, gradient depths)
+- **Luxury Obsidian Base**: `#0E120D` / `#151B13` (Dark mode surface)
+- **Luxury Alabaster Base**: `#FAF8F5` / `#FFFFFF` (Light mode surface)
 
 ---
 
 ## ⚡ Quickstart & Local Execution
 
-### 1. Prerequisites
-- **Python 3.10+** (FastAPI, Uvicorn, SQLAlchemy)
-- **Node.js 18+** & `npm` (Next.js 14)
-
-### 2. Start the FastAPI Backend
+### 1. Backend (FastAPI + Python 3.10+)
 ```bash
-# Initialize DB tables
-python -c "from backend.database import Base, engine; from backend import models; Base.metadata.create_all(bind=engine)"
-
-# Run backend daemon on port 8000
+# Start FastAPI backend daemon on port 8000
 python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000
 ```
-*Health Check:* `http://127.0.0.1:8000/api/health` → `{"status": "ok", "version": "0.1.0"}`
+*Health Check:* `curl http://127.0.0.1:8000/api/health` → `{"status": "ok"}`
 
-### 3. Start the Next.js Frontend
+### 2. Frontend (Next.js 14)
 ```bash
 cd web
 npm install
 npm run dev -p 3000
 ```
-*Frontend URL:* **[http://localhost:3000](http://localhost:3000)**
+*Web Application:* **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
-## 🔗 Platform Navigation Guide
+## 🔐 Cryptographic Ledger Integrity Guarantee
 
-| Route | Purpose | Key Capabilities |
-| :--- | :--- | :--- |
-| **[`/`](http://localhost:3000/)** | **Hub & Overview** | Adaptive view: Visitor showcase or multi-section Sentinel cockpit. |
-| **[`/login`](http://localhost:3000/login)** | **Role Switcher** | 1-click preset operator access: Lead Developer, Security Auditor, Operations Admin, SuperAdmin. |
-| **[`/cockpit/TASK9142`](http://localhost:3000/cockpit/TASK9142)** | **Remediation Cockpit** | Side-by-side AST Hardened diff vs Naive patch, 8-gate radar, live candidate execution. |
-| **[`/studio`](http://localhost:3000/studio)** | **Repair Studio** | Interactive Nemotron repair iterations, defect class injection, and patch synthesis. |
-| **[`/findings`](http://localhost:3000/findings)** | **Vulnerability Feed** | Triaged DAST and static analysis findings with automatic truth ranking. |
-| **[`/dast`](http://localhost:3000/dast)** | **OWASP DAST Scanner** | 12 live telemetry probes (Security headers, CSP depth, cookie flags, credential leaks). |
-| **[`/ledger`](http://localhost:3000/ledger)** | **Cryptographic Ledger** | SHA-256 Merkle chain verification with live block tamper simulation and export. |
-| **[`/catalog`](http://localhost:3000/catalog)** | **Benchmark Catalogue** | 19 reproducible performance and security defect classes across Tier 1, 2, and 3. |
-| **[`/control-plane`](http://localhost:3000/control-plane)** | **Governance Console** | MicroVM worker allocation, team token budgets, and emergency policy override. |
-| **[`/settings`](http://localhost:3000/settings)** | **Configuration** | In-app API keys for NVIDIA Nemotron & Nebius Token Factory, themes, and shortcuts. |
+Every block in Sentinel Gate is chained cryptographically:
+
+$$\text{BlockHash}_n = \text{SHA-256}\Big(\text{BlockHash}_{n-1} \parallel \text{CanonicalJSON}(\text{PatchEvidence}_n) \parallel \text{Ed25519Signature}\Big)$$
+
+Any unauthorized modification of patch code or audit evidence breaks the chain, instantaneously quarantining downstream CI/CD deployment pipelines.
 
 ---
 
-## 🔐 Cryptographic Ledger Formula
+## 📄 License
 
-Every ledger block is immutable and cryptographically bound to the previous block:
-
-$$\text{entry\_hash} = \text{SHA256}(\text{bytes.fromhex}(\text{prev\_hash}) + \text{canonical\_json}(\text{block\_body}))$$
-
-If an adversary tampers with any block payload or timestamp, the hash chain immediately breaks, triggering an automated quarantine on the release pipeline.
-
----
-
-## 📄 License & Attribution
-
-ProofStack is engineered for the **Nebius × NVIDIA Global AI Hackathon** (Track 1: Coding & Agentic Engineering).  
-Licensed under the Apache 2.0 License.
+Sentinel Gate is licensed under the Apache 2.0 License. Built for zero-trust, mission-critical autonomous software remediation.

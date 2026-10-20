@@ -1,12 +1,13 @@
-import "./globals.css";
-import LenisScrollProvider from "@/components/scroll-provider/ScrollProvider";
+import React from "react";
+import type { Metadata } from "next";
+import "@/styles/globals.css";
+import { ScrollProvider } from "@/components/scroll-provider/ScrollProvider";
 import { AuthProvider } from "@/context/AuthContext";
-import { ThemeProvider } from "@/lib/theme";
 import { CurtainProvider } from "@/components/layout/CurtainTransition";
 
-export const metadata = {
-  title: "ProofStack | Autonomous DevSecOps Engine",
-  description: "Autonomous Security Remediation & Cryptographic AST Verification Platform with NVIDIA Nemotron",
+export const metadata: Metadata = {
+  title: "Sentinel Gate | Deterministic AST Security & Exploit Oracle",
+  description: "Autonomous AST vulnerability remediation, 12 DAST exploit sandboxes, and SHA-256 Merkle audit chains powered by NVIDIA Nemotron.",
 };
 
 export default function RootLayout({
@@ -15,25 +16,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="dark" data-palette="quantum-aurora">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen antialiased bg-[#07090E] text-[#F8FAFC]">
-        <LenisScrollProvider>
-          <ThemeProvider>
-            <AuthProvider>
-              <CurtainProvider>
-                {children}
-              </CurtainProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </LenisScrollProvider>
+    <html lang="en" className="dark">
+      <body className="bg-[#0E120D] text-[#FDFBF7] min-h-screen selection:bg-[#D7BE82]/30 selection:text-[#FDFBF7]">
+        <ScrollProvider>
+          <AuthProvider>
+            <CurtainProvider>
+              {children}
+            </CurtainProvider>
+          </AuthProvider>
+        </ScrollProvider>
       </body>
     </html>
   );

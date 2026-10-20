@@ -3,12 +3,13 @@
 import React, { ReactNode } from "react";
 import HorizonNav from "@/components/horizon-nav/HorizonNav";
 import Footer from "@/components/footer/Footer";
+import ParticleField from "@/components/particle-field/ParticleField";
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div
       style={{
@@ -21,49 +22,52 @@ export default function MainLayout({ children }: MainLayoutProps) {
         overflowX: "hidden",
       }}
     >
-      {/* Ambient Celestial Glows (Quantum Aurora: Obsidian, Cyan, Indigo) */}
+      {/* Interactive Particle Constellation Joining Background */}
+      <ParticleField />
+
+      {/* Ambient Radiant Glows in Soft Fawn (D7BE82) & Saddle Brown (7A4419) & Ebony (515A47) */}
       <div
-        className="orb-glow-1"
+        className="orb-ambient-1"
         style={{
           position: "fixed",
-          top: "-150px",
+          top: "-160px",
           left: "15%",
-          width: "550px",
-          height: "550px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%)",
-          filter: "blur(60px)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-      <div
-        className="orb-glow-2"
-        style={{
-          position: "fixed",
-          top: "40%",
-          right: "-150px",
           width: "650px",
           height: "650px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(129, 140, 248, 0.10) 0%, rgba(16, 185, 129, 0.04) 50%, transparent 70%)",
-          filter: "blur(80px)",
+          background: "radial-gradient(circle, rgba(215, 190, 130, 0.14) 0%, rgba(81, 90, 71, 0.08) 50%, transparent 70%)",
+          filter: "blur(90px)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      <div
+        className="orb-ambient-2"
+        style={{
+          position: "fixed",
+          top: "45%",
+          right: "-160px",
+          width: "700px",
+          height: "700px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(122, 68, 25, 0.16) 0%, rgba(215, 190, 130, 0.06) 50%, transparent 70%)",
+          filter: "blur(100px)",
           pointerEvents: "none",
           zIndex: 0,
         }}
       />
 
-      {/* Horizon Navigation Dock (Zero sidebars) */}
+      {/* Sticky Top Horizon Dock */}
       <HorizonNav />
 
-      {/* Main Content Viewport */}
+      {/* Main Viewport */}
       <main
         style={{
           flex: 1,
           width: "100%",
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "32px 24px 64px 24px",
+          padding: "36px 24px 64px 24px",
           position: "relative",
           zIndex: 1,
         }}
@@ -71,8 +75,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
         {children}
       </main>
 
-      {/* High-Tech Soothing Footer */}
+      {/* Engineering Footer */}
       <Footer />
     </div>
   );
 }
+
+export default MainLayout;

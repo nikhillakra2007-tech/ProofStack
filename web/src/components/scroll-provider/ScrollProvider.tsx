@@ -3,16 +3,16 @@
 import React, { useEffect, useRef } from "react";
 import Lenis from "lenis";
 
-interface LenisScrollProviderProps {
+interface ScrollProviderProps {
   children: React.ReactNode;
 }
 
-export default function LenisScrollProvider({ children }: LenisScrollProviderProps) {
+export function ScrollProvider({ children }: ScrollProviderProps) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.1,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 2,
       infinite: false,
@@ -35,3 +35,5 @@ export default function LenisScrollProvider({ children }: LenisScrollProviderPro
 
   return <>{children}</>;
 }
+
+export default ScrollProvider;
