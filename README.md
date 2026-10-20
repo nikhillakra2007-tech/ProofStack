@@ -1,11 +1,33 @@
 # Sentinel Gate — Autonomous AST Security Verification & Cryptographic Remediation Platform
 
-> **NVIDIA Nemotron 70B • Tree-Sitter AST Invariants • 12 Adversarial DAST Probes • SHA-256 Merkle Evidence Ledger**  
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Production-D7BE82?style=for-the-badge&logo=vercel&logoColor=0E120D)](https://web-bay-eight-49.vercel.app)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-515A47?style=for-the-badge&logo=next.js&logoColor=white)](https://web-bay-eight-49.vercel.app)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-7A4419?style=for-the-badge&logo=nvidia&logoColor=white)](https://web-bay-eight-49.vercel.app)
+[![Audit](https://img.shields.io/badge/Merkle_Ledger-SHA--256-D7BE82?style=for-the-badge&logo=shield&logoColor=0E120D)](https://web-bay-eight-49.vercel.app/ledger)
+
+> **🚀 LIVE PRODUCTION APPLICATION**: **[https://web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)**  
 > *Engineered for High-Assurance AI Patch Synthesis, Zero-Day Exploit Neutralization, and Cryptographic Release Auditing.*
 
 ```
 Deterministic Code Decides; The Generative Model Only Proposes.
 ```
+
+---
+
+## 🌐 Live Production Navigation Guide
+
+Access the complete Sentinel Gate platform directly on Vercel:
+
+| Platform Module | Production URL | Operational Role |
+| :--- | :--- | :--- |
+| **🌐 Public Landing & Walkthrough** | **[web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)** | 10-section cinematic walkthrough, demo video, and interactive radar. |
+| **🛡️ Remediation Cockpit** | **[web-bay-eight-49.vercel.app/cockpit](https://web-bay-eight-49.vercel.app/cockpit)** | Side-by-side AST Hardened diff vs vulnerable source, 8-gate radar. |
+| **🔬 AST Studio** | **[web-bay-eight-49.vercel.app/studio](https://web-bay-eight-49.vercel.app/studio)** | Interactive Nemotron 70B prompt playground & synthetic repair testing. |
+| **🚨 Vulnerability Registry** | **[web-bay-eight-49.vercel.app/findings](https://web-bay-eight-49.vercel.app/findings)** | Triaged CVE/CWE vulnerability feed with automated confidence ranking. |
+| **⚡ OWASP DAST Sandbox** | **[web-bay-eight-49.vercel.app/dast](https://web-bay-eight-49.vercel.app/dast)** | 12 dynamic attack probes (SQLi, IDOR, SSRF, prototype pollution). |
+| **🔗 Merkle Audit Ledger** | **[web-bay-eight-49.vercel.app/ledger](https://web-bay-eight-49.vercel.app/ledger)** | SHA-256 Merkle chain verification with live block tamper simulation. |
+| **⚙️ Platform Settings** | **[web-bay-eight-49.vercel.app/settings](https://web-bay-eight-49.vercel.app/settings)** | In-app API keys for NVIDIA Nemotron, model parameters & hardware keys. |
+| **🔐 Role Authentication** | **[web-bay-eight-49.vercel.app/login](https://web-bay-eight-49.vercel.app/login)** | 1-click RBAC access: Lead Developer, Security Auditor, Operations Admin. |
 
 ---
 
@@ -132,20 +154,23 @@ Curated palette (`coolors.co/515a47-d7be82-7a4419`):
 
 ## ⚡ Quickstart & Local Execution
 
-### 1. Backend (FastAPI + Python 3.10+)
+### 1. Live Deployment
+No installation needed! Visit **[https://web-bay-eight-49.vercel.app](https://web-bay-eight-49.vercel.app)**.
+
+### 2. Backend (FastAPI + Python 3.10+)
 ```bash
 # Start FastAPI backend daemon on port 8000
 python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000
 ```
 *Health Check:* `curl http://127.0.0.1:8000/api/health` → `{"status": "ok"}`
 
-### 2. Frontend (Next.js 14)
+### 3. Frontend Local Development (Next.js 14)
 ```bash
 cd web
 npm install
 npm run dev -p 3000
 ```
-*Web Application:* **[http://localhost:3000](http://localhost:3000)**
+*Local Web Application:* **[http://localhost:3000](http://localhost:3000)**
 
 ---
 

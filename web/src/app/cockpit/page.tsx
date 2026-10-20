@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useCurtain } from "@/components/layout/CurtainTransition";
 
-export function CockpitPage() {
+export default function CockpitPage() {
   const { user } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const [selectedFinding, setSelectedFinding] = useState(MOCK_FINDINGS[0]);
@@ -233,5 +233,3 @@ export function CockpitPage() {
     </MainLayout>
   );
 }
-
-export default CockpitPage;
