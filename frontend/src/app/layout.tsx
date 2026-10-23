@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-[#0E120D] text-[#FDFBF7] min-h-screen selection:bg-[#D7BE82]/30 selection:text-[#FDFBF7]">
+      <body className="bg-[var(--bg)] text-[var(--ink)] min-h-screen selection:bg-emerald-500/25 selection:text-[var(--ink)] antialiased font-sans">
         <ScrollProvider>
           <AuthProvider>
             <CurtainProvider>

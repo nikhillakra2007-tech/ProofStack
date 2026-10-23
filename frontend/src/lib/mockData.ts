@@ -124,6 +124,37 @@ export interface FindingItem {
 
 export const MOCK_FINDINGS: FindingItem[] = [
   {
+    id: "SEC-900",
+    cwe: "CWE-639",
+    title: "Insecure Direct Object Reference (IDOR) in Cache Key",
+    severity: "Critical",
+    file: "backend/invoices.py",
+    line: 34,
+    description: "Invoice cache key lacked tenant/principal partitioning (cache_key = f'inv:{invoice_id}'), allowing cross-tenant data exfiltration during speedup optimization.",
+    vulnerableCode: `@router.get("/invoices/{invoice_id}")
+def get_invoice(invoice_id: str, db: Session = Depends(get_db)):
+    # Flaw: Global unkeyed cache permits Bob to read Alice's invoice #42
+    cache_key = f"inv:{invoice_id}"
+    cached = redis.get(cache_key)
+    if cached:
+        return json.loads(cached)
+    inv = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    redis.setex(cache_key, 300, json.dumps(inv.to_dict()))
+    return inv.to_dict()`,
+    suggestedFix: `@router.get("/invoices/{invoice_id}")
+def get_invoice(invoice_id: str, principal: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Hardened AST: Cache strictly partitioned by tenant_id + authenticated user
+    cache_key = f"inv:{principal.tenant_id}:{principal.id}:{invoice_id}"
+    cached = redis.get(cache_key)
+    if cached:
+        return json.loads(cached)
+    inv = db.query(Invoice).filter(Invoice.id == invoice_id, Invoice.tenant_id == principal.tenant_id).first()
+    if not inv:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    redis.setex(cache_key, 300, json.dumps(inv.to_dict()))
+    return inv.to_dict()`,
+  },
+  {
     id: "SEC-901",
     cwe: "CWE-89",
     title: "SQL Injection via Unsanitized Raw String Interpolation",

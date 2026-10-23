@@ -34,39 +34,38 @@ export function BrandLogo({
         viewBox="0 0 48 48"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ flexShrink: 0, filter: "drop-shadow(0 0 12px rgba(215, 190, 130, 0.35))" }}
+        style={{ flexShrink: 0, filter: "drop-shadow(0 0 12px rgba(16, 185, 129, 0.4))" }}
       >
         <defs>
-          {/* Rich Metallic Gradient */}
-          <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F5E6BE" />
-            <stop offset="45%" stopColor="#D7BE82" />
-            <stop offset="85%" stopColor="#9C5A23" />
-            <stop offset="100%" stopColor="#7A4419" />
+          {/* Cyber Emerald Metallic Gradient */}
+          <linearGradient id="sentinelEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#34D399" />
+            <stop offset="50%" stopColor="#10B981" />
+            <stop offset="100%" stopColor="#059669" />
           </linearGradient>
 
-          {/* Deep Ebony Core Shadow */}
-          <linearGradient id="ebonyDepth" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1E271B" />
-            <stop offset="100%" stopColor="#0B0F0B" />
+          {/* Deep Navy/Graphite Core Shadow */}
+          <linearGradient id="sentinelCore" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0F172A" />
+            <stop offset="100%" stopColor="#030712" />
           </linearGradient>
 
-          {/* Soft Amber Glow */}
-          <radialGradient id="amberCoreGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#D7BE82" stopOpacity="0.8" />
-            <stop offset="60%" stopColor="#7A4419" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#0E120D" stopOpacity="0" />
+          {/* Soft Emerald Glow */}
+          <radialGradient id="emeraldCoreGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#10B981" stopOpacity="0.7" />
+            <stop offset="60%" stopColor="#0284C7" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#030712" stopOpacity="0" />
           </radialGradient>
         </defs>
 
         {/* Ambient Core Radial Glow */}
-        <circle cx="24" cy="24" r="18" fill="url(#amberCoreGlow)" />
+        <circle cx="24" cy="24" r="18" fill="url(#emeraldCoreGlow)" />
 
         {/* Outer Chamfered Sentinel Shield Base */}
         <path
           d="M24 3L40 9V22C40 32.5 33.2 41.5 24 45C14.8 41.5 8 32.5 8 22V9L24 3Z"
-          fill="url(#ebonyDepth)"
-          stroke="url(#goldMetallic)"
+          fill="url(#sentinelCore)"
+          stroke="url(#sentinelEmerald)"
           strokeWidth="1.8"
           strokeLinejoin="round"
         />
@@ -74,7 +73,7 @@ export function BrandLogo({
         {/* Inner Faceted Guard Lines */}
         <path
           d="M24 7L36 11.5V21.5C36 29.8 30.8 37 24 40C17.2 37 12 29.8 12 21.5V11.5L24 7Z"
-          stroke="rgba(215, 190, 130, 0.35)"
+          stroke="rgba(16, 185, 129, 0.35)"
           strokeWidth="1"
           strokeDasharray="2 2"
         />
@@ -82,13 +81,13 @@ export function BrandLogo({
         {/* Central Oracle Gate / AST Diamond Node */}
         <path
           d="M24 13L32 24L24 35L16 24L24 13Z"
-          fill="url(#goldMetallic)"
-          opacity="0.9"
+          fill="url(#sentinelEmerald)"
+          opacity="0.95"
         />
 
         {/* Inner Laser Aperture Crosshair */}
-        <circle cx="24" cy="24" r="3.2" fill="#0E120D" stroke="#FFFFFF" strokeWidth="1" />
-        <path d="M24 17V21M24 27V31M17 24H21M27 24H31" stroke="#0E120D" strokeWidth="1.2" strokeLinecap="round" />
+        <circle cx="24" cy="24" r="3.2" fill="#030712" stroke="#FFFFFF" strokeWidth="1" />
+        <path d="M24 17V21M24 27V31M17 24H21M27 24H31" stroke="#030712" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
 
       {/* Brand Typography */}
@@ -108,7 +107,7 @@ export function BrandLogo({
             <span
               style={{
                 color: "transparent",
-                backgroundImage: "linear-gradient(135deg, #D7BE82 0%, #E8CFA0 50%, #B86A2D 100%)",
+                backgroundImage: "linear-gradient(135deg, #10B981 0%, #34D399 50%, #38BDF8 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 fontWeight: 800,
@@ -122,15 +121,15 @@ export function BrandLogo({
             <span
               style={{
                 fontSize: dimensions.sub,
-                color: "var(--fawn)",
+                color: "var(--emerald)",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontWeight: 600,
                 marginTop: "1px",
-                opacity: 0.85,
+                opacity: 0.9,
               }}
             >
-              NVIDIA Nemotron 70B Defense
+              Deterministic Security Platform
             </span>
           )}
         </div>
@@ -138,3 +137,5 @@ export function BrandLogo({
     </div>
   );
 }
+
+export default BrandLogo;

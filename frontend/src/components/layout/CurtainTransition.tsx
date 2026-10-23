@@ -143,9 +143,9 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
             left: 0,
             width: "100%",
             height: "50.5%",
-            background: "linear-gradient(180deg, #0E120D 0%, #151B13 70%, #20291D 100%)",
-            borderBottom: "1.5px solid rgba(215, 190, 130, 0.4)",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.7)",
+            background: "linear-gradient(180deg, #030712 0%, #0B1120 70%, #0F172A 100%)",
+            borderBottom: "1.5px solid rgba(16, 185, 129, 0.4)",
+            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.8)",
             transform: "translateY(-100%)",
           }}
         />
@@ -159,9 +159,9 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
             left: 0,
             width: "100%",
             height: "50.5%",
-            background: "linear-gradient(0deg, #0E120D 0%, #151B13 70%, #20291D 100%)",
-            borderTop: "1.5px solid rgba(215, 190, 130, 0.4)",
-            boxShadow: "0 -10px 40px rgba(0, 0, 0, 0.7)",
+            background: "linear-gradient(0deg, #030712 0%, #0B1120 70%, #0F172A 100%)",
+            borderTop: "1.5px solid rgba(16, 185, 129, 0.4)",
+            boxShadow: "0 -10px 40px rgba(0, 0, 0, 0.8)",
             transform: "translateY(100%)",
           }}
         />
@@ -184,19 +184,19 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
         >
           <div
             style={{
-              width: "60px",
-              height: "60px",
-              borderRadius: "18px",
-              background: "rgba(21, 27, 19, 0.95)",
-              border: "1.5px solid #D7BE82",
+              width: "56px",
+              height: "56px",
+              borderRadius: "16px",
+              background: "rgba(11, 17, 32, 0.95)",
+              border: "1.5px solid #10B981",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 0 35px rgba(215, 190, 130, 0.35)",
-              color: "#D7BE82",
+              boxShadow: "0 0 35px rgba(16, 185, 129, 0.35)",
+              color: "#10B981",
             }}
           >
-            <ShieldCheck style={{ width: "28px", height: "28px" }} />
+            <ShieldCheck style={{ width: "26px", height: "26px" }} />
           </div>
 
           <div
@@ -204,19 +204,19 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
               fontFamily: "var(--font-mono, monospace)",
               fontSize: "11px",
               fontWeight: 700,
-              letterSpacing: "0.15em",
-              color: "#D7BE82",
+              letterSpacing: "0.12em",
+              color: "#10B981",
               textTransform: "uppercase",
               display: "flex",
               alignItems: "center",
               gap: "6px",
-              background: "rgba(14, 18, 13, 0.8)",
+              background: "rgba(3, 7, 18, 0.85)",
               padding: "6px 14px",
               borderRadius: "999px",
-              border: "1px solid rgba(215, 190, 130, 0.25)",
+              border: "1px solid rgba(16, 185, 129, 0.3)",
             }}
           >
-            <Sparkles style={{ width: "12px", height: "12px", color: "#D7BE82" }} />
+            <Sparkles style={{ width: "12px", height: "12px", color: "#10B981" }} />
             <span>TRANSITIONING TO {label.toUpperCase()}</span>
           </div>
         </div>

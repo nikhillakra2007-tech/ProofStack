@@ -5,53 +5,59 @@
 @tailwind utilities;
 
 :root {
-  /* DARK MODE: Deep Cosmic Pitch Black with Radiant Cyber Multi-Color Accents */
+  /* DARK MODE: Deep near-black/navy foundation, layered graphite surfaces, restrained emerald/lime accents */
   --bg: #030712;
-  --surface: #0B0F19;
-  --surface-raised: rgba(11, 15, 25, 0.85);
-  --card-bg: #0E1526;
+  --surface: #0B1120;
+  --surface-raised: rgba(15, 23, 42, 0.90);
+  --card-bg: #0F172A;
   
-  --primary: #38BDF8;
-  --primary-glow: rgba(56, 189, 248, 0.25);
+  --primary: #10B981;
+  --primary-glow: rgba(16, 185, 129, 0.25);
   
-  --cyan: #06B6D4;
-  --azure: #38BDF8;
+  --cyan: #38BDF8;
+  --azure: #0284C7;
   --emerald: #10B981;
+  --lime: #00F0A0;
   --gold: #F59E0B;
-  --violet: #A855F7;
-  --rose: #F43F5E;
-  --fawn: #F59E0B;
+  --amber: #F59E0B;
+  --violet: #818CF8;
+  --rose: #EF4444;
+  --crimson: #EF4444;
+  --fawn: #10B981;
   
   --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(56, 189, 248, 0.35);
+  --line-strong: rgba(16, 185, 129, 0.3);
   --line-subtle: rgba(255, 255, 255, 0.04);
   
   --ink: #F8FAFC;
-  --ink-secondary: #E2E8F0;
+  --ink-secondary: #CBD5E1;
   --ink-body: #94A3B8;
   --ink-muted: #64748B;
 }
 
 html.light, [data-theme="light"] {
-  /* LIGHT MODE: Crisp High-Contrast Porcelain Alabaster - Zero Muddy Brown */
+  /* LIGHT MODE: Crisp High-Contrast Technical Console */
   --bg: #F8FAFC;
   --surface: #FFFFFF;
   --surface-raised: rgba(255, 255, 255, 0.95);
   --card-bg: #FFFFFF;
   
-  --primary: #0284C7;
-  --primary-glow: rgba(2, 132, 199, 0.15);
+  --primary: #059669;
+  --primary-glow: rgba(5, 150, 105, 0.15);
   
-  --cyan: #0891B2;
-  --azure: #0284C7;
+  --cyan: #0284C7;
+  --azure: #0369A1;
   --emerald: #059669;
+  --lime: #10B981;
   --gold: #D97706;
-  --violet: #7C3AED;
-  --rose: #E11D48;
-  --fawn: #D97706;
+  --amber: #D97706;
+  --violet: #6366F1;
+  --rose: #DC2626;
+  --crimson: #DC2626;
+  --fawn: #059669;
   
   --line: rgba(15, 23, 42, 0.08);
-  --line-strong: rgba(2, 132, 199, 0.3);
+  --line-strong: rgba(5, 150, 105, 0.3);
   --line-subtle: rgba(15, 23, 42, 0.04);
   
   --ink: #0F172A;

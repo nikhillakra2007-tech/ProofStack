@@ -25,17 +25,17 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Interactive Particle & Star Constellation Network */}
       <ParticleField />
 
-      {/* Cyber Celestial Ambient Radiance */}
+      {/* Restrained Cyber Ambient Radiance */}
       <div
-        className="orb-ambient-1 pointer-events-none fixed -top-40 left-[10%] w-[650px] h-[650px] rounded-full blur-[110px] -z-10"
+        className="orb-ambient-1 pointer-events-none fixed -top-40 left-[10%] w-[550px] h-[550px] rounded-full blur-[120px] -z-10"
         style={{
-          background: "radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(168, 85, 247, 0.06) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(56, 189, 248, 0.04) 50%, transparent 70%)",
         }}
       />
       <div
-        className="orb-ambient-2 pointer-events-none fixed top-[40%] -right-40 w-[700px] h-[700px] rounded-full blur-[120px] -z-10"
+        className="orb-ambient-2 pointer-events-none fixed top-[45%] -right-40 w-[600px] h-[600px] rounded-full blur-[130px] -z-10"
         style={{
-          background: "radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(56, 189, 248, 0.05) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, rgba(16, 185, 129, 0.04) 50%, transparent 70%)",
         }}
       />
 
