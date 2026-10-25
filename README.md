@@ -1,15 +1,15 @@
-# ProofStack (Sentinel Gate)
+# ProofStack (Sentinel Gate & Cockpit)
 
-[![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app)
+[![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://proofstack-cockpit.vercel.app)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://proofstack-cockpit.vercel.app)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://sentinel-gate-seven.vercel.app/ledger)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://proofstack-cockpit.vercel.app)
+[![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app/ledger)
 
 > **Autonomous Verification Engine with Zero-Compromise Gate & Live-Target DAST**  
 > *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*  
 >
-> 🚀 **Live Production Platform**: **[https://sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)**  
+> 🚀 **Live Production Platform**: **[https://proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)**  
 > *Core Invariant: Deterministic Code Decides; The Generative Model Only Proposes.*
 
 ---
@@ -18,43 +18,58 @@
 
 | View | Live Production URL | Description |
 | :--- | :--- | :--- |
-| **🏠 Platform Landing** | **[sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)** | High-DPI radar hero, live invariant terminal, 4-stage pipeline |
-| **🕹️ Remediation Cockpit** | **[sentinel-gate-seven.vercel.app/cockpit](https://sentinel-gate-seven.vercel.app/cockpit)** | Side-by-side AST diff viewer with 8-gate deterministic security interlock |
-| **⚡ DAST Exploit Sandbox** | **[sentinel-gate-seven.vercel.app/dast](https://sentinel-gate-seven.vercel.app/dast)** | 12-vector dynamic adversarial exploit probe suite against live targets |
-| **📜 Cryptographic Ledger** | **[sentinel-gate-seven.vercel.app/ledger](https://sentinel-gate-seven.vercel.app/ledger)** | Immutable HMAC-SHA256 Merkle chain with tamper detection simulator |
-| **🔬 Interactive Studio** | **[sentinel-gate-seven.vercel.app/studio](https://sentinel-gate-seven.vercel.app/studio)** | Code repair playground with live gate execution and telemetry |
-| **🛡️ Findings Registry** | **[sentinel-gate-seven.vercel.app/findings](https://sentinel-gate-seven.vercel.app/findings)** | Triaged CWE vulnerability catalog, root cause analysis & status |
-| **🔐 RBAC Gateway** | **[sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)** | 1-click role authentication: Developer, Auditor, Admin, Super Admin |
+| **🏠 Platform Landing** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Marketing hero, scroll-driven story, architecture showcase |
+| **📊 Operations Dashboard** | **[proofstack-cockpit.vercel.app/dashboard](https://proofstack-cockpit.vercel.app/dashboard)** | Real-time telemetry, remediation throughput, active task monitoring |
+| **🕹️ Remediation Cockpit** | **[proofstack-cockpit.vercel.app/cockpit/TASK9142](https://proofstack-cockpit.vercel.app/cockpit/TASK9142)** | 6-tab deep cockpit with Monaco side-by-side diff & 8-gate interlock |
+| **🔬 Interactive Studio** | **[proofstack-cockpit.vercel.app/studio](https://proofstack-cockpit.vercel.app/studio)** | Code repair playground with live AST verification and telemetry |
+| **🎛️ Control Plane** | **[proofstack-cockpit.vercel.app/control-plane](https://proofstack-cockpit.vercel.app/control-plane)** | Multi-tenant runner pool management, system health, broker telemetry |
+| **⚡ DAST Exploit Sandbox** | **[proofstack-cockpit.vercel.app/dast](https://proofstack-cockpit.vercel.app/dast)** | 12-vector dynamic adversarial exploit probe suite against live targets |
+| **📜 Cryptographic Ledger** | **[proofstack-cockpit.vercel.app/ledger](https://proofstack-cockpit.vercel.app/ledger)** | Immutable HMAC-SHA256 Merkle chain with tamper detection simulator |
+| **🛡️ Findings Registry** | **[proofstack-cockpit.vercel.app/findings](https://proofstack-cockpit.vercel.app/findings)** | Triaged CWE vulnerability catalog, root cause analysis & status |
+| **📚 Knowledge Library** | **[proofstack-cockpit.vercel.app/library](https://proofstack-cockpit.vercel.app/library)** | Zero-Compromise policy guides, truth hierarchy, and audit specs |
+| **🔐 RBAC Gateway** | **[proofstack-cockpit.vercel.app/login](https://proofstack-cockpit.vercel.app/login)** | 1-click role authentication: Developer, Auditor, Admin, Super Admin |
 
 ---
 
 ## 📸 Platform Interface & Screenshots
 
-### 1. Platform Landing & Live Invariant Radar
-Interactive real-time vulnerability terminal featuring live payload injection, AST invariant synthesis, and live pass/fail gating:
-![Platform Landing & Live Verification Terminal](docs/screenshots/landing_hero.png)
+### 1. Platform Landing & Live Story Engine
+Interactive scroll-driven platform hero detailing autonomous verification, deterministic gating, and evidence synthesis:
+![Platform Landing & Story Engine](docs/screenshots/landing_hero.png)
 
-### 2. Autonomous Remediation Cockpit
-Side-by-side AST syntax diff with dynamic 8-gate deterministic security interlock and live attestation sealing:
+### 2. Autonomous Operations Dashboard
+Real-time operations center tracking MTTR, gate throughput, active tasks, and fleet vulnerability distribution:
+![Operations Dashboard](docs/screenshots/dashboard.png)
+
+### 3. Remediation Cockpit & Monaco Diff Viewer
+Deep 6-tab verification cockpit featuring side-by-side AST syntax diffs, deterministic gate progression, and live evidence logs:
 ![Remediation Cockpit](docs/screenshots/cockpit.png)
 
-### 3. 12-Vector DAST Sandbox
-Adversarial exploit validation suite testing candidate patches against real-world CWE payloads in isolated execution environments:
-![12-Vector DAST Sandbox](docs/screenshots/dast.png)
-
-### 4. Cryptographic Evidence Ledger
-Immutable HMAC-SHA256 audit ledger tracking all remediation decisions with real-time cryptographic tamper detection:
-![Cryptographic Evidence Ledger](docs/screenshots/ledger.png)
-
-### 5. Interactive Studio Playground
+### 4. Interactive Studio Playground
 Real-time AST repair workbench allowing engineers to execute gate runs, inspect runtime telemetry, and verify candidate patches:
 ![Interactive Studio Playground](docs/screenshots/studio.png)
 
-### 6. Vulnerability Triage & Findings Registry
+### 5. Multi-Tenant Control Plane
+System administration cockpit monitoring runner pools, container sandboxes, database transactions, and broker queues:
+![Control Plane](docs/screenshots/control_plane.png)
+
+### 6. 12-Vector DAST Exploit Sandbox
+Adversarial exploit validation suite testing candidate patches against real-world CWE payloads in isolated execution environments:
+![12-Vector DAST Sandbox](docs/screenshots/dast.png)
+
+### 7. Cryptographic Evidence Ledger
+Immutable HMAC-SHA256 audit ledger tracking all remediation decisions with real-time cryptographic tamper detection:
+![Cryptographic Evidence Ledger](docs/screenshots/ledger.png)
+
+### 8. Vulnerability Triage & Findings Registry
 Comprehensive security findings index categorized by severity, exploit vector, and verification status:
 ![Vulnerability Triage & Findings Registry](docs/screenshots/findings.png)
 
-### 7. Role Authentication Gateway
+### 9. Policy & Verification Library
+Documentation and specification center for the Zero-Compromise truth hierarchy, verification thresholds, and governance invariants:
+![Knowledge Library](docs/screenshots/library.png)
+
+### 10. Role Authentication Gateway
 Dedicated access clearance routing operators strictly into their authorized workspace (Developer, Auditor, Admin, Super Admin):
 ![Role Clearance Gateway](docs/screenshots/login.png)
 
@@ -123,7 +138,7 @@ graph TD
 
 ## ⚡ Local Development & Quick Start
 
-ProofStack is a full-stack system consisting of a FastAPI backend (Python 3.12+), an immutable SQLite or PostgreSQL database, an optional Redis pub/sub event bus, and a Next.js 14 frontend (`sentinel-gate`).
+ProofStack is a full-stack platform consisting of a FastAPI backend (Python 3.12+), an SQLite or PostgreSQL database, an optional Redis pub/sub event bus, and the Next.js 14 Cockpit client (`web/` or `frontend/`).
 
 ### 1. Prerequisites
 - Python 3.12+
@@ -171,10 +186,9 @@ python -m uvicorn backend.server:app --host 127.0.0.1 --port 8765 --reload
 ```
 Health check: `http://127.0.0.1:8765/api/health`
 
-#### Terminal 2 — Frontend Next.js Client (Port 3000):
+#### Terminal 2 — Frontend Cockpit Next.js Client (Port 3000):
 ```bash
-cd frontend
-cp .env.local.example .env.local
+cd web
 npm install
 npm run dev
 ```
@@ -219,9 +233,9 @@ python scripts/verify_e2e.py
 python scripts/verify_phase.py
 ```
 
-### Build & Typecheck Frontend
+### Build & Typecheck Frontend Cockpit
 ```bash
-cd frontend
+cd web
 npm run build
 ```
 
@@ -256,7 +270,7 @@ proofstack remediate --url https://staging.example.com --repo ./repo --yes
 
 ## 🔐 Cryptographic Ledger Integrity Guarantee
 
-Every block in Sentinel Gate is chained cryptographically:
+Every block in ProofStack is chained cryptographically:
 
 $$\text{BlockHash}_n = \text{SHA-256}\Big(\text{BlockHash}_{n-1} \parallel \text{CanonicalJSON}(\text{PatchEvidence}_n) \parallel \text{Ed25519Signature}\Big)$$
 
