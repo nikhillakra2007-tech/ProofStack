@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskIntakeSchema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "tenant_id", "requested_by", "repo", "target", "task_class", "problems", "budget", "sandbox"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{8}$"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "requested_by": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "baseline_commit"],
+      "properties": {
+        "url": {"type": "string"},
+        "baseline_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbol"],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_.]*:[a-zA-Z0-9_.]+$"
+        }
+      }
+    },
+    "task_class": {
+      "type": "string",
+      "enum": ["performance", "security", "correctness"]
+    },
+    "problems": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "T1-1", "T1-2", "T1-3", "T1-4", "T1-5", "T1-6", "T1-7", "T1-8",
+          "T2-1", "T2-2", "T2-3", "T2-4", "T2-5", "T2-6", "T2-7",
+          "T3-1", "T3-2", "T3-3", "T3-4"
+        ]
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_tokens", "max_wall_seconds", "max_patch_iterations"],
+      "properties": {
+        "max_tokens": {"type": "integer", "maximum": 120000},
+        "max_wall_seconds": {"type": "integer", "maximum": 600},
+        "max_patch_iterations": {"type": "integer", "minimum": 1, "maximum": 5}
+      }
+    },
+    "sandbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeout_s", "memory_mb", "network"],
+      "properties": {
+        "timeout_s": {"type": "integer", "maximum": 60},
+        "memory_mb": {"type": "integer", "maximum": 1024},
+        "network": {"type": "string", "enum": ["none", "loopback"]}
+      }
+    }
+  }
+}

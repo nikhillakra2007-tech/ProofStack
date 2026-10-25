@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HypothesisSchema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hypotheses"],
+  "properties": {
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "problem_id", "claim", "code_refs", "evidence_refs", "experiment", "predicted_outcomes"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": ["H1", "H2", "H3"]
+          },
+          "problem_id": {
+            "type": "string",
+            "enum": [
+              "T1-1", "T1-2", "T1-3", "T1-4", "T1-5", "T1-6", "T1-7", "T1-8",
+              "T2-1", "T2-2", "T2-3", "T2-4", "T2-5", "T2-6", "T2-7",
+              "T3-1", "T3-2", "T3-3", "T3-4"
+            ]
+          },
+          "claim": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 400
+          },
+          "code_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["file", "line_start", "line_end"],
+              "properties": {
+                "file": {"type": "string"},
+                "line_start": {"type": "integer", "minimum": 1},
+                "line_end": {"type": "integer", "minimum": 1}
+              }
+            }
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^art_[0-9a-f]{12}$"
+            }
+          },
+          "experiment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "setup_cost", "risk"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "static_ast",
+                  "counter_probe",
+                  "scaling_sweep",
+                  "race_harness",
+                  "tracemalloc_run",
+                  "pyperf_full",
+                  "exploit_probe"
+                ]
+              },
+              "setup_cost": {
+                "type": "integer",
+                "enum": [0, 2, 5]
+              },
+              "risk": {
+                "type": "integer",
+                "enum": [0, 3, 10]
+              }
+            }
+          },
+          "predicted_outcomes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["if_true", "if_false"],
+            "properties": {
+              "if_true": {"type": "string", "enum": ["CONFIRMED", "REFUTED", "INCONCLUSIVE"]},
+              "if_false": {"type": "string", "enum": ["CONFIRMED", "REFUTED", "INCONCLUSIVE"]}
+            }
+          }
+        }
+      }
+    }
+  }
+}

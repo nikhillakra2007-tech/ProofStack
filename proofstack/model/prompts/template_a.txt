@@ -1,0 +1,17 @@
+SYSTEM: {shared_preamble}
+USER:
+TASK_ID: {task_id}
+TASK_CLASS: {task_class}
+PROBLEM_BLOCKS: {problem_blocks}
+EVIDENCE: {evidence_list}
+AST_FINDINGS: {ast_findings}
+RUNTIME_INJECTION: {runtime_injection}
+UNTRUSTED_SOURCE:
+<untrusted_source file="{target_file}">
+{source_code}
+</untrusted_source>
+IDENTITY_SYMBOLS: {identity_symbols}
+ALLOWED_EXPERIMENTS: [static_ast, counter_probe, scaling_sweep, race_harness, tracemalloc_run, pyperf_full, exploit_probe]
+
+Generate 1 to 3 competing hypotheses (H1..H3) predicting exact outcomes to separate root causes.
+OUTPUT JSON matching HypothesisSchema.

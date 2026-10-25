@@ -1,0 +1,25 @@
+SYSTEM: {shared_preamble}
+USER:
+TASK_ID: {task_id}
+SUPPORTED_HYPOTHESIS: {supported_hypothesis}
+PROBLEM: {problem_id} - {problem_title}
+CONSTRAINTS: {constraints}
+FORBIDDEN: {forbidden}
+WRITABLE_PATHS: {writable_paths}
+PROTECTED_PATHS: {protected_paths}
+IDENTITY_SYMBOLS (must remain present and used): {identity_symbols}
+INTERACTIONS (cross-problem invariants to preserve): {interactions}
+UNTRUSTED_SOURCE:
+<untrusted_source file="{target_file}">
+{source_code}
+</untrusted_source>
+
+Synthesize the smallest unified diff that resolves the flaw and passes the Zero-Compromise Gauntlet G0-G7.
+OUTPUT JSON:
+{
+  "diff": "<unified diff>",
+  "rationale": "<=60 words",
+  "preserved_identity": [..],
+  "new_dependencies": [],
+  "behavior_notes": "..."
+}

@@ -1,0 +1,65 @@
+# ProofStack (PerfProof)
+
+> **Autonomous Verification Engine with Zero-Compromise Gate & Live-Target DAST**  
+> *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*
+
+---
+
+## Overview
+
+ProofStack is an autonomous verification engine that:
+1. **Proves a defect is real (RED)** using deterministic probes and empirical profiling.
+2. **Has NVIDIA Nemotron synthesize minimal, defensive patches** (`nvidia/nemotron-3-super-120b` for diagnosis, `nvidia/nemotron-3.5-lightning` for patches).
+3. **Proves the fix works (GREEN)** while a strict **Zero-Compromise Gate (G0 to G7)** rejects any candidate that trades one defect for another.
+4. **Performs Dynamic Application Security Testing (DAST - Module M8)** against live deployed endpoints, mapping findings back to source code and autonomously repairing them with sandbox verification (**Gates R0 to R6**).
+
+---
+
+## Key Invariants
+
+1. **Deterministic Code Decides; LLM Proposes**: Model outputs never set measurements, verdicts, or ledger entries.
+2. **Zero-Compromise Invariant**:
+   $$\text{Verdict} = \text{ACCEPT} \iff \Delta\text{Perf} > \tau_{\text{noise}} \land \text{Security\_regress} = \emptyset \land \text{Correctness\_regress} = \emptyset \land \text{Concurrency\_safe} = \text{True}$$
+3. **Truth Hierarchy (Rank 1 to 6)**:
+   - Rank 1: Exact Counts (SQL queries, stub hits)
+   - Rank 2: Empirical Scaling Ratios (Log-log slope)
+   - Rank 3: Allocation Bytes (tracemalloc peak)
+   - Rank 4: Invariant Counters
+   - Rank 5: Exploit Outcome Oracles
+   - Rank 6: Wall-Clock Medians (Confirmation only)
+4. **Identity Preservation Guard (G3 / R4)**: No patch may drop `user_id`, `tenant_id`, session parameters, or auth decorators.
+5. **Cryptographic Evidence Ledger**: Append-only SHA-256 hash-chain over canonical JSON:
+   $$\text{entry\_hash} = \text{SHA256}(\text{bytes.fromhex}(\text{prev\_hash}) + \text{canonical\_json}(\text{body}))$$
+
+---
+
+## CLI Usage
+
+```bash
+# Scan a repository target and establish baseline
+proofstack scan ./repo --target app.routes:get_orders --class performance
+
+# Evaluate candidate patch through the Zero-Compromise Gauntlet
+proofstack verify --task TASK1234 --iterations 3
+
+# Export cryptographic audit report
+proofstack report --task TASK1234 --format md
+
+# Verify integrity of the evidence ledger
+proofstack ledger verify --task-id TASK1234
+
+# Check active NVIDIA Nemotron models
+proofstack models check
+
+# Scan live target for OWASP DAST vulnerabilities (D-01 to D-12)
+proofstack dast scan --url https://staging.example.com
+
+# Autonomous agentic remediation with sandbox verification
+proofstack remediate --url https://staging.example.com --repo ./repo --yes
+```
+
+---
+
+## License
+
+Apache-2.0

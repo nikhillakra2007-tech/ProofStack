@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SandboxExecutionResultSchema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exec_id",
+    "revision",
+    "backend",
+    "command",
+    "probe_state",
+    "exit_code",
+    "timed_out",
+    "limits",
+    "stdout_artifact_id",
+    "stderr_artifact_id"
+  ],
+  "properties": {
+    "exec_id": {
+      "type": "string",
+      "pattern": "^ex_[0-9a-f]{12}$"
+    },
+    "revision": {
+      "type": "string",
+      "enum": ["baseline", "candidate"]
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "run_id", "isolation_level"],
+      "properties": {
+        "name": {"type": "string", "enum": ["token_factory", "local_container"]},
+        "run_id": {"type": "string"},
+        "isolation_level": {"type": "string", "enum": ["platform", "container"]}
+      }
+    },
+    "command": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "probe_state": {
+      "type": "string",
+      "enum": ["RED", "GREEN", "ERROR", "NOT_REPRODUCED", "NOT_RUN"]
+    },
+    "exit_code": {"type": "integer"},
+    "timed_out": {"type": "boolean"},
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeout_s", "memory_mb", "network"],
+      "properties": {
+        "timeout_s": {"type": "integer"},
+        "memory_mb": {"type": "integer"},
+        "network": {"type": "string"}
+      }
+    },
+    "stdout_artifact_id": {
+      "type": "string",
+      "pattern": "^art_[0-9a-f]{12}$"
+    },
+    "stderr_artifact_id": {
+      "type": "string",
+      "pattern": "^art_[0-9a-f]{12}$"
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "samples": {"type": "array", "items": {"type": "number"}},
+        "median": {"type": "number"},
+        "cv": {"type": "number"},
+        "sql_statement_count": {"type": "integer"},
+        "scaling_exponent": {"type": "number"},
+        "tracemalloc_bytes": {"type": "integer"},
+        "invariant_violations": {"type": "integer"}
+      }
+    },
+    "policy_violations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["timeout", "oom", "network_egress", "file_outside_worktree", "banned_command"]
+      }
+    }
+  }
+}

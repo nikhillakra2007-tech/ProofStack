@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DastFindingSchema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "finding_id",
+    "scan_id",
+    "check_id",
+    "title",
+    "owasp",
+    "severity",
+    "confidence",
+    "url",
+    "evidence",
+    "repro_steps",
+    "origin",
+    "source_candidates",
+    "status"
+  ],
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "pattern": "^fd_[0-9a-f]{12}$"
+    },
+    "scan_id": {
+      "type": "string",
+      "pattern": "^sc_[0-9a-f]{12}$"
+    },
+    "check_id": {
+      "type": "string",
+      "enum": ["D-01", "D-02", "D-03", "D-04", "D-05", "D-06", "D-07", "D-08", "D-09", "D-10", "D-11", "D-12"]
+    },
+    "title": {"type": "string"},
+    "owasp": {
+      "type": "string",
+      "enum": ["A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["Info", "Low", "Medium", "High", "Critical"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["confirmed", "likely", "advice"]
+    },
+    "url": {"type": "string"},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary", "redacted_preview", "artifact"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["header", "cookie", "body_match", "dom_sink", "network", "storage"]
+        },
+        "summary": {"type": "string"},
+        "redacted_preview": {"type": ["string", "null"]},
+        "artifact": {
+          "type": "string",
+          "pattern": "^art_[0-9a-f]{12}$"
+        }
+      }
+    },
+    "repro_steps": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "origin": {
+      "type": "string",
+      "enum": ["code", "infrastructure", "unknown"]
+    },
+    "source_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "line_start", "line_end", "why"],
+        "properties": {
+          "file": {"type": "string"},
+          "line_start": {"type": "integer"},
+          "line_end": {"type": "integer"},
+          "why": {"type": "string"}
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "OPEN",
+        "REMEDIATION_PROPOSED",
+        "VERIFIED",
+        "REJECTED",
+        "INCONCLUSIVE",
+        "ACCEPTED_RISK"
+      ]
+    }
+  }
+}
