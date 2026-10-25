@@ -446,7 +446,67 @@ class DastScanRequest(BaseModel):
 
 class DastTargetRequest(BaseModel):
     targetUrl: str
-    repoPath: Optional[str] = "./web"
+    repoPath: Optional[str] = "./frontend"
     scanProfile: Optional[str] = "OWASP Top-10 Quick"
     model_config = ConfigDict(extra="ignore")
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+    model_config = ConfigDict(extra="forbid")
+
+
+class UserRegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str = ""
+    role: Optional[str] = "developer"
+    tenant_id: Optional[str] = "00000000-0000-0000-0000-000000000001"
+    model_config = ConfigDict(extra="forbid")
+
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    full_name: str
+    role: str
+    tenant_id: str
+    is_active: bool
+    created_at: Optional[datetime] = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+    role: str
+    tenant_id: str
+    can_override_policy: bool = False
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DastTargetResponse(BaseModel):
+    id: str
+    targetId: str
+    targetUrl: str
+    repoPath: str
+    scanProfile: str
+    ownershipStatus: str
+    verificationToken: str
+    tenantId: str
+    createdAt: Optional[datetime] = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DastScanResponse(BaseModel):
+    scanId: str
+    targetUrl: str
+    ownershipStatus: str
+    checksExecuted: int
+    findings: list[dict]
+    status: str
+    model_config = ConfigDict(from_attributes=True)
+
 

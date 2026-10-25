@@ -6,6 +6,7 @@ import {
   Cpu, Play, Terminal, Sparkles, CheckCircle2, 
   Copy, Check, RefreshCw, Code, ShieldCheck, ArrowRight
 } from "lucide-react";
+import { api } from "@/lib/api";
 
 export default function StudioPage() {
   const [code, setCode] = useState<string>(
@@ -29,29 +30,23 @@ export default function StudioPage() {
     setExplanation(null);
 
     try {
-      const res = await fetch("http://127.0.0.1:8765/api/heal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, problemId: "T1-2" })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setBackendUsed("FastAPI / Nemotron (Port 8765)");
-        setPatchResult(data.patchedCode);
-        setExplanation(data.explanation);
-        setAstTree([
-          "Module -> FunctionDef(name='fetch_invoice')",
-          "  Arguments: invoice_id: str, db: Session",
-          "  Body: Assign(targets=[Name('stmt')])",
-          "    Call: select(Invoice).where(Invoice.id == bindparam('inv_id'))",
-          "  Return: db.scalars(stmt, {'inv_id': invoice_id}).first()"
-        ]);
-        setSynthesizing(false);
-        return;
-      }
+      const data = await api.studio.healCode(code, "T1-2");
+      setBackendUsed("FastAPI / Nemotron (Port 8765)");
+      setPatchResult(data.patchedCode);
+      setExplanation(data.explanation);
+      setAstTree([
+        "Module -> FunctionDef(name='fetch_invoice')",
+        "  Arguments: invoice_id: str, db: Session",
+        "  Body: Assign(targets=[Name('stmt')])",
+        "    Call: select(Invoice).where(Invoice.id == bindparam('inv_id'))",
+        "  Return: db.scalars(stmt, {'inv_id': invoice_id}).first()"
+      ]);
+      setSynthesizing(false);
+      return;
     } catch {
       // Local fallback
     }
+
 
     setTimeout(() => {
       setBackendUsed("Local Deterministic Fallback");

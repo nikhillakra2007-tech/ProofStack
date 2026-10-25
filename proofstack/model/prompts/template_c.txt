@@ -1,0 +1,23 @@
+SYSTEM: {shared_preamble}
+USER:
+TASK_ID: {task_id}
+PREVIOUS_DIFF:
+```diff
+{previous_diff}
+```
+FAILING_GATE: {failed_gate}
+COUNTEREXAMPLE_EVIDENCE:
+{counterexample_evidence}
+GATES_TO_KEEP: {gates_to_keep}
+ATTEMPT_HISTORY: {attempt_history}
+
+Repair the patch so that the counterexample is resolved while keeping all passing gates intact.
+OUTPUT JSON:
+{
+  "diff": "<unified diff>",
+  "rationale": "<=60 words",
+  "preserved_identity": [..],
+  "new_dependencies": [],
+  "behavior_notes": "...",
+  "give_up_reason": null
+}

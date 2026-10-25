@@ -8,24 +8,21 @@ import {
   RefreshCw, CheckCircle2, Lock, Cpu, Download, Info
 } from "lucide-react";
 
+import { api } from "@/lib/api";
+
 export default function LedgerPage() {
   const [chain, setChain] = useState<MerkleBlock[]>(MOCK_MERKLE_CHAIN);
   const [isTampered, setIsTampered] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [liveVerifyStatus, setLiveVerifyStatus] = useState<string | null>(null);
 
-  // Attempt verification from live backend if reachable
+  // Attempt verification from live backend via centralized API client
   const verifyChain = async () => {
     setVerifying(true);
     try {
-      const res = await fetch("http://127.0.0.1:8765/api/ledger/verify");
-      if (res.ok) {
-        const data = await res.json();
-        setLiveVerifyStatus(`Valid: ${data.verified} | Head Hash: ${data.headHash.slice(0, 16)}... | Blocks: ${data.totalBlocks}`);
-      } else {
-        setLiveVerifyStatus(`Valid: ${!isTampered} | Head Hash: ${isTampered ? "CORRUPTED" : "0xb3e94a81c0..."} | Blocks: ${chain.length}`);
-      }
-    } catch {
+      const data = await api.ledger.verifyGlobal();
+      setLiveVerifyStatus(`Valid: ${data.verified} | Head Hash: ${data.headHash ? data.headHash.slice(0, 16) + '...' : 'None'} | Blocks: ${data.totalBlocks}`);
+    } catch (err: any) {
       setLiveVerifyStatus(`Valid: ${!isTampered} | Head Hash: ${isTampered ? "CORRUPTED" : "0xb3e94a81c0..."} | Blocks: ${chain.length}`);
     } finally {
       setTimeout(() => setVerifying(false), 500);

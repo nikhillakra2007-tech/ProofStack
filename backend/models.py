@@ -38,6 +38,28 @@ class GateStatus(str, enum.Enum):
     NOT_APPLICABLE = "NOT_APPLICABLE"
 
 
+class UserRole(str, enum.Enum):
+    DEVELOPER = "developer"
+    AUDITOR = "auditor"
+    ADMIN = "admin"
+    SUPER_ADMIN = "super_admin"
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(String(36), primary_key=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=False, default="")
+    role = Column(SQLEnum(UserRole), nullable=False, default=UserRole.DEVELOPER, index=True)
+    tenant_id = Column(String(36), nullable=False, default="00000000-0000-0000-0000-000000000001", index=True)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    projects = relationship("Project", back_populates="owner")
+
+
 class Project(Base):
     __tablename__ = "projects"
     id = Column(String(36), primary_key=True)
@@ -48,11 +70,15 @@ class Project(Base):
     allowed_paths = Column(JSON, default=list)
     policy_config = Column(JSON, default=dict)
     budget_config = Column(JSON, default=dict)
+    tenant_id = Column(String(36), nullable=False, default="00000000-0000-0000-0000-000000000001", index=True)
+    owner_user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     version = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+    owner = relationship("User", back_populates="projects")
     tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
+
 
 
 class Task(Base):
@@ -377,3 +403,36 @@ class Report(Base):
     deterministic_hash = Column(String(64), nullable=True)
 
     run = relationship("Run", back_populates="reports")
+
+
+class DastTarget(Base):
+    __tablename__ = "dast_targets"
+    id = Column(String(36), primary_key=True)
+    target_id = Column(String(64), unique=True, nullable=False, index=True)
+    target_url = Column(String(1000), nullable=False)
+    repo_path = Column(String(500), nullable=False, default="./frontend")
+    scan_profile = Column(String(100), nullable=False, default="OWASP Top-10 Quick")
+    ownership_status = Column(String(50), nullable=False, default="VERIFIED")
+    verification_token = Column(String(100), nullable=False)
+    tenant_id = Column(String(36), nullable=False, default="00000000-0000-0000-0000-000000000001", index=True)
+    created_by_user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    scans = relationship("DastScan", back_populates="target", cascade="all, delete-orphan")
+
+
+class DastScan(Base):
+    __tablename__ = "dast_scans"
+    id = Column(String(36), primary_key=True)
+    scan_id = Column(String(64), unique=True, nullable=False, index=True)
+    target_id = Column(String(36), ForeignKey("dast_targets.id", ondelete="CASCADE"), nullable=True, index=True)
+    target_url = Column(String(1000), nullable=False)
+    scan_profile = Column(String(100), nullable=False, default="12-Vector Comprehensive")
+    checks_executed = Column(Integer, default=12)
+    findings = Column(JSON, default=list)
+    status = Column(String(50), default="COMPLETED")
+    tenant_id = Column(String(36), nullable=False, default="00000000-0000-0000-0000-000000000001", index=True)
+    executed_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    target = relationship("DastTarget", back_populates="scans")
+

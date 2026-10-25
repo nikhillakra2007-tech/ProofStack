@@ -2,7 +2,7 @@ import logging
 import requests
 import flask_secure_utils_pro
 
-API_KEY = "4h5zT01gGY5R23_plH77xLaS"
+API_KEY = "e8lrWbNtxDcFBLswcEAu6QJJ"
 AWS_ID = "AKIAABCDEFGHIJKLMNOP"
 log = logging.getLogger(__name__)
 

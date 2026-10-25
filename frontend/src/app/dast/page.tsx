@@ -33,6 +33,8 @@ const INITIAL_PROBES: ProbeResult[] = [
   { id: 12, name: "CRLF Log Injection / Header Splitting", vector: "CWE-113", payload: "%0d%0aSet-Cookie: admin=1", status: "blocked", latency: "0.16ms", details: "HTTP header sanitization strips control linefeed characters." },
 ];
 
+import { api } from "@/lib/api";
+
 export default function DastPage() {
   const [probes, setProbes] = useState<ProbeResult[]>(INITIAL_PROBES);
   const [isRunningAll, setIsRunningAll] = useState(false);
@@ -44,15 +46,11 @@ export default function DastPage() {
     setProbes((prev) => prev.map((p) => ({ ...p, status: "running" })));
 
     try {
-      const res = await fetch("http://127.0.0.1:8765/api/dast/scans", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetUrl: "https://staging.perfproof.internal", scanProfile: "12-Vector Comprehensive" }),
+      const data = await api.dast.triggerScan({
+        targetUrl: "https://staging.perfproof.internal",
+        scanProfile: "12-Vector Comprehensive"
       });
-      if (res.ok) {
-        const data = await res.json();
-        setScanTelemetry({ scanId: data.scanId, targetUrl: data.targetUrl });
-      }
+      setScanTelemetry({ scanId: data.scanId, targetUrl: data.targetUrl });
     } catch {
       // Local fallback
     }

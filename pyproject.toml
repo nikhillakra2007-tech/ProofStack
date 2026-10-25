@@ -34,3 +34,10 @@ proofstack = "proofstack.cli.main:app"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["proofstack*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+

@@ -2,11 +2,13 @@
 import pytest
 from fastapi.testclient import TestClient
 from backend.server import app
+from backend.config import settings
 
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    return TestClient(app, headers={"X-API-Key": settings.secret_key})
+
 
 
 def test_public_run_endpoint_safe(client):

@@ -1,0 +1,19 @@
+SYSTEM: {shared_preamble}
+USER:
+TASK_ID: {task_id} FINDING: {finding_json}
+FRAMEWORK_HINT: {framework} ITERATION: {iteration}/{max_iterations}
+<runtime_injection>{scan_evidence_redacted}</runtime_injection>
+<untrusted_source file="{file}" lines="{a}-{b}">{source_excerpt}</untrusted_source>
+WRITABLE_PATHS: {writable_paths} PROTECTED_PATHS: {protected_paths}
+IDENTITY_SYMBOLS (must remain present and used): {identity_symbols}
+GREEN_GATES: R1 target check D-xx passes on the rebuilt site; R2 no new findings; R3 tests and smoke unchanged; R4 identity preserved; R6 only writable paths, no feature removed.
+CONSTRAINTS (by check):
+ D-01/D-02: add or tighten headers/CSP using nonces or hashes instead of 'unsafe-inline'; keep every legitimate script working.
+ Start from default-src 'self'; add only the origins the app actually loads (listed in <runtime_injection>).
+ D-03: set Secure, HttpOnly, SameSite=Lax (or Strict if flows allow) in the session library options.
+ D-05/D-11: move the secret server-side or to a server-only env var; never print it; rotate-note in rationale.
+ D-06: replace the sink with textContent / safe DOM APIs or a sanitiser already in the lockfile.
+ D-07: remove the exposed file from the public directory or block the route; do not delete application pages.
+FORBIDDEN: default-src * or any wildcard CSP; disabling the check; hiding headers only in test builds; removing the page, route or feature; new dependency (use NEEDS_HUMAN_APPROVAL instead); editing tests; echoing secrets.
+OUTPUT JSON: { "diff": "<unified diff>", "rationale": "<=60 words", "preserved_identity": [..], "new_dependencies": [], "behavior_notes": "...", "give_up_reason": null|"..." }
+Return give_up_reason instead of weakening a gate. Never claim the fix works: verification is done by the gates.

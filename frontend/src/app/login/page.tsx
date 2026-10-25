@@ -28,6 +28,7 @@ export default function LoginPage() {
     {
       role: "developer" as UserRole,
       route: "/developer",
+      email: "developer@sentinel.internal",
       label: "Lead Developer",
       persona: "Alex Chen (Staff Dev)",
       badge: "AST Invariant & Synthesis",
@@ -38,6 +39,7 @@ export default function LoginPage() {
     {
       role: "auditor" as UserRole,
       route: "/auditor",
+      email: "auditor@sentinel.internal",
       label: "Security Auditor",
       persona: "Elena Rostova (Lead Auditor)",
       badge: "Cryptographic Attestation",
@@ -48,6 +50,7 @@ export default function LoginPage() {
     {
       role: "admin" as UserRole,
       route: "/admin",
+      email: "admin@sentinel.internal",
       label: "Operations Admin",
       persona: "Marcus Vance (Ops Admin)",
       badge: "Sandbox & MicroVM Pools",
@@ -58,6 +61,7 @@ export default function LoginPage() {
     {
       role: "super_admin" as UserRole,
       route: "/ciso",
+      email: "ciso@sentinel.internal",
       label: "SuperAdmin (CISO)",
       persona: "Dr. Sarah Lin (CISO)",
       badge: "Zero-Trust Posture",
@@ -67,16 +71,23 @@ export default function LoginPage() {
     },
   ];
 
-  const handle1ClickRoleLogin = (r: typeof rolePresets[0]) => {
+  const handle1ClickRoleLogin = async (r: typeof rolePresets[0]) => {
     setSelectedRole(r.role);
-    setEmail(r.persona);
-    if (typeof login === "function") {
-      login(r.persona, r.role);
+    setEmail(r.email);
+    setPassword("P@ssw0rd2026!Secure");
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      await login(r.email, "P@ssw0rd2026!Secure", r.role);
+      setIsSubmitting(false);
+      navigateWithCurtain(r.route, r.label);
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || "Authentication failed. Please check credentials.");
     }
-    navigateWithCurtain(r.route, r.label);
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -94,18 +105,15 @@ export default function LoginPage() {
     const targetPreset = rolePresets.find((p) => p.role === selectedRole) || rolePresets[0];
 
     try {
-      if (typeof login === "function") {
-        login(email, selectedRole);
-      }
-      setTimeout(() => {
-        setIsSubmitting(false);
-        navigateWithCurtain(targetPreset.route, targetPreset.label);
-      }, 400);
-    } catch {
+      await login(email, password, selectedRole);
       setIsSubmitting(false);
       navigateWithCurtain(targetPreset.route, targetPreset.label);
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || "Invalid operator credentials. Please retry.");
     }
   };
+
 
   const handlePasswordReset = (e: React.FormEvent) => {
     e.preventDefault();

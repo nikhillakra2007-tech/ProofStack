@@ -11,6 +11,7 @@ import {
   Server, Link as LinkIcon
 } from "lucide-react";
 import { useCurtain } from "@/components/layout/CurtainTransition";
+import { api } from "@/lib/api";
 
 export default function CockpitPage() {
   const { user } = useAuth();
@@ -25,9 +26,9 @@ export default function CockpitPage() {
 
   // Check FastAPI backend on port 8765
   useEffect(() => {
-    fetch("http://127.0.0.1:8765/api/health")
+    api.health.check()
       .then((res) => {
-        if (res.ok) setBackendStatus("online");
+        if (res.status === "ok") setBackendStatus("online");
         else setBackendStatus("local");
       })
       .catch(() => setBackendStatus("local"));
@@ -36,11 +37,7 @@ export default function CockpitPage() {
   const handleApplyPatch = async (findingId: string) => {
     setIsPatching(true);
     try {
-      await fetch("http://127.0.0.1:8765/api/heal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: selectedFinding.vulnerableCode, problemId: "T1-3" }),
-      });
+      await api.studio.healCode(selectedFinding.vulnerableCode, "T1-3");
     } catch {
       // Local fallback
     }
@@ -51,6 +48,7 @@ export default function CockpitPage() {
       }
     }, 750);
   };
+
 
   const handleCopy = (text: string, isVuln: boolean) => {
     navigator.clipboard.writeText(text);
