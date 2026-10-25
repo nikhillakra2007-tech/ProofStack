@@ -7,6 +7,10 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from proofstack.ledger import LedgerStore, verify_chain
+from proofstack.dast import OwnershipVerifier, ScannerWorker, ALL_DAST_CHECKS
+from proofstack.schemas import EvidenceLedgerEntrySchema
+
 app = FastAPI(
     title="ProofStack Autonomous Verification Engine API",
     version="1.0.0",

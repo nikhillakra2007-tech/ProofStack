@@ -4,8 +4,6 @@ Draft 2020-12 compliant with extra="forbid" (additionalProperties=false).
 """
 
 from __future__ import annotations
-import os
-import json
 from datetime import datetime
 from typing import List, Dict, Optional, Literal, Any
 from uuid import UUID
@@ -280,75 +278,3 @@ class RemediationResultSchema(StrictBase):
     verdict: Literal["ACCEPT", "REJECT", "INCONCLUSIVE"]
     reasons: List[str]
     ledger_head: str = Field(..., pattern=r"^[0-9a-f]{64}$")
-
-
-# --- JSON Schema Validator Helper ---
-
-SCHEMA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "schemas")
-
-
-def _load_schema(name: str) -> dict:
-    path = os.path.join(SCHEMA_DIR, name)
-    with open(path) as f:
-        return json.load(f)
-
-
-def validate_against_schema(data: dict, schema: dict) -> list[str]:
-    """Minimal JSON Schema validator for the ProofStack subset."""
-    errors = []
-    if schema.get("type") == "object":
-        if not isinstance(data, dict):
-            return [f"expected object, got {type(data).__name__}"]
-        for req in schema.get("required", []):
-            if req not in data:
-                errors.append(f"missing required field: {req}")
-        props = schema.get("properties", {})
-        if schema.get("additionalProperties") is False:
-            for key in data:
-                if key not in props:
-                    errors.append(f"unknown field: {key}")
-        for key, value in data.items():
-            if key in props:
-                errors.extend(f"{key}: {e}" for e in validate_against_schema(value, props[key]))
-    elif schema.get("type") == "array":
-        if not isinstance(data, list):
-            return [f"expected array, got {type(data).__name__}"]
-        if "minItems" in schema and len(data) < schema["minItems"]:
-            errors.append(f"expected at least {schema['minItems']} items, got {len(data)}")
-        if "maxItems" in schema and len(data) > schema["maxItems"]:
-            errors.append(f"expected at most {schema['maxItems']} items, got {len(data)}")
-        if "items" in schema:
-            for i, item in enumerate(data):
-                errors.extend(f"[{i}]: {e}" for e in validate_against_schema(item, schema["items"]))
-    elif schema.get("type") == "string":
-        if not isinstance(data, str):
-            errors.append(f"expected string, got {type(data).__name__}")
-        elif "pattern" in schema:
-            import re
-            if not re.match(schema["pattern"], data):
-                errors.append(f"does not match pattern {schema['pattern']}")
-    elif schema.get("type") == "integer":
-        if not isinstance(data, int) or isinstance(data, bool):
-            errors.append(f"expected integer, got {type(data).__name__}")
-        if "minimum" in schema and data < schema["minimum"]:
-            errors.append(f"less than minimum {schema['minimum']}")
-        if "maximum" in schema and data > schema["maximum"]:
-            errors.append(f"greater than maximum {schema['maximum']}")
-    elif schema.get("type") == "number":
-        if not isinstance(data, (int, float)) or isinstance(data, bool):
-            errors.append(f"expected number, got {type(data).__name__}")
-        if "minimum" in schema and data < schema["minimum"]:
-            errors.append(f"less than minimum {schema['minimum']}")
-    elif schema.get("type") == "boolean":
-        if not isinstance(data, bool):
-            errors.append(f"expected boolean, got {type(data).__name__}")
-    if "enum" in schema and data not in schema["enum"]:
-        errors.append(f"value {data!r} not in enum {schema['enum']}")
-    return errors
-
-
-def validate_task_intake(data: dict) -> list[str]:
-    """Validate task intake data against schemas/task-intake.v1.json."""
-    schema = _load_schema("task-intake.v1.json")
-    return validate_against_schema(data, schema)
-

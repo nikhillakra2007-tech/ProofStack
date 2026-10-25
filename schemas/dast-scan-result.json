@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DastScanResultSchema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scan_id",
+    "target_id",
+    "started_at",
+    "ended_at",
+    "requests_made",
+    "pages_visited",
+    "findings",
+    "limits",
+    "scanner_version",
+    "browser"
+  ],
+  "properties": {
+    "scan_id": {
+      "type": "string",
+      "pattern": "^sc_[0-9a-f]{12}$"
+    },
+    "target_id": {
+      "type": "string",
+      "pattern": "^tg_[0-9a-f]{12}$"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "requests_made": {"type": "integer"},
+    "pages_visited": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^fd_[0-9a-f]{12}$"
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_rps", "max_requests"],
+      "properties": {
+        "max_rps": {"type": "number"},
+        "max_requests": {"type": "integer"}
+      }
+    },
+    "scanner_version": {"type": "string"},
+    "browser": {"type": "string"}
+  }
+}

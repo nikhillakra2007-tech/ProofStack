@@ -1,83 +1,65 @@
-# Sentinel Gate — Autonomous AST Security Verification & Cryptographic Remediation
+# ProofStack (PerfProof)
 
-[![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app)
-[![HMAC-SHA256](https://img.shields.io/badge/Audit_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://sentinel-gate-seven.vercel.app/ledger)
-
-> **Live Production Platform**: **[https://sentinel-gate-seven.vercel.app](https://sentinel-gate-seven.vercel.app)**  
-> *Core Invariant: Deterministic Code Decides; The Generative Model Only Proposes.*
+> **Autonomous Verification Engine with Zero-Compromise Gate & Live-Target DAST**  
+> *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*
 
 ---
 
-## 📸 Platform Interface & Screenshots
+## Overview
 
-### 1. Platform Landing & Live AST Verification Terminal
-Interactive real-time vulnerability terminal featuring live payload injection, AST invariant synthesis, and live pass/fail gating:
-![Platform Landing & Live Verification Terminal](docs/screenshots/landing_hero.png)
-
-### 2. Remediation Cockpit
-Side-by-side AST syntax diff with dynamic 8-gate deterministic security interlock and live attestation sealing:
-![Remediation Cockpit](docs/screenshots/cockpit.png)
-
-### 3. 12-Vector DAST Sandbox
-Adversarial exploit validation suite testing candidate patches against real-world CWE payloads in isolated execution environments:
-![12-Vector DAST Sandbox](docs/screenshots/dast.png)
-
-### 4. Cryptographic Evidence Ledger
-Immutable HMAC-SHA256 audit ledger tracking all remediation decisions with real-time cryptographic tamper detection:
-![Cryptographic Evidence Ledger](docs/screenshots/ledger.png)
-
-### 5. Role Authentication Gateway
-Dedicated access clearance routing operators strictly into their authorized workspace (Lead Developer, Security Auditor, Operations Admin, SuperAdmin CISO):
-![Role Clearance Gateway](docs/screenshots/login.png)
+ProofStack is an autonomous verification engine that:
+1. **Proves a defect is real (RED)** using deterministic probes and empirical profiling.
+2. **Has NVIDIA Nemotron synthesize minimal, defensive patches** (`nvidia/nemotron-3-super-120b` for diagnosis, `nvidia/nemotron-3.5-lightning` for patches).
+3. **Proves the fix works (GREEN)** while a strict **Zero-Compromise Gate (G0 to G7)** rejects any candidate that trades one defect for another.
+4. **Performs Dynamic Application Security Testing (DAST - Module M8)** against live deployed endpoints, mapping findings back to source code and autonomously repairing them with sandbox verification (**Gates R0 to R6**).
 
 ---
 
-## 🏛️ System Architecture
+## Key Invariants
 
-```mermaid
-graph TD
-    A[Vulnerability Input: CVE / AST Taint Sink] --> B[Tree-Sitter Compiler Grammar Parser]
-    B --> C[AST Invariant & Formal Constraints Defined]
-    C --> D[NVIDIA Nemotron 70B Patch Proposal]
-    D --> E[Isolated Ephemeral Sandbox Hot-Load]
-    E --> F[12-Vector DAST Adversarial Exploit Probes]
-    F --> G{All 8 Verification Gates Pass?}
-    G -- "FAIL (Veto)" --> H[Release Blocked · Patch Quarantined]
-    G -- "PASS (Sealed)" --> I[HMAC-SHA256 Evidence Ledger Record Appended]
-    I --> J[Production PR Released with Attestation]
-```
-
----
-
-## 🛡️ Core Verification Interlocks
-
-- **8 Deterministic Gates**: AST Parser Guard (`G0`), Regression Suite (`G1`), Exploit Oracle (`G2`), Identity Tenancy Guard (`G3`), Concurrency Invariant (`G4`), Performance Delta (`G5`), Memory Hygiene (`G6`), Deterministic Sign-off (`G7`).
-- **12 DAST CWE Vectors**: Coverage across IDOR (`CWE-639`), SQLi (`CWE-89`), SSRF (`CWE-918`), Command Injection (`CWE-78`), ReDoS (`CWE-1333`), Path Traversal (`CWE-22`), Prototype Pollution (`CWE-1321`), JWT Algorithm None (`CWE-345`), XXE (`CWE-611`), Pickle Deserialization (`CWE-502`), SSTI (`CWE-1336`), and CRLF Header Splitting (`CWE-113`).
+1. **Deterministic Code Decides; LLM Proposes**: Model outputs never set measurements, verdicts, or ledger entries.
+2. **Zero-Compromise Invariant**:
+   $$\text{Verdict} = \text{ACCEPT} \iff \Delta\text{Perf} > \tau_{\text{noise}} \land \text{Security\_regress} = \emptyset \land \text{Correctness\_regress} = \emptyset \land \text{Concurrency\_safe} = \text{True}$$
+3. **Truth Hierarchy (Rank 1 to 6)**:
+   - Rank 1: Exact Counts (SQL queries, stub hits)
+   - Rank 2: Empirical Scaling Ratios (Log-log slope)
+   - Rank 3: Allocation Bytes (tracemalloc peak)
+   - Rank 4: Invariant Counters
+   - Rank 5: Exploit Outcome Oracles
+   - Rank 6: Wall-Clock Medians (Confirmation only)
+4. **Identity Preservation Guard (G3 / R4)**: No patch may drop `user_id`, `tenant_id`, session parameters, or auth decorators.
+5. **Cryptographic Evidence Ledger**: Append-only SHA-256 hash-chain over canonical JSON:
+   $$\text{entry\_hash} = \text{SHA256}(\text{bytes.fromhex}(\text{prev\_hash}) + \text{canonical\_json}(\text{body}))$$
 
 ---
 
-## 🚀 Local Quickstart
+## CLI Usage
 
-### 1. Backend Engine (FastAPI)
 ```bash
-python server.py
-```
-- Health API: `http://127.0.0.1:8765/api/health`
-- Swagger UI: `http://127.0.0.1:8765/docs`
+# Scan a repository target and establish baseline
+proofstack scan ./repo --target app.routes:get_orders --class performance
 
-### 2. Frontend Application (Next.js 14)
-```bash
-cd frontend
-npm install
-npm run dev
+# Evaluate candidate patch through the Zero-Compromise Gauntlet
+proofstack verify --task TASK1234 --iterations 3
+
+# Export cryptographic audit report
+proofstack report --task TASK1234 --format md
+
+# Verify integrity of the evidence ledger
+proofstack ledger verify --task-id TASK1234
+
+# Check active NVIDIA Nemotron models
+proofstack models check
+
+# Scan live target for OWASP DAST vulnerabilities (D-01 to D-12)
+proofstack dast scan --url https://staging.example.com
+
+# Autonomous agentic remediation with sandbox verification
+proofstack remediate --url https://staging.example.com --repo ./repo --yes
 ```
-- Local Application: `http://localhost:3000`
-- Production Deployment: `https://sentinel-gate-seven.vercel.app`
 
 ---
 
-## 📄 License
-Apache-2.0 License.
+## License
+
+Apache-2.0
