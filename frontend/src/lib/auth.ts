@@ -1,106 +1,106 @@
-export type UserRole = "developer" | "auditor" | "admin" | "super_admin";
+import { UserRole, UserSession } from "./types";
+import { ROLES, TENANT_UUID } from "./roles";
 
-export interface UserSession {
-  userId: string;
-  tenantId: string;
+export interface RolePreset {
+  label: string;
   email: string;
   role: UserRole;
-  token: string;
-  canOverridePolicy: boolean;
-}
-
-export interface RoleDefinition {
-  label: string;
-  roleTitle: string;
+  badge: string;
   description: string;
-  badgeColor: string;
-  defaultPath: string;
-  canAccessStudio: boolean;
-  canApproveRelease: boolean;
   canOverridePolicy: boolean;
-  canManageQuotas: boolean;
+  landingPath: string;
 }
 
-export const ROLES: Record<UserRole, RoleDefinition> = {
-  developer: {
-    label: "Lead Developer",
-    roleTitle: "Staff Software Engineer",
-    description: "Synthesize patches, inspect AST diffs, and run DAST exploit probes.",
-    badgeColor: "#10B981",
-    defaultPath: "/developer",
-    canAccessStudio: true,
-    canApproveRelease: false,
-    canOverridePolicy: false,
-    canManageQuotas: false,
-  },
-  auditor: {
-    label: "Security Auditor",
-    roleTitle: "Cryptographic Assurance Auditor",
-    description: "Inspect SHA-256 Merkle chain, simulate tamper vectors, export audit packs.",
-    badgeColor: "#38BDF8",
-    defaultPath: "/auditor",
-    canAccessStudio: false,
-    canApproveRelease: false,
-    canOverridePolicy: false,
-    canManageQuotas: false,
-  },
-  admin: {
-    label: "Operations Admin",
-    roleTitle: "DevSecOps Infrastructure Admin",
-    description: "Manage token quotas, monitor microVM pools, and triage findings.",
-    badgeColor: "#818CF8",
-    defaultPath: "/admin",
-    canAccessStudio: true,
-    canApproveRelease: true,
-    canOverridePolicy: false,
-    canManageQuotas: true,
-  },
-  super_admin: {
-    label: "SuperAdmin",
-    roleTitle: "Chief Information Security Officer",
-    description: "Full control plane authority, root signing key, emergency policy override.",
-    badgeColor: "#F59E0B",
-    defaultPath: "/ciso",
-    canAccessStudio: true,
-    canApproveRelease: true,
+export const JUDGE_PRESETS: RolePreset[] = [
+  {
+    label: ROLES.super_admin.label,
+    email: ROLES.super_admin.email,
+    role: "super_admin",
+    badge: "super_admin",
+    description: ROLES.super_admin.description,
     canOverridePolicy: true,
-    canManageQuotas: true,
+    landingPath: ROLES.super_admin.primaryRoute,
   },
-};
-
-export const PRESET_USERS: Array<{ email: string; role: UserRole; name: string }> = [
-  { email: "developer@sentinel.internal", role: "developer", name: "Alex Chen (Staff Dev)" },
-  { email: "auditor@sentinel.internal", role: "auditor", name: "Elena Rostova (Lead Auditor)" },
-  { email: "admin@sentinel.internal", role: "admin", name: "Marcus Vance (Ops Admin)" },
-  { email: "ciso@sentinel.internal", role: "super_admin", name: "Dr. Sarah Lin (CISO)" },
+  {
+    label: ROLES.admin.label,
+    email: ROLES.admin.email,
+    role: "admin",
+    badge: "admin",
+    description: ROLES.admin.description,
+    canOverridePolicy: false,
+    landingPath: ROLES.admin.primaryRoute,
+  },
+  {
+    label: ROLES.developer.label,
+    email: ROLES.developer.email,
+    role: "developer",
+    badge: "developer",
+    description: ROLES.developer.description,
+    canOverridePolicy: false,
+    landingPath: ROLES.developer.primaryRoute,
+  },
+  {
+    label: ROLES.auditor.label,
+    email: ROLES.auditor.email,
+    role: "auditor",
+    badge: "auditor",
+    description: ROLES.auditor.description,
+    canOverridePolicy: false,
+    landingPath: ROLES.auditor.primaryRoute,
+  },
 ];
 
-const STORAGE_KEY = "sentinel_session";
-
 export function getStoredSession(): UserSession | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
+  if (typeof window === "undefined") {
     return null;
   }
+
+  const stored = localStorage.getItem("proofstack_session");
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.role && ROLES[parsed.role as UserRole]) {
+        return parsed;
+      }
+    } catch {
+      // invalid JSON
+    }
+  }
+
+  // Also check cookie for proofstack_role
+  if (typeof document !== "undefined") {
+    const match = document.cookie.match(/(?:^|;\s*)proofstack_role=([^;]*)/);
+    if (match && match[1]) {
+      const role = match[1] as UserRole;
+      const def = ROLES[role];
+      if (def) {
+        const session: UserSession = {
+          userId: `usr_${def.role}`,
+          tenantId: def.tenantUuid,
+          email: def.email,
+          role: def.role,
+          token: `jwt_rs256_${def.role}_token`,
+          canOverridePolicy: def.canOverridePolicy,
+        };
+        localStorage.setItem("proofstack_session", JSON.stringify(session));
+        return session;
+      }
+    }
+  }
+
+  return null;
 }
 
 export function setStoredSession(session: UserSession): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-  } catch (e) {
-    console.error("Failed to persist session", e);
+  if (typeof window !== "undefined") {
+    localStorage.setItem("proofstack_session", JSON.stringify(session));
+    document.cookie = `proofstack_role=${session.role}; path=/; max-age=86400; SameSite=Lax`;
   }
 }
 
 export function clearStoredSession(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) {
-    console.error("Failed to clear session", e);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("proofstack_session");
+    document.cookie = "proofstack_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
   }
 }

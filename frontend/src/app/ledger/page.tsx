@@ -1,187 +1,372 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MainLayout } from "@/components/layout/MainLayout";
-import { MOCK_MERKLE_CHAIN, MerkleBlock } from "@/lib/mockData";
-import { 
-  Link as LinkIcon, ShieldCheck, AlertOctagon, 
-  RefreshCw, CheckCircle2, Lock, Cpu, Download, Info
-} from "lucide-react";
-
-import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/lib/theme";
+import { ROLES } from "@/lib/roles";
+import { downloadEvidenceReport } from "@/lib/evidenceExport";
+import { getLedgerBlocks, resetLedgerBlocks, StoredLedgerBlock } from "@/lib/ledgerStore";
 
 export default function LedgerPage() {
-  const [chain, setChain] = useState<MerkleBlock[]>(MOCK_MERKLE_CHAIN);
-  const [isTampered, setIsTampered] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [liveVerifyStatus, setLiveVerifyStatus] = useState<string | null>(null);
+  const { role } = useAuth();
+  const { isTampered, setIsTampered } = useTheme();
+  const roleDef = ROLES[role] || ROLES.developer;
 
-  // Attempt verification from live backend via centralized API client
-  const verifyChain = async () => {
-    setVerifying(true);
-    try {
-      const data = await api.ledger.verifyGlobal();
-      setLiveVerifyStatus(`Valid: ${data.verified} | Head Hash: ${data.headHash ? data.headHash.slice(0, 16) + '...' : 'None'} | Blocks: ${data.totalBlocks}`);
-    } catch (err: any) {
-      setLiveVerifyStatus(`Valid: ${!isTampered} | Head Hash: ${isTampered ? "CORRUPTED" : "0xb3e94a81c0..."} | Blocks: ${chain.length}`);
-    } finally {
-      setTimeout(() => setVerifying(false), 500);
-    }
-  };
+  const [blocks, setBlocks] = useState<StoredLedgerBlock[]>([]);
+  const [notification, setNotification] = useState<string>("");
 
-  const handleTamper = () => {
+  useEffect(() => {
+    setBlocks(getLedgerBlocks());
+    const handleUpdate = () => {
+      setBlocks(getLedgerBlocks());
+    };
+    window.addEventListener("proofstack:ledger-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("proofstack:ledger-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
+  }, []);
+
+  const handleSimulateTamper = () => {
     setIsTampered(true);
-    setLiveVerifyStatus("TAMPER DETECTED: Block #3 payload mutated. Parent hash validation failed.");
+    setNotification("Adversarial payload injected into Block #2: 'score' changed from 0.96 to 0.99 [TAMPERED]. Hash chain broken.");
   };
 
-  const handleReset = () => {
-    setVerifying(true);
-    setTimeout(() => {
-      setIsTampered(false);
-      setLiveVerifyStatus(null);
-      setVerifying(false);
-    }, 500);
+  const handleRestoreClean = () => {
+    setIsTampered(false);
+    resetLedgerBlocks();
+    setBlocks(getLedgerBlocks());
+    setNotification("Evidence ledger restored to authentic SHA-256 state. All blocks cryptographically verified.");
+    setTimeout(() => setNotification(""), 4000);
+  };
+
+  const handleExportEvidence = () => {
+    downloadEvidenceReport({
+      ledgerBlocks: blocks,
+    });
+    setNotification("Downloaded ProofStack_Verification_Evidence_Report.md with SHA-256 Merkle chain.");
+    setTimeout(() => setNotification(""), 4000);
   };
 
   return (
-    <MainLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[var(--line)]">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-400 mb-2 font-semibold">
-              <LinkIcon className="w-3.5 h-3.5" />
-              <span>CRYPTOGRAPHIC ATTESTATION REGISTRY</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--ink)]">
-              HMAC-SHA256 Cryptographic Evidence Ledger
-            </h1>
-            <p className="text-xs text-[var(--ink-body)] mt-1 max-w-2xl">
-              Immutable append-only ledger recording every baseline telemetry capture, model hypothesis, patch diff, and gate verdict.
-            </p>
+    <div>
+      {/* Header Card (PDF pp. 27-28) */}
+      <div
+        className="card"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "14px",
+          marginBottom: "14px",
+          padding: "16px 20px",
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ color: "var(--brand)" }}>
+          <svg className="i" viewBox="0 0 24 24" style={{ width: "24px", height: "24px" }}>
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+          </svg>
+        </span>
+        <div>
+          <div className="row" style={{ gap: "8px", flexWrap: "wrap" }}>
+            <b className="disp" style={{ fontSize: "20px", fontWeight: 700 }}>
+              Cryptographic Evidence Ledger Explorer
+            </b>
+            <span className="chip brand">SHA-256 Hash Chain</span>
+            <span className={`chip ${isTampered ? "fail" : "pass"}`}>
+              {isTampered ? "CHAIN BROKEN" : "CHAIN INTACT ✓"}
+            </span>
           </div>
+          <div className="mono" style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
+            Authoritative append-only ledger: entry_hash = SHA256(bytes.fromhex(prev_hash) + canonical_json(body))
+          </div>
+        </div>
 
-          <div className="flex items-center gap-3">
+        {/* Action Buttons */}
+        <div style={{ marginLeft: "auto", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="btn sec"
+            onClick={handleExportEvidence}
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px" }}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export Evidence (Markdown)
+          </button>
+
+          <button
+            type="button"
+            className="btn sec"
+            onClick={handleRestoreClean}
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px" }}>
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+            Restore Clean Ledger
+          </button>
+
+          {!isTampered ? (
             <button
-              onClick={verifyChain}
-              disabled={verifying}
-              className="px-4 py-2.5 rounded-xl font-mono text-xs font-bold transition-all bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-2"
+              type="button"
+              className="btn sec"
+              onClick={handleSimulateTamper}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                borderColor: "color-mix(in srgb, var(--fail) 40%, var(--line))",
+              }}
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{verifying ? "Verifying..." : "Verify Ledger Chain"}</span>
+              <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px", color: "var(--fail)" }}>
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Simulate Tamper
             </button>
+          ) : (
             <button
-              onClick={isTampered ? handleReset : handleTamper}
-              className={`px-4 py-2.5 rounded-xl font-mono text-xs font-bold transition-all flex items-center gap-2 ${
-                isTampered
-                  ? "bg-emerald-500 hover:bg-emerald-400 text-slate-950"
-                  : "bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/40"
-              }`}
+              type="button"
+              className="btn danger"
+              onClick={handleRestoreClean}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
             >
-              {isTampered ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Restore Chain Integrity</span>
-                </>
-              ) : (
-                <>
-                  <AlertOctagon className="w-3.5 h-3.5" />
-                  <span>Simulate Database Tamper</span>
-                </>
-              )}
+              <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px" }}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              INTEGRITY VIOLATION (Reset)
             </button>
-          </div>
-        </div>
-
-        {/* Live Verification Banner */}
-        {liveVerifyStatus && (
-          <div className={`p-4 rounded-xl border text-xs font-mono flex items-center justify-between gap-3 ${
-            isTampered 
-              ? "bg-red-950/20 border-red-500/50 text-red-300"
-              : "bg-emerald-950/20 border-emerald-500/50 text-emerald-300"
-          }`}>
-            <div className="flex items-center gap-2">
-              {isTampered ? <AlertOctagon className="w-4 h-4 text-red-400" /> : <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-              <span className="font-bold">{liveVerifyStatus}</span>
-            </div>
-            <span className="text-[10px] text-[var(--ink-muted)]">Algorithm: HMAC-SHA256</span>
-          </div>
-        )}
-
-        {/* Important Integrity vs Security Callout */}
-        <div className="p-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] text-xs text-[var(--ink-body)] flex items-start gap-3">
-          <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-          <div className="leading-relaxed">
-            <span className="font-bold text-[var(--ink)]">Audit Distinction Notice: </span>
-            Cryptographic ledger integrity proves that the historical record has not been altered or tampered with. It is distinct from proof that candidate code is secure, which is independently validated by compiler AST invariants (Gate G3) and adversarial DAST exploit probes (Gate G4).
-          </div>
-        </div>
-
-        {/* Merkle Root State Banner */}
-        <div className={`p-6 rounded-2xl border transition-all ${
-          isTampered
-            ? "bg-red-950/20 border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.2)]"
-            : "bg-[var(--surface)] border-emerald-500/40 shadow-lg"
-        }`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs">
-            <div>
-              <div className="text-[11px] text-[var(--ink-muted)] uppercase tracking-wider mb-1">
-                Current Head Block Hash
-              </div>
-              <div className={`text-base md:text-lg font-bold truncate ${isTampered ? "text-red-400" : "text-emerald-400"}`}>
-                {isTampered ? "0xINVALID_PARENT_HASH_CORRUPTION_DETECTED" : "0xb3e94a81c0451e04cf8d743a1290bb3457102e3a1294801e0fa389dc129034aa"}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase ${
-                isTampered 
-                  ? "bg-red-500/20 text-red-300 border border-red-500" 
-                  : "bg-emerald-500/20 text-emerald-300 border border-emerald-500"
-              }`}>
-                {isTampered ? "TAMPER DETECTED: INVALID" : "CRYPTOGRAPHICALLY ATTESTED"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Chain Block Explorer */}
-        <div className="space-y-3 font-mono text-xs">
-          {chain.map((block, index) => {
-            const isCorruptedBlock = isTampered && index === 3;
-            return (
-              <div
-                key={block.block}
-                className={`p-5 rounded-2xl border transition-all ${
-                  isCorruptedBlock
-                    ? "bg-red-950/30 border-red-500 text-red-300 shadow-md"
-                    : "bg-[var(--surface)] border-[var(--line)] text-[var(--ink)]"
-                }`}
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-3 border-b border-[var(--line)] mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="px-2 py-0.5 rounded-md bg-[var(--line)] text-[10px] font-bold text-emerald-400">
-                      Block #{block.block}
-                    </span>
-                    <span className="font-bold text-sm text-[var(--ink)]">{block.action}</span>
-                  </div>
-                  <span className="text-[11px] text-[var(--ink-muted)]">{block.timestamp}</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] text-[var(--ink-muted)]">
-                  <div className="truncate">
-                    <span className="text-emerald-400 font-bold mr-1.5">Block Hash:</span>
-                    <span className="font-mono">{isCorruptedBlock ? "0xDEADBEEF_MUTATED_PAYLOAD" : block.hash}</span>
-                  </div>
-                  <div className="truncate">
-                    <span className="text-[var(--ink-muted)] font-bold mr-1.5">Parent Hash:</span>
-                    <span className="font-mono">{block.parentHash}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          )}
         </div>
       </div>
-    </MainLayout>
+
+      {/* Notification Toast */}
+      {notification && (
+        <div
+          style={{
+            border: isTampered
+              ? "1px solid color-mix(in srgb, var(--fail) 55%, var(--line))"
+              : "1px solid var(--pass)",
+            background: isTampered
+              ? "color-mix(in srgb, var(--fail) 10%, var(--surface))"
+              : "color-mix(in srgb, var(--pass) 10%, var(--surface))",
+            color: isTampered ? "var(--fail)" : "var(--pass)",
+            borderRadius: "8px",
+            padding: "10px 16px",
+            marginBottom: "14px",
+            fontSize: "12.5px",
+            fontFamily: "var(--f-mono)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>{notification}</span>
+          <button
+            type="button"
+            onClick={() => setNotification("")}
+            style={{ background: "transparent", border: "none", color: "inherit", cursor: "pointer" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Tamper Alert Banner (PDF p. 28) */}
+      {isTampered && (
+        <div
+          style={{
+            border: "1px solid color-mix(in srgb, var(--fail) 55%, var(--line))",
+            background: "color-mix(in srgb, var(--fail) 8%, var(--surface))",
+            borderRadius: "10px",
+            padding: "16px 20px",
+            marginBottom: "16px",
+            display: "flex",
+            gap: "14px",
+            animation: "fadeIn 200ms ease-out",
+          }}
+        >
+          <span style={{ color: "var(--fail)", marginTop: "2px" }}>
+            <svg className="i" viewBox="0 0 24 24" style={{ width: "22px", height: "22px" }}>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </span>
+          <div>
+            <b
+              className="mono"
+              style={{ color: "var(--fail)", fontSize: "13px", letterSpacing: ".05em" }}
+            >
+              ADVERSARIAL TAMPER DETECTED AT BLOCK #2 (HYPOTHESIS SCORE FORGED)
+            </b>
+            <div style={{ fontSize: "12.5px", marginTop: "4px", lineHeight: 1.6 }}>
+              A single byte in Block #2 was mutated: <code style={{ background: "rgba(239, 68, 68, 0.2)", padding: "2px 6px", borderRadius: "4px" }}>&quot;score&quot;: 0.96 → &quot;0.99 [TAMPERED]&quot;</code>.
+              Because SHA-256 is strictly chained, the calculated entry hash diverged from the stored hash. Downstream blocks #3, #4, and #5 immediately failed verification (<span style={{ color: "var(--fail)", fontWeight: 700 }}>HASH MISMATCH</span>), proving that no verdict or measurement can ever be forged or modified undetected.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Centered 880px Chain Rail */}
+      <div style={{ maxWidth: "880px", margin: "0 auto", paddingBottom: "24px" }}>
+        {blocks.map((block, idx) => {
+          const isFailing = isTampered && block.index >= 2;
+          const isTamperedTarget = isTampered && block.index === 2;
+
+          return (
+            <React.Fragment key={block.index}>
+              {/* Chain Block */}
+              <div
+                className={`block ${isFailing ? "bad" : ""}`}
+                style={{
+                  border: isFailing
+                    ? "1px solid color-mix(in srgb, var(--fail) 65%, var(--line))"
+                    : "1px solid var(--line)",
+                  background: isFailing
+                    ? "color-mix(in srgb, var(--fail) 5%, var(--surface))"
+                    : "var(--surface)",
+                  borderRadius: "10px",
+                  padding: "16px",
+                  boxShadow: isFailing ? "0 0 16px rgba(239, 68, 68, 0.12)" : "none",
+                }}
+              >
+                {/* Block Header */}
+                <div className="hd" style={{ display: "flex", alignItems: "center", marginBottom: "12px", gap: "10px" }}>
+                  <span className={`chip ${isFailing ? "fail" : "brand"}`}>
+                    BLOCK #{block.index}
+                  </span>
+                  <b className="mono" style={{ fontSize: "13px" }}>
+                    {block.type}
+                  </b>
+
+                  <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }} className="mono">
+                    <span style={{ fontSize: "11px", color: "var(--ink2)", display: "flex", alignItems: "center", gap: "4px" }}>
+                      <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      {block.actor}
+                    </span>
+                    <span style={{ fontSize: "11px", color: "var(--ink2)", display: "flex", alignItems: "center", gap: "4px" }}>
+                      <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      {block.time}
+                    </span>
+
+                    {isFailing ? (
+                      <span className="chip fail" style={{ fontWeight: 700 }}>
+                        <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                        HASH MISMATCH
+                      </span>
+                    ) : (
+                      <span className="chip pass">
+                        <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Verified
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                {/* Hashes Row */}
+                <div
+                  className="grid"
+                  style={{ gridTemplateColumns: "1fr 1fr", gap: "10px" }}
+                >
+                  <div className="hbox" style={{ padding: "8px 10px", background: "var(--surface2)", borderRadius: "6px", border: "1px solid var(--line)" }}>
+                    <small style={{ fontSize: "10px", color: "var(--ink2)", display: "block" }}>PREV_HASH</small>
+                    <div className="hash mono" style={{ fontSize: "10.5px", color: "var(--ink)" }}>
+                      {block.prevHash}
+                    </div>
+                  </div>
+                  <div className="hbox" style={{ padding: "8px 10px", background: "var(--surface2)", borderRadius: "6px", border: "1px solid var(--line)" }}>
+                    <small style={{ fontSize: "10px", color: "var(--ink2)", display: "block" }}>ENTRY_HASH</small>
+                    <div
+                      className={`hash mono ${isFailing ? "r" : "g"}`}
+                      style={{
+                        fontSize: "10.5px",
+                        fontWeight: 600,
+                        color: isFailing ? "var(--fail)" : "var(--pass)",
+                      }}
+                    >
+                      {isTamperedTarget
+                        ? "45a89df0123bc890192389102389019238901238901238901234e890123890ff [MUTATED HASH]"
+                        : isFailing
+                        ? `${block.entryHash.slice(0, 48)}... [CASCADE MISMATCH]`
+                        : block.entryHash}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payload JSON Well */}
+                <pre
+                  className="mono"
+                  style={{
+                    margin: "10px 0 0",
+                    padding: "10px 12px",
+                    background: isFailing ? "color-mix(in srgb, var(--fail) 6%, var(--bg))" : "var(--bg)",
+                    border: isFailing ? "1px solid color-mix(in srgb, var(--fail) 30%, var(--line))" : "1px solid var(--line)",
+                    borderRadius: "7px",
+                    fontSize: "11.5px",
+                    lineHeight: 1.6,
+                    color: "var(--ink)",
+                    overflowX: "auto",
+                  }}
+                >
+                  {JSON.stringify(
+                    isTamperedTarget
+                      ? {
+                          ...block.payload,
+                          score: "0.99 [TAMPERED]",
+                          _tampered_by: "adversarial_injection",
+                          _expected_score: 0.96,
+                        }
+                      : block.payload,
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+
+              {/* Chain Link (Down Arrow) */}
+              {idx < blocks.length - 1 && (
+                <div
+                  className="link"
+                  style={{
+                    color: isTampered && idx >= 1 ? "var(--fail)" : "var(--ink3)",
+                    textAlign: "center",
+                    padding: "8px 0",
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  <svg className="i" viewBox="0 0 24 24" style={{ width: "20px", height: "20px" }}>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
   );
 }

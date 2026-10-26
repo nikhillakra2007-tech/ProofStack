@@ -1,470 +1,922 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useCurtain } from "@/components/layout/CurtainTransition";
-import { 
-  ShieldCheck, Terminal, Lock, KeyRound, User, 
-  ArrowRight, CheckCircle2, ShieldAlert, Cpu, 
-  Code2, Binary, Server, Award, Sparkles, Eye, EyeOff,
-  AlertCircle, HelpCircle, Mail, RefreshCw
-} from "lucide-react";
-import { UserRole } from "@/lib/auth";
-import { BrandLogo } from "@/components/brand-logo/BrandLogo";
+import { useTheme } from "@/lib/theme";
+import { ROLES } from "@/lib/roles";
+import { UserRole } from "@/lib/types";
 
-export default function LoginPage() {
-  const { login } = useAuth();
-  const { navigateWithCurtain } = useCurtain();
-  const [activeTab, setActiveTab] = useState<"signin" | "reset" | "personas">("signin");
-  const [selectedRole, setSelectedRole] = useState<UserRole>("developer");
-  const [email, setEmail] = useState("developer@sentinel.internal");
-  const [password, setPassword] = useState("P@ssw0rd2026!Secure");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [resetSent, setResetSent] = useState(false);
+function LoginContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect") || "/dashboard";
 
-  const rolePresets = [
-    {
-      role: "developer" as UserRole,
-      route: "/developer",
-      email: "developer@sentinel.internal",
-      label: "Lead Developer",
-      persona: "Alex Chen (Staff Dev)",
-      badge: "AST Invariant & Synthesis",
-      desc: "Tree-Sitter compiler grammar parsing, token-masked neural patch synthesis, and patch diff review.",
-      icon: <Code2 className="w-5 h-5 text-emerald-400" />,
-      badgeColor: "#10B981",
-    },
-    {
-      role: "auditor" as UserRole,
-      route: "/auditor",
-      email: "auditor@sentinel.internal",
-      label: "Security Auditor",
-      persona: "Elena Rostova (Lead Auditor)",
-      badge: "Cryptographic Attestation",
-      desc: "SHA-256 Merkle chain verification, adversary bit-flip tamper injection, and audit pack export.",
-      icon: <Binary className="w-5 h-5 text-cyan-400" />,
-      badgeColor: "#38BDF8",
-    },
-    {
-      role: "admin" as UserRole,
-      route: "/admin",
-      email: "admin@sentinel.internal",
-      label: "Operations Admin",
-      persona: "Marcus Vance (Ops Admin)",
-      badge: "Sandbox & MicroVM Pools",
-      desc: "Ephemeral gVisor runner management, NVIDIA inference token quotas, and CI/CD webhooks.",
-      icon: <Server className="w-5 h-5 text-indigo-400" />,
-      badgeColor: "#818CF8",
-    },
-    {
-      role: "super_admin" as UserRole,
-      route: "/ciso",
-      email: "ciso@sentinel.internal",
-      label: "SuperAdmin (CISO)",
-      persona: "Dr. Sarah Lin (CISO)",
-      badge: "Zero-Trust Posture",
-      desc: "Cryptographic root signing key authority, SOC2/FedRAMP matrix, and dual-key emergency override gates.",
-      icon: <Award className="w-5 h-5 text-amber-400" />,
-      badgeColor: "#F59E0B",
-    },
-  ];
+  const { loginAs, setSessionData } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
-  const handle1ClickRoleLogin = async (r: typeof rolePresets[0]) => {
-    setSelectedRole(r.role);
-    setEmail(r.email);
-    setPassword("P@ssw0rd2026!Secure");
-    setIsSubmitting(true);
-    setErrorMessage(null);
-    try {
-      await login(r.email, "P@ssw0rd2026!Secure", r.role);
-      setIsSubmitting(false);
-      navigateWithCurtain(r.route, r.label);
-    } catch (err: any) {
-      setIsSubmitting(false);
-      setErrorMessage(err.message || "Authentication failed. Please check credentials.");
-    }
-  };
+  // Tab mode: 'judge' | 'signin' | 'recovery'
+  const [activeTab, setActiveTab] = useState<"judge" | "signin" | "recovery">("judge");
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
+  // Sign in form state
+  const [email, setEmail] = useState<string>("operator@perfproof.internal");
+  const [password, setPassword] = useState<string>("••••••••••••");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSsoLoading, setIsSsoLoading] = useState<boolean>(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState<boolean>(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
-    if (!email || !email.includes("@")) {
-      setErrorMessage("Please enter a valid operator email address.");
-      return;
-    }
+  // Real-time authentication feedback simulation
+  const [authStep, setAuthStep] = useState<{
+    provider: "sso" | "passkey" | "key" | "judge";
+    status: "connecting" | "verified";
+    message: string;
+    token?: string;
+  } | null>(null);
 
-    if (password.length < 8) {
-      setErrorMessage("Password must be at least 8 characters long.");
-      return;
-    }
+  // Recovery state
+  const [recoveryEmail, setRecoveryEmail] = useState<string>("admin@perfproof.internal");
+  const [mfaCode, setMfaCode] = useState<string>("771892");
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+  const [recoverySuccess, setRecoverySuccess] = useState<string | null>(null);
 
-    setIsSubmitting(true);
-    const targetPreset = rolePresets.find((p) => p.role === selectedRole) || rolePresets[0];
+  // 1-Click Judge Access
+  const handleJudgeAccess = (role: UserRole) => {
+    setIsLoading(true);
+    loginAs(role);
+    setNotice(`Signed in as ${ROLES[role].label}. Launching workspace…`);
 
-    try {
-      await login(email, password, selectedRole);
-      setIsSubmitting(false);
-      navigateWithCurtain(targetPreset.route, targetPreset.label);
-    } catch (err: any) {
-      setIsSubmitting(false);
-      setErrorMessage(err.message || "Invalid operator credentials. Please retry.");
-    }
-  };
+    const dest =
+      redirectParam !== "/dashboard"
+        ? redirectParam
+        : role === "developer"
+        ? "/studio"
+        : role === "auditor"
+        ? "/findings"
+        : role === "admin"
+        ? "/catalog"
+        : "/dashboard";
 
-
-  const handlePasswordReset = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes("@")) {
-      setErrorMessage("Please enter a valid operator email address to receive reset credentials.");
-      return;
-    }
-    setIsSubmitting(true);
-    setErrorMessage(null);
     setTimeout(() => {
-      setIsSubmitting(false);
-      setResetSent(true);
+      router.push(dest);
+    }, 350);
+  };
+
+  // Interactive SSO Sign In (Okta / SAML 2.0)
+  const handleSsoSignIn = () => {
+    setIsSsoLoading(true);
+    setAuthStep({
+      provider: "sso",
+      status: "connecting",
+      message: "Initiating Okta / SAML 2.0 handshake with perfproof.okta.com...",
+    });
+
+    setTimeout(() => {
+      setAuthStep({
+        provider: "sso",
+        status: "verified",
+        message: "SAML 2.0 Identity Assertion Verified · Claims Extracted",
+        token: "okta_saml_009142_superadmin_verified",
+      });
+      loginAs("super_admin");
+
+      setTimeout(() => {
+        router.push(redirectParam !== "/dashboard" ? redirectParam : "/dashboard");
+      }, 500);
     }, 600);
   };
 
+  // Interactive Passkey Sign In (WebAuthn / FIDO2)
+  const handlePasskeySignIn = () => {
+    setIsPasskeyLoading(true);
+    setAuthStep({
+      provider: "passkey",
+      status: "connecting",
+      message: "Requesting WebAuthn / FIDO2 biometric assertion from secure enclave...",
+    });
+
+    setTimeout(() => {
+      setAuthStep({
+        provider: "passkey",
+        status: "verified",
+        message: "Biometric Assertion Confirmed (Hardware Attestation Ed25519)",
+        token: "fido2_cred_ed25519_developer_verified",
+      });
+      loginAs("developer");
+
+      setTimeout(() => {
+        router.push(redirectParam !== "/dashboard" ? redirectParam : "/studio");
+      }, 500);
+    }, 600);
+  };
+
+  // Standard Form Submit (Operator Key)
+  const handleStandardSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setAuthStep({
+      provider: "key",
+      status: "connecting",
+      message: `Verifying operator key signature for ${email}...`,
+    });
+
+    setTimeout(() => {
+      setAuthStep({
+        provider: "key",
+        status: "verified",
+        message: "Operator Key Verified · Session Tokens Issued",
+        token: "jwt_token_super_admin_verified",
+      });
+      loginAs("super_admin");
+
+      setTimeout(() => {
+        router.push(redirectParam);
+      }, 500);
+    }, 550);
+  };
+
+  // Recovery Submit
+  const handleRecoverySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+
+    if (mfaCode.trim() === "000000") {
+      setRecoveryError("Invalid recovery signature · 2 attempts remaining before 15m rate limit lockout.");
+      return;
+    }
+
+    setIsLoading(true);
+    setRecoverySuccess("6-Digit MFA verified · Operator key rotated successfully. Logging in…");
+    loginAs("super_admin");
+    setTimeout(() => {
+      router.push(redirectParam);
+    }, 550);
+  };
+
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] flex flex-col lg:flex-row selection:bg-emerald-500/25">
-      {/* Left Column: Platform Security Credentials & Status */}
-      <div className="lg:w-1/2 p-8 lg:p-14 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[var(--line)] bg-[var(--surface)] relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <div
+      className="ps nosidebar app-frame"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1.12fr",
+        width: "100%",
+        minHeight: "100vh",
+        height: "100vh",
+        overflow: "hidden",
+        background: "var(--bg)",
+      }}
+    >
+      {/* Left Panel: Compact Brand & Proof (Blueprint pp. 11-12) */}
+      <section
+        style={{
+          background: "var(--side)",
+          color: "var(--side-ink)",
+          padding: "36px 44px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          borderRight: "1px solid var(--side-line)",
+          position: "relative",
+          overflowY: "auto",
+        }}
+      >
+        {/* Top: Brand Header */}
         <div>
-          <button
-            onClick={() => navigateWithCurtain("/", "Sentinel Gate")}
-            className="flex items-center gap-3 mb-10 hover:opacity-85 transition-opacity"
-            aria-label="Return to Sentinel Gate Homepage"
-          >
-            <BrandLogo size="md" showWordmark={true} />
-          </button>
-
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-400 mb-4 font-semibold">
-            <Cpu className="w-3.5 h-3.5" />
-            <span>ROLE-BASED ACCESS CONTROL GATEWAY</span>
-          </div>
-
-          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight text-[var(--ink)]">
-            Cryptographically Verified Access to Sentinel Core
-          </h1>
-
-          <p className="text-[var(--ink-body)] text-sm mt-3 leading-relaxed max-w-lg">
-            Choose your assigned operator persona for instant authenticated access, or enter your internal credentials. All session events are anchored into the HMAC-SHA256 evidence ledger.
-          </p>
-
-          {/* 4 Role Persona Cards */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
-            {rolePresets.map((r) => (
-              <div
-                key={r.role}
-                onClick={() => handle1ClickRoleLogin(r)}
-                className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--card-bg)] hover:border-emerald-500/50 cursor-pointer transition-all space-y-1.5 hover:scale-[1.01] shadow-sm"
+          <div className="brand" style={{ padding: 0 }}>
+            <div className="logo">
+              <svg
+                style={{ width: "18px", height: "18px", fill: "none", stroke: "currentColor", strokeWidth: 2 }}
+                viewBox="0 0 24 24"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {r.icon}
-                    <span className="font-bold text-[var(--ink)]">{r.label}</span>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
-                <div className="text-[11px] text-[var(--ink-muted)] line-clamp-1">{r.persona}</div>
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+              </svg>
+            </div>
+            <div>
+              <b style={{ fontSize: "16px", color: "var(--side-ink)" }}>ProofStack</b>
+              <span style={{ fontSize: "11px", color: "var(--side-mute)" }}>Autonomous Verification Engine</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "32px" }}>
+            <span
+              className="chip brand"
+              style={{
+                fontSize: "10.5px",
+                padding: "3px 8px",
+                letterSpacing: ".04em",
+                borderRadius: "14px",
+                marginBottom: "12px",
+                display: "inline-block",
+              }}
+            >
+              BLUEPRINT SPEC · ZERO-COMPROMISE
+            </span>
+            <h1
+              style={{
+                fontFamily: "var(--f-display)",
+                fontSize: "38px",
+                lineHeight: 1.1,
+                letterSpacing: "-.02em",
+                margin: "0 0 12px 0",
+                color: "var(--side-ink)",
+              }}
+            >
+              Every patch ships with proof.
+            </h1>
+            <p
+              style={{
+                fontSize: "14px",
+                lineHeight: 1.5,
+                color: "var(--side-mute)",
+                margin: 0,
+                maxWidth: "460px",
+              }}
+            >
+              Deterministic verification for software performance and safety. Competing AI patches are isolated, tested against exploit oracles, and sealed in an append-only ledger.
+            </p>
+          </div>
+
+          {/* Compact Live Proof Card (INV-4821) */}
+          <div
+            style={{
+              padding: "12px 14px",
+              borderRadius: "9px",
+              background: "color-mix(in srgb, var(--side-ink) 5%, transparent)",
+              border: "1px solid var(--side-line)",
+              marginTop: "24px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span className="mono" style={{ fontSize: "12px", fontWeight: 700, color: "var(--side-ink)" }}>
+                INV-4821 · orders.py:get_orders
+              </span>
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  color: "#6FD39B",
+                  background: "#163124",
+                  padding: "2px 7px",
+                  borderRadius: "4px",
+                  border: "1px solid #234E39",
+                }}
+              >
+                ✓ ACCEPTED · 3/3 GATES PASSED
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "8px" }}>
+              <b style={{ fontSize: "19px", color: "var(--term-pass, #6FD39B)" }}>4.8x faster</b>
+              <span className="mono" style={{ fontSize: "11px", color: "var(--side-mute)" }}>
+                428 ms → 89 ms (+74.2% ΔPerf)
+              </span>
+            </div>
+            <div className="mono" style={{ fontSize: "10.5px", color: "var(--side-mute)", marginTop: "4px" }}>
+              joinedload eager queries · identity predicates preserved · 0 regressions
+            </div>
+          </div>
+
+          {/* 3 Concise Trust Points */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "24px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
+                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               </div>
-            ))}
+              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
+                <b>Zero-Compromise Invariants:</b> Gates G0–G7 eliminate functional regressions, SQLi shortcuts, and race locks.
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
+                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
+                <b>Cryptographic Evidence Ledger:</b> Every microVM run is chained in an immutable SHA-256 Merkle log.
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
+                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
+                <b>NVIDIA Nemotron 3 on Nebius:</b> Self-healing patches synthesized with sub-second feedback loops.
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Hardware Status Bar */}
-        <div className="mt-8 pt-6 border-t border-[var(--line)] flex flex-wrap items-center justify-between text-[11px] font-mono text-[var(--ink-muted)] gap-3">
-          <div className="flex items-center gap-2 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>NVIDIA Nemotron 70B Online</span>
-          </div>
-          <div className="text-[var(--ink-muted)]">HMAC-SHA256 Ledger Active</div>
+        {/* Bottom Note */}
+        <div className="mono" style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "24px" }}>
+          Nebius Token Factory · NVIDIA Nemotron 3 · ProofStack Engine
         </div>
-      </div>
+      </section>
 
-      {/* Right Column: Interactive Role Selector & Form */}
-      <div className="lg:w-1/2 p-8 lg:p-14 flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-full max-w-md space-y-6">
-          {/* Form Tabs */}
-          <div className="flex items-center p-1 rounded-xl bg-[var(--surface)] border border-[var(--line)]">
+      {/* Right Panel: Sign-In + Judge Access + Reset Key (Fits in 100vh) */}
+      <section
+        style={{
+          padding: "36px 48px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "var(--bg)",
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "460px" }}>
+          {/* Top Bar: Switch to Public Site / Toggle Theme */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
             <button
               type="button"
-              onClick={() => { setActiveTab("signin"); setErrorMessage(null); setResetSent(false); }}
-              className={`flex-1 py-2 text-xs font-mono font-semibold rounded-lg transition-colors ${
-                activeTab === "signin"
-                  ? "bg-emerald-500 text-slate-950 shadow-sm"
-                  : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
-              }`}
+              className="btn sm sec"
+              onClick={() => router.push("/home")}
+              style={{ fontSize: "11.5px" }}
+            >
+              ← Back to Public Site
+            </button>
+            <button
+              type="button"
+              className="iconbtn"
+              onClick={toggleTheme}
+              title={`Switch to ${resolvedTheme === "light" ? "dark" : "light"} mode`}
+              style={{ width: "30px", height: "30px" }}
+            >
+              {resolvedTheme === "light" ? (
+                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              ) : (
+                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="4" />
+                  <line x1="12" y1="2" x2="12" y2="4" />
+                  <line x1="12" y1="20" x2="12" y2="22" />
+                  <line x1="4.9" y1="4.9" x2="6.3" y2="6.3" />
+                  <line x1="17.7" y1="17.7" x2="19.1" y2="19.1" />
+                  <line x1="2" y1="12" x2="4" y2="12" />
+                  <line x1="20" y1="12" x2="22" y2="12" />
+                  <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
+                  <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          {/* Mode Switcher Tabs */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              padding: "4px",
+              borderRadius: "8px",
+              background: "var(--surface2)",
+              marginBottom: "20px",
+              border: "1px solid var(--line)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setActiveTab("judge")}
+              style={{
+                border: "none",
+                background: activeTab === "judge" ? "var(--surface)" : "transparent",
+                color: activeTab === "judge" ? "var(--brand)" : "var(--ink2)",
+                fontWeight: activeTab === "judge" ? 700 : 500,
+                fontSize: "12px",
+                padding: "8px 0",
+                borderRadius: "6px",
+                cursor: "pointer",
+                boxShadow: activeTab === "judge" ? "0 2px 6px rgba(0,0,0,0.08)" : "none",
+                transition: "all 120ms ease",
+              }}
+            >
+              Judge Access ⚡
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("signin")}
+              style={{
+                border: "none",
+                background: activeTab === "signin" ? "var(--surface)" : "transparent",
+                color: activeTab === "signin" ? "var(--brand)" : "var(--ink2)",
+                fontWeight: activeTab === "signin" ? 700 : 500,
+                fontSize: "12px",
+                padding: "8px 0",
+                borderRadius: "6px",
+                cursor: "pointer",
+                boxShadow: activeTab === "signin" ? "0 2px 6px rgba(0,0,0,0.08)" : "none",
+                transition: "all 120ms ease",
+              }}
             >
               Sign In
             </button>
             <button
               type="button"
-              onClick={() => { setActiveTab("personas"); setErrorMessage(null); }}
-              className={`flex-1 py-2 text-xs font-mono font-semibold rounded-lg transition-colors ${
-                activeTab === "personas"
-                  ? "bg-emerald-500 text-slate-950 shadow-sm"
-                  : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
-              }`}
+              onClick={() => setActiveTab("recovery")}
+              style={{
+                border: "none",
+                background: activeTab === "recovery" ? "var(--surface)" : "transparent",
+                color: activeTab === "recovery" ? "var(--brand)" : "var(--ink2)",
+                fontWeight: activeTab === "recovery" ? 700 : 500,
+                fontSize: "12px",
+                padding: "8px 0",
+                borderRadius: "6px",
+                cursor: "pointer",
+                boxShadow: activeTab === "recovery" ? "0 2px 6px rgba(0,0,0,0.08)" : "none",
+                transition: "all 120ms ease",
+              }}
             >
-              Role Presets
-            </button>
-            <button
-              type="button"
-              onClick={() => { setActiveTab("reset"); setErrorMessage(null); }}
-              className={`flex-1 py-2 text-xs font-mono font-semibold rounded-lg transition-colors ${
-                activeTab === "reset"
-                  ? "bg-emerald-500 text-slate-950 shadow-sm"
-                  : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
-              }`}
-            >
-              Reset Key
+              Reset Key / MFA
             </button>
           </div>
 
-          {/* Error Banner */}
-          {errorMessage && (
-            <div 
-              role="alert" 
-              className="p-3.5 rounded-xl bg-red-950/30 border border-red-500/50 text-red-300 text-xs font-mono flex items-center gap-2"
+          {authStep && (
+            <div
+              className="mono"
+              style={{
+                padding: "10px 14px",
+                borderRadius: "6px",
+                background:
+                  authStep.status === "verified"
+                    ? "color-mix(in srgb, var(--pass) 10%, var(--surface))"
+                    : "color-mix(in srgb, var(--brand) 10%, var(--surface))",
+                border: `1px solid ${authStep.status === "verified" ? "var(--pass)" : "var(--brand)"}`,
+                color: authStep.status === "verified" ? "var(--pass)" : "var(--brand)",
+                fontSize: "11.5px",
+                marginBottom: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                animation: "fadeIn 120ms ease-out",
+              }}
             >
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* TAB 1: Sign In Form */}
-          {activeTab === "signin" && (
-            <div className="space-y-5">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
-                  Operator Portal Authentication
-                </h2>
-                <p className="text-xs text-[var(--ink-body)] mt-1">
-                  Authenticate with your clearance role and security credentials.
-                </p>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span>{authStep.status === "verified" ? "✓" : "⚡"}</span>
+                <b>{authStep.message}</b>
               </div>
-
-              {/* Persona Selector Pill Grid */}
-              <div>
-                <label className="block text-xs font-mono text-[var(--ink-muted)] mb-1.5 uppercase tracking-wider">
-                  Select Target Persona
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {rolePresets.map((r) => {
-                    const isSelected = selectedRole === r.role;
-                    return (
-                      <button
-                        key={r.role}
-                        type="button"
-                        onClick={() => {
-                          setSelectedRole(r.role);
-                          setEmail(r.persona);
-                        }}
-                        className={`p-2.5 rounded-xl border text-left transition-all ${
-                          isSelected
-                            ? "bg-emerald-500/15 border-emerald-500 text-[var(--ink)] shadow-sm font-semibold"
-                            : "bg-[var(--surface)] border-[var(--line)] text-[var(--ink-muted)] hover:border-[var(--line-strong)]"
-                        }`}
-                      >
-                        <div className="text-xs font-mono text-emerald-400 truncate">{r.label}</div>
-                        <div className="text-[10px] text-[var(--ink-muted)] truncate">{r.persona.split(" ")[0]}</div>
-                      </button>
-                    );
-                  })}
+              {authStep.token && (
+                <div style={{ fontSize: "10.5px", opacity: 0.85, paddingLeft: "16px" }}>
+                  Token: <code>{authStep.token}</code>
                 </div>
-              </div>
-
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div>
-                  <label htmlFor="auth-email" className="block text-xs font-mono text-[var(--ink-muted)] mb-1.5">
-                    Operator Identity / Email
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-3 w-4 h-4 text-[var(--ink-muted)]" />
-                    <input
-                      id="auth-email"
-                      type="text"
-                      autoComplete="username"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--line)] text-[var(--ink)] text-sm font-mono focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="auth-password" className="block text-xs font-mono text-[var(--ink-muted)] mb-1.5">
-                    Security Passphrase / Token
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-3 w-4 h-4 text-[var(--ink-muted)]" />
-                    <input
-                      id="auth-password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--line)] text-[var(--ink)] text-sm font-mono focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-3 text-[var(--ink-muted)] hover:text-[var(--ink)]"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <div className="text-[11px] text-[var(--ink-muted)] mt-1.5 font-mono">
-                    Must be 8+ characters. Handled locally with zero external transmission.
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:scale-[1.01] active:scale-[0.99]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                      <span>Attesting Local Session...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Enter {rolePresets.find((p) => p.role === selectedRole)?.label} Portal</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* TAB 2: Persona 1-Click Simulator */}
-          {activeTab === "personas" && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-bold tracking-tight text-[var(--ink)]">
-                  Local Development Personas
-                </h2>
-                <p className="text-xs text-[var(--ink-body)] mt-1">
-                  1-click role clearance simulation for evaluators and presentation walkthroughs.
-                </p>
-              </div>
-
-              <div className="space-y-2.5">
-                {rolePresets.map((r) => (
-                  <button
-                    key={r.role}
-                    type="button"
-                    onClick={() => handle1ClickRoleLogin(r)}
-                    className="w-full text-left p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:border-emerald-500/50 transition-all flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[var(--bg)] border border-[var(--line)] flex items-center justify-center">
-                        {r.icon}
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold font-mono text-[var(--ink)] group-hover:text-emerald-400 transition-colors">
-                          {r.label}
-                        </div>
-                        <div className="text-[11px] text-[var(--ink-muted)] font-mono">{r.persona}</div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-emerald-400 shrink-0" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: Password Reset */}
-          {activeTab === "reset" && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-bold tracking-tight text-[var(--ink)]">
-                  Reset Operator Credentials
-                </h2>
-                <p className="text-xs text-[var(--ink-body)] mt-1">
-                  Request a cryptographically signed recovery token for your operator ID.
-                </p>
-              </div>
-
-              {resetSent ? (
-                <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono space-y-2">
-                  <div className="flex items-center gap-2 font-bold">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Reset Token Issued</span>
-                  </div>
-                  <p className="text-[var(--ink-body)] leading-relaxed">
-                    Development notice: A local reset session was initialized for <strong>{email}</strong>. In production, this link is signed by HSM root key and dispatched via corporate IdP.
-                  </p>
-                  <button
-                    onClick={() => { setResetSent(false); setActiveTab("signin"); }}
-                    className="text-emerald-400 underline font-semibold mt-1 inline-block"
-                  >
-                    Return to Sign In
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handlePasswordReset} className="space-y-4">
-                  <div>
-                    <label htmlFor="reset-email" className="block text-xs font-mono text-[var(--ink-muted)] mb-1.5">
-                      Operator Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-3 w-4 h-4 text-[var(--ink-muted)]" />
-                      <input
-                        id="reset-email"
-                        type="email"
-                        autoComplete="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--line)] text-[var(--ink)] text-sm font-mono focus:border-emerald-400 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-xs transition-all flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                        <span>Generating Recovery Token...</span>
-                      </>
-                    ) : (
-                      <span>Dispatch Recovery Token</span>
-                    )}
-                  </button>
-                </form>
               )}
             </div>
           )}
 
-          <div className="text-center pt-2">
-            <button
-              onClick={() => navigateWithCurtain("/", "Sentinel Gate")}
-              className="text-xs font-mono text-[var(--ink-muted)] hover:text-emerald-400 transition-colors"
+          {notice && !authStep && (
+            <div
+              className="mono"
+              style={{
+                padding: "10px 14px",
+                borderRadius: "6px",
+                background: "color-mix(in srgb, var(--pass) 10%, var(--surface))",
+                border: "1px solid var(--pass)",
+                color: "var(--pass)",
+                fontSize: "11.5px",
+                marginBottom: "16px",
+              }}
             >
-              ← Return to Main Homepage
-            </button>
-          </div>
+              ✓ {notice}
+            </div>
+          )}
+
+          {/* TAB 1: JUDGE 1-CLICK DEMO ACCESS (Blueprint Page 11) */}
+          {activeTab === "judge" && (
+            <div>
+              <div style={{ marginBottom: "16px" }}>
+                <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
+                  Hackathon Judge 1-Click Access
+                </h2>
+                <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
+                  Click any role persona to enter the platform instantly with configured RBAC permissions:
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {/* 1. Developer */}
+                <div
+                  onClick={() => handleJudgeAccess("developer")}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--brand)";
+                    e.currentTarget.style.background = "color-mix(in srgb, var(--brand) 4%, var(--surface))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "16px" }}>🚀</span>
+                      <b style={{ fontSize: "13.5px" }}>Developer Persona</b>
+                      <span className="chip brand" style={{ fontSize: "10px", padding: "2px 6px" }}>
+                        Studio &amp; Retest
+                      </span>
+                    </div>
+                    <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
+                      Enter Studio →
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
+                    Split-diff Monaco inspection, live custom code edits, and rootless microVM execution.
+                  </div>
+                </div>
+
+                {/* 2. Security Auditor */}
+                <div
+                  onClick={() => handleJudgeAccess("auditor")}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--brand)";
+                    e.currentTarget.style.background = "color-mix(in srgb, var(--brand) 4%, var(--surface))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "16px" }}>🛡️</span>
+                      <b style={{ fontSize: "13.5px" }}>Security Auditor</b>
+                      <span className="chip pass" style={{ fontSize: "10px", padding: "2px 6px" }}>
+                        Findings &amp; Ledger
+                      </span>
+                    </div>
+                    <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
+                      Enter Findings →
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
+                    Live DAST findings, OWASP automated checks, tamper testing, and cryptographic verification.
+                  </div>
+                </div>
+
+                {/* 3. Workspace Admin */}
+                <div
+                  onClick={() => handleJudgeAccess("admin")}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--brand)";
+                    e.currentTarget.style.background = "color-mix(in srgb, var(--brand) 4%, var(--surface))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "16px" }}>⚙️</span>
+                      <b style={{ fontSize: "13.5px" }}>Workspace Admin</b>
+                      <span className="chip" style={{ fontSize: "10px", padding: "2px 6px" }}>
+                        Catalog &amp; Quotas
+                      </span>
+                    </div>
+                    <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
+                      Enter Catalog →
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
+                    19-Problem benchmark catalog, test suites, token budget allocation, and policy enforcement.
+                  </div>
+                </div>
+
+                {/* 4. Super Admin */}
+                <div
+                  onClick={() => handleJudgeAccess("super_admin")}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid var(--line)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    transition: "all 120ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--brand)";
+                    e.currentTarget.style.background = "color-mix(in srgb, var(--brand) 4%, var(--surface))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.background = "var(--surface)";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "16px" }}>👑</span>
+                      <b style={{ fontSize: "13.5px" }}>Super Admin</b>
+                      <span className="chip fail" style={{ fontSize: "10px", padding: "2px 6px" }}>
+                        Fleet &amp; Dashboard
+                      </span>
+                    </div>
+                    <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
+                      Enter Dashboard →
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
+                    Complete platform control plane: microVM telemetry, emergency policy overrides, and fleet health.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: WORK EMAIL SIGN IN */}
+          {activeTab === "signin" && (
+            <form onSubmit={handleStandardSignIn}>
+              <div style={{ marginBottom: "16px" }}>
+                <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
+                  Sign in with Operator Key
+                </h2>
+                <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
+                  Authenticate to your assigned tenant boundary:
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, marginBottom: "6px" }}>
+                    Work Email
+                  </label>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "13px",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                    <label style={{ fontSize: "12px", fontWeight: 600 }}>Operator Key / Password</label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("recovery")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--brand)",
+                        fontSize: "11.5px",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      Forgot key?
+                    </button>
+                  </div>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "13px",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn"
+                disabled={isLoading}
+                style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13.5px", cursor: "pointer" }}
+              >
+                {isLoading ? "Verifying signature…" : "Continue with Operator Key"}
+              </button>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "18px 0 14px",
+                  color: "var(--ink3)",
+                  fontSize: "11.5px",
+                }}
+              >
+                <div style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+                <span style={{ padding: "0 10px" }}>or continue with</span>
+                <div style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <button
+                  type="button"
+                  className="btn sec sm"
+                  disabled={isSsoLoading || isPasskeyLoading || isLoading}
+                  onClick={handleSsoSignIn}
+                  style={{ justifyContent: "center", fontSize: "12px", height: "36px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  {isSsoLoading ? (
+                    <>
+                      <span className="dot" style={{ background: "var(--brand)" }} />
+                      Okta Handshake...
+                    </>
+                  ) : (
+                    <>
+                      <span>🔑</span>
+                      Continue with SSO
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="btn sec sm"
+                  disabled={isSsoLoading || isPasskeyLoading || isLoading}
+                  onClick={handlePasskeySignIn}
+                  style={{ justifyContent: "center", fontSize: "12px", height: "36px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  {isPasskeyLoading ? (
+                    <>
+                      <span className="dot" style={{ background: "var(--brand)" }} />
+                      Enclave Touch...
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      Sign in with Passkey
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* TAB 3: RESET KEY & 6-DIGIT MFA (Blueprint Page 12) */}
+          {activeTab === "recovery" && (
+            <form onSubmit={handleRecoverySubmit}>
+              <div style={{ marginBottom: "16px" }}>
+                <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
+                  Reset Key &amp; Session Recovery
+                </h2>
+                <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
+                  Rotate compromised operator key using MFA recovery token:
+                </div>
+              </div>
+
+              {recoveryError && (
+                <div
+                  className="mono"
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    background: "color-mix(in srgb, var(--fail) 10%, var(--surface))",
+                    border: "1px solid var(--fail)",
+                    color: "var(--fail)",
+                    fontSize: "11.5px",
+                    marginBottom: "14px",
+                  }}
+                >
+                  ✕ {recoveryError}
+                </div>
+              )}
+
+              {recoverySuccess && (
+                <div
+                  className="mono"
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    background: "color-mix(in srgb, var(--pass) 10%, var(--surface))",
+                    border: "1px solid var(--pass)",
+                    color: "var(--pass)",
+                    fontSize: "11.5px",
+                    marginBottom: "14px",
+                  }}
+                >
+                  ✓ {recoverySuccess}
+                </div>
+              )}
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, marginBottom: "6px" }}>
+                    Work Email Address
+                  </label>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="email"
+                      value={recoveryEmail}
+                      onChange={(e) => setRecoveryEmail(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "13px",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, marginBottom: "6px" }}>
+                    6-Digit Hardware MFA / Recovery Code
+                  </label>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={mfaCode}
+                      onChange={(e) => setMfaCode(e.target.value)}
+                      placeholder="e.g. 771892"
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "14px",
+                        letterSpacing: ".2em",
+                        fontFamily: "var(--f-mono)",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: "11px", color: "var(--ink2)", marginTop: "4px" }}>
+                    (Demo: use default &apos;771892&apos; to pass, or &apos;000000&apos; to trigger rate-limit error)
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn"
+                disabled={isLoading}
+                style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13px", cursor: "pointer" }}
+              >
+                {isLoading ? "Verifying MFA Token…" : "Rotate Operator Key & Enter"}
+              </button>
+            </form>
+          )}
         </div>
-      </div>
+      </section>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="card">Loading Sign In…</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
