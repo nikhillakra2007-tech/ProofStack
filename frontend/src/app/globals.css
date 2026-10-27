@@ -7,6 +7,16 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
 :root,
 [data-theme="light"] {
   --bg-canvas: #F6F3EC;

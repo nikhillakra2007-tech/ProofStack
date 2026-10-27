@@ -242,92 +242,78 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         </div>
       </header>
 
-      {/* Mobile Drawer with Smooth Reveal & Clean Links */}
-      {mobileMenuOpen && (
-        <div
+      {/* Mobile Drawer with Smooth Reveal & Clean Links in BOTH Directions */}
+      <div
+        className={`mobile-menu-drawer ${mobileMenuOpen ? "is-open" : ""}`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink3)", marginBottom: "4px" }}>
+          Sections
+        </div>
+        {SECTION_LINKS.map((link) => {
+          const isActive = activeSection === link.id;
+          return (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              onClick={(e) => handleNavClick(e, link.id)}
+              style={{
+                fontSize: "15px",
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? "var(--brand)" : "var(--heading-primary)",
+                padding: "10px 14px",
+                borderRadius: "8px",
+                background: isActive ? "var(--surface-green)" : "var(--surface)",
+                border: `1px solid ${isActive ? "var(--brand)" : "var(--line)"}`,
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                transition: "all 180ms ease",
+              }}
+            >
+              <span>{link.label}</span>
+              {isActive && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--brand)" }} />}
+            </a>
+          );
+        })}
+
+        <div style={{ height: "1px", background: "var(--line)", margin: "10px 0" }} />
+
+        <Link
+          href="/login"
+          onClick={() => setMobileMenuOpen(false)}
           style={{
-            position: "fixed",
-            top: "64px",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "color-mix(in srgb, var(--bg) 98%, transparent)",
-            zIndex: 99,
-            padding: "24px 20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            borderBottom: "1px solid var(--line)",
-            overflowY: "auto",
-            animation: "fadeIn 150ms ease-out",
+            padding: "12px 14px",
+            borderRadius: "8px",
+            border: "1px solid var(--line)",
+            background: "var(--surface)",
+            color: "var(--heading-primary)",
+            fontWeight: 600,
+            textDecoration: "none",
+            textAlign: "center",
+            fontSize: "14px",
+            transition: "all 180ms ease",
           }}
         >
-          <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink3)", marginBottom: "4px" }}>
-            Sections
-          </div>
-          {SECTION_LINKS.map((link) => {
-            const isActive = activeSection === link.id;
-            return (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                onClick={(e) => handleNavClick(e, link.id)}
-                style={{
-                  fontSize: "15px",
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? "var(--brand)" : "var(--heading-primary)",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  background: isActive ? "var(--surface-green)" : "var(--surface)",
-                  border: `1px solid ${isActive ? "var(--brand)" : "var(--line)"}`,
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <span>{link.label}</span>
-                {isActive && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--brand)" }} />}
-              </a>
-            );
-          })}
+          Sign in
+        </Link>
 
-          <div style={{ height: "1px", background: "var(--line)", margin: "10px 0" }} />
-
-          <Link
-            href="/login"
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              padding: "12px 14px",
-              borderRadius: "8px",
-              border: "1px solid var(--line)",
-              background: "var(--surface)",
-              color: "var(--heading-primary)",
-              fontWeight: 600,
-              textDecoration: "none",
-              textAlign: "center",
-              fontSize: "14px",
-            }}
-          >
-            Sign in
-          </Link>
-
-          <Link
-            href="/cockpit/TASK9142"
-            onClick={() => setMobileMenuOpen(false)}
-            className="btn-pill-primary"
-            style={{
-              height: "42px",
-              justifyContent: "center",
-              fontSize: "14px",
-              textDecoration: "none",
-            }}
-          >
-            <span>Launch Cockpit</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      )}
+        <Link
+          href="/cockpit/TASK9142"
+          onClick={() => setMobileMenuOpen(false)}
+          className="btn-pill-primary"
+          style={{
+            height: "42px",
+            justifyContent: "center",
+            fontSize: "14px",
+            textDecoration: "none",
+          }}
+        >
+          <span>Launch Cockpit</span>
+          <ArrowRight size={14} />
+        </Link>
+      </div>
     </>
   );
 }

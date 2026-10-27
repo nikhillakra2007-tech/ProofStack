@@ -278,13 +278,14 @@ section[id] {
   font-weight: 500;
   color: var(--ink2);
   text-decoration: none;
-  transition: all 160ms ease;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
 .nav-pill:hover {
   background: var(--surface-green);
   color: var(--heading-primary);
+  transform: translateY(-1px);
 }
 
 .nav-pill.active {
@@ -293,7 +294,93 @@ section[id] {
   font-weight: 600;
 }
 
-/* Sentinel Assistant & Launcher Polish */
+/* Button hover & active feedback */
+.btn-pill-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--brand);
+  color: var(--brand-ink, #172E27);
+  font-family: var(--f-ui, 'Inter', sans-serif);
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--brand);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, box-shadow 180ms ease, border-color 160ms ease;
+  box-shadow: 0 1px 3px rgba(32, 201, 166, 0.2);
+}
+
+.btn-pill-primary:hover {
+  transform: translateY(-1.5px);
+  background: var(--brand-hover, #17AF91);
+  border-color: var(--brand-hover, #17AF91);
+  box-shadow: 0 4px 14px rgba(32, 201, 166, 0.32);
+}
+
+.btn-pill-primary:active {
+  transform: translateY(0.5px) scale(0.985);
+  box-shadow: 0 1px 4px rgba(32, 201, 166, 0.2);
+}
+
+.btn-pill-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  color: var(--heading-primary);
+  font-family: var(--f-ui, 'Inter', sans-serif);
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, border-color 160ms ease, box-shadow 180ms ease;
+}
+
+.btn-pill-secondary:hover {
+  transform: translateY(-1.5px);
+  background: var(--surface2);
+  border-color: var(--line-strong, var(--line));
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-pill-secondary:active {
+  transform: translateY(0.5px) scale(0.985);
+}
+
+/* Theme toggle micro-interaction */
+.theme-toggle-btn {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: rotate(15deg) scale(1.06);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.94);
+}
+
+/* Interactive Card & Visual Panel Hover */
+.card-interactive-hover {
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-interactive-hover:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0,0,0,0.04));
+  transform: translateY(-2px);
+}
+
+/* Sentinel Assistant & Launcher Transitions */
+.sentinel-launcher-btn {
+  transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 .sentinel-launcher-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg, 0 12px 32px rgba(0,0,0,0.18));
@@ -305,15 +392,41 @@ section[id] {
   outline-offset: 2px;
 }
 
-@keyframes fadeIn {
+.sentinel-launcher-btn.is-hidden {
+  opacity: 0;
+  transform: translateY(12px) scale(0.95);
+  pointer-events: none;
+}
+
+/* Dual-direction Sentinel Panel Animations */
+@keyframes sentinelEnter {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(14px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
+}
+
+@keyframes sentinelExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.sentinel-window {
+  animation: sentinelEnter 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sentinel-window.is-exiting {
+  animation: sentinelExit 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (max-width: 640px) {
@@ -328,13 +441,69 @@ section[id] {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+/* ===== Hero Staggered Entrance Animations ===== */
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
   }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-anim-badge {
+  animation: heroFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
+}
+
+.hero-anim-title {
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+
+.hero-anim-subtitle {
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
+}
+
+.hero-anim-actions {
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 320ms both;
+}
+
+.hero-anim-chips {
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 420ms both;
+}
+
+.hero-anim-showcase {
+  animation: heroFadeUp 750ms cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
+}
+
+/* ===== Reusable Scroll-Reveal Animations ===== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 650ms cubic-bezier(0.16, 1, 0.3, 1), transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.scroll-reveal-stagger-1 {
+  transition-delay: 80ms;
+}
+
+.scroll-reveal-stagger-2 {
+  transition-delay: 160ms;
+}
+
+.scroll-reveal-stagger-3 {
+  transition-delay: 240ms;
+}
+
+.scroll-reveal-stagger-4 {
+  transition-delay: 320ms;
 }
 
 /* ===== Header Navigation Styles ===== */
@@ -362,12 +531,41 @@ section[id] {
   }
 }
 
-/* ===== FAQ Accordion Animations ===== */
+/* Dual-direction Mobile Menu Drawer */
+.mobile-menu-drawer {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--bg) 98%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 99;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1), transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-menu-drawer.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ===== Dual-Direction FAQ Accordion Animations ===== */
 .faq-accordion-item {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
   overflow: hidden;
 }
 
@@ -376,20 +574,82 @@ section[id] {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
-.faq-content-enter {
-  animation: faqExpand 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.faq-answer-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  opacity: 0;
 }
 
-@keyframes faqExpand {
-  from {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-4px);
+.faq-answer-wrapper.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.faq-answer-inner {
+  overflow: hidden;
+}
+
+.faq-chevron-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, color 160ms ease;
+}
+
+.faq-chevron-icon.rotated {
+  transform: rotate(180deg);
+  background: var(--surface-green);
+  color: var(--brand);
+}
+
+/* Lenis standard scroll rules */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  to {
-    opacity: 1;
-    max-height: 400px;
-    transform: translateY(0);
+
+  .scroll-reveal,
+  .hero-anim-badge,
+  .hero-anim-title,
+  .hero-anim-subtitle,
+  .hero-anim-actions,
+  .hero-anim-chips,
+  .hero-anim-showcase {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
   }
 }
+
 

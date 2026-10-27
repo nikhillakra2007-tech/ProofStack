@@ -54,7 +54,7 @@ export default function FAQSection() {
       }}
     >
       {/* Section Header */}
-      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+      <div className="scroll-reveal" style={{ textAlign: "center", marginBottom: "40px" }}>
         <div
           style={{
             display: "inline-flex",
@@ -101,8 +101,8 @@ export default function FAQSection() {
         </p>
       </div>
 
-      {/* Accordion Container (All closed by default) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* Accordion Container (All closed by default with dual-direction animated transitions) */}
+      <div className="scroll-reveal scroll-reveal-stagger-1" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {FAQS.map((faq, index) => {
           const isOpen = openIndex === index;
           return (
@@ -129,24 +129,11 @@ export default function FAQSection() {
                   fontFamily: "var(--f-ui)",
                   fontSize: "15px",
                   fontWeight: 600,
-                  transition: "color 150ms ease",
+                  transition: "color 180ms ease",
                 }}
               >
                 <span style={{ paddingRight: "16px" }}>{faq.question}</span>
-                <span
-                  style={{
-                    display: "grid",
-                    placeItems: "center",
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    background: isOpen ? "var(--surface-green)" : "var(--bg)",
-                    border: "1px solid var(--line)",
-                    flexShrink: 0,
-                    transition: "transform 200ms cubic-bezier(0.16, 1, 0.3, 1), background 150ms ease",
-                    transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                  }}
-                >
+                <span className={`faq-chevron-icon ${isOpen ? "rotated" : ""}`}>
                   <ChevronDown
                     size={16}
                     style={{ color: isOpen ? "var(--brand)" : "var(--ink2)" }}
@@ -154,22 +141,25 @@ export default function FAQSection() {
                 </span>
               </button>
 
-              {isOpen && (
-                <div
-                  id={`faq-answer-${index}`}
-                  role="region"
-                  aria-labelledby={`faq-question-${index}`}
-                  className="faq-content-enter"
-                  style={{
-                    padding: "0 20px 20px",
-                    fontSize: "13.5px",
-                    lineHeight: 1.6,
-                    color: "var(--ink2)",
-                  }}
-                >
-                  {faq.answer}
+              <div
+                id={`faq-answer-${index}`}
+                role="region"
+                aria-labelledby={`faq-question-${index}`}
+                className={`faq-answer-wrapper ${isOpen ? "is-open" : ""}`}
+              >
+                <div className="faq-answer-inner">
+                  <div
+                    style={{
+                      padding: "0 20px 20px",
+                      fontSize: "13.5px",
+                      lineHeight: 1.6,
+                      color: "var(--ink2)",
+                    }}
+                  >
+                    {faq.answer}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           );
         })}

@@ -8,15 +8,11 @@ import { Sparkles } from "lucide-react";
 export default function SentinelLauncher() {
   const { isCopilotOpen, setIsCopilotOpen } = useTheme();
 
-  // If the assistant window is open, hide this launcher button.
-  // This ensures exactly one assistant element is visible and prevents duplicate/ghost launchers.
-  if (isCopilotOpen) return null;
-
   return (
     <button
       type="button"
       onClick={() => setIsCopilotOpen(!isCopilotOpen)}
-      className="sentinel-launcher-btn"
+      className={`sentinel-launcher-btn ${isCopilotOpen ? "is-hidden" : ""}`}
       aria-label="Toggle Sentinel Autonomous AI Copilot"
       aria-expanded={isCopilotOpen}
       style={{

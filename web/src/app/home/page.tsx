@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
+import ScrollRevealObserver from "@/components/providers/ScrollRevealObserver";
 import MarketingHeader from "@/components/home/MarketingHeader";
 import MarketingHero from "@/components/home/MarketingHero";
 import CoreProductSections from "@/components/home/CoreProductSections";
@@ -12,6 +13,7 @@ export default function PublicHomePage() {
 
   return (
     <SmoothScrollProvider>
+      <ScrollRevealObserver />
       <div
         style={{
           minHeight: "100vh",

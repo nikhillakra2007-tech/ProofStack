@@ -103,7 +103,7 @@ export default function CoreProductSections() {
           borderTop: "1px solid var(--line)",
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 44px" }}>
+        <div className="scroll-reveal" style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 44px" }}>
           <div
             style={{
               fontFamily: "var(--f-mono, monospace)",
@@ -162,7 +162,7 @@ export default function CoreProductSections() {
               flexDirection: "column",
               justifyContent: "space-between",
             }}
-            className="lg:col-span-7"
+            className="lg:col-span-7 scroll-reveal scroll-reveal-stagger-1 card-interactive-hover"
           >
             <div>
               <div
@@ -338,7 +338,7 @@ export default function CoreProductSections() {
               flexDirection: "column",
               justifyContent: "space-between",
             }}
-            className="lg:col-span-5"
+            className="lg:col-span-5 scroll-reveal scroll-reveal-stagger-2 card-interactive-hover"
           >
             <div>
               <div
@@ -455,6 +455,7 @@ export default function CoreProductSections() {
               flexWrap: "wrap",
               gap: "20px",
             }}
+            className="lg:col-span-12 scroll-reveal scroll-reveal-stagger-3 card-interactive-hover"
           >
             <div style={{ maxWidth: "720px" }}>
               <div
@@ -524,7 +525,7 @@ export default function CoreProductSections() {
           borderTop: "1px solid var(--line)",
         }}
       >
-        <div style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 40px" }}>
+        <div className="scroll-reveal" style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 40px" }}>
           <div
             style={{
               fontFamily: "var(--f-mono, monospace)",
@@ -596,9 +597,10 @@ export default function CoreProductSections() {
               snippetLabel: "MERKLE SEAL",
               snippet: "SEAL-SHA256-c77a9142\nVERDICT: 8/8 PASS",
             },
-          ].map((item) => (
+          ].map((item, index) => (
             <div
               key={item.step}
+              className={`scroll-reveal scroll-reveal-stagger-${index + 1} card-interactive-hover`}
               style={{
                 background: "var(--surface)",
                 borderRadius: "14px",
@@ -716,6 +718,7 @@ export default function CoreProductSections() {
         }}
       >
         <div
+          className="scroll-reveal"
           style={{
             background: "var(--surface-green)",
             borderRadius: "20px",

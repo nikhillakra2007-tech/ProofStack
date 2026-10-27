@@ -291,7 +291,7 @@ export default function HeroShowcaseTriad() {
               flexDirection: "column",
               justifyContent: "space-between",
             }}
-            className="lg:col-span-3"
+            className="lg:col-span-3 card-interactive-hover"
           >
             <div>
               <div
@@ -477,7 +477,7 @@ export default function HeroShowcaseTriad() {
               display: "flex",
               flexDirection: "column",
             }}
-            className="lg:col-span-5"
+            className="lg:col-span-5 card-interactive-hover"
           >
             {/* Explorer Header & Search Filter */}
             <div style={{ marginBottom: "12px" }}>
@@ -704,7 +704,7 @@ export default function HeroShowcaseTriad() {
               flexDirection: "column",
               justifyContent: "space-between",
             }}
-            className="lg:col-span-4"
+            className="lg:col-span-4 card-interactive-hover"
           >
             <div>
               {/* Header */}

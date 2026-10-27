@@ -462,7 +462,7 @@ export default function SentinelAssistant() {
   return (
     <div
       ref={windowRef}
-      className="sentinel-window"
+      className={`sentinel-window ${isExiting ? "is-exiting" : ""}`}
       role="dialog"
       aria-label="Sentinel Autonomous Security Copilot"
       style={windowStyle}

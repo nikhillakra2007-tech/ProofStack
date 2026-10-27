@@ -30,6 +30,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
     >
       {/* 1. Eyebrow Badge */}
       <div
+        className="hero-anim-badge"
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -70,6 +71,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
       {/* 2. Semgrep-Inspired Centered Headline */}
       <div
+        className="hero-anim-title"
         style={{
           maxWidth: "880px",
           textAlign: "center",
@@ -94,6 +96,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
       {/* 3. Supporting Paragraph */}
       <p
+        className="hero-anim-subtitle"
         style={{
           maxWidth: "700px",
           textAlign: "center",
@@ -111,6 +114,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
       {/* 4. Action Buttons (Pill CTAs) */}
       <div
+        className="hero-anim-actions"
         style={{
           display: "flex",
           alignItems: "center",
@@ -164,6 +168,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
       {/* 5. Toolchain Trust Chips */}
       <div
+        className="hero-anim-chips"
         style={{
           display: "flex",
           alignItems: "center",
@@ -195,7 +200,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
       </div>
 
       {/* 6. Massive Semgrep-Style Product Visual Showcase (Triad Panels) */}
-      <div id="product" style={{ width: "100%", scrollMarginTop: "80px" }}>
+      <div id="product" className="hero-anim-showcase" style={{ width: "100%", scrollMarginTop: "80px" }}>
         <HeroShowcaseTriad />
       </div>
     </section>
