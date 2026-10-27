@@ -209,7 +209,7 @@ function LoginContent() {
                 display: "inline-block",
               }}
             >
-              BLUEPRINT SPEC · ZERO-COMPROMISE
+              EVALUATION &amp; WORKSPACE GATEWAY
             </span>
             <h1
               style={{
@@ -232,7 +232,9 @@ function LoginContent() {
                 maxWidth: "460px",
               }}
             >
-              Deterministic verification for software performance and safety. Competing AI patches are isolated, tested against exploit oracles, and sealed in an append-only ledger.
+              Deterministic verification for software security. Candidate AI repairs
+              are tested against live container exploit probes and verified across
+              8 compiler and test gates.
             </p>
           </div>
 
@@ -284,7 +286,7 @@ function LoginContent() {
                 </svg>
               </div>
               <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>Zero-Compromise Invariants:</b> Gates G0–G7 eliminate functional regressions, SQLi shortcuts, and race locks.
+                <b>Deterministic Gates:</b> Automated checks verify syntax correctness, zero linter regressions, and passing test suites.
               </div>
             </div>
 
@@ -295,7 +297,7 @@ function LoginContent() {
                 </svg>
               </div>
               <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>Cryptographic Evidence Ledger:</b> Every microVM run is chained in an immutable SHA-256 Merkle log.
+                <b>Cryptographic Ledger:</b> Every test verdict and patch diff is hashed into an HMAC-SHA256 audit record.
               </div>
             </div>
 
@@ -306,7 +308,7 @@ function LoginContent() {
                 </svg>
               </div>
               <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>NVIDIA Nemotron 3 on Nebius:</b> Self-healing patches synthesized with sub-second feedback loops.
+                <b>NVIDIA Nemotron 70B:</b> Contextual security patches scoped strictly to the affected code statement.
               </div>
             </div>
           </div>
@@ -314,7 +316,7 @@ function LoginContent() {
 
         {/* Bottom Note */}
         <div className="mono" style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "24px" }}>
-          Nebius Token Factory · NVIDIA Nemotron 3 · ProofStack Engine
+          NVIDIA Nemotron 70B · ProofStack Verification Engine
         </div>
       </section>
 
@@ -374,7 +376,7 @@ function LoginContent() {
                 transition: "all 120ms ease",
               }}
             >
-              Judge Access ⚡
+              Evaluation Roles
             </button>
             <button
               type="button"
@@ -392,7 +394,7 @@ function LoginContent() {
                 transition: "all 120ms ease",
               }}
             >
-              Sign In
+              Work Email
             </button>
             <button
               type="button"
@@ -410,7 +412,7 @@ function LoginContent() {
                 transition: "all 120ms ease",
               }}
             >
-              Reset Key / MFA
+              Password Recovery
             </button>
           </div>
 
@@ -505,15 +507,15 @@ function LoginContent() {
             </div>
           )}
 
-          {/* TAB 1: JUDGE 1-CLICK DEMO ACCESS (Blueprint Page 11) */}
+          {/* TAB 1: EVALUATION 1-CLICK DEMO ACCESS */}
           {activeTab === "judge" && (
             <div>
               <div style={{ marginBottom: "16px" }}>
                 <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
-                  Hackathon Judge 1-Click Access
+                  Evaluation Personas (1-Click Access)
                 </h2>
                 <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
-                  Click any role persona to enter the platform instantly with configured RBAC permissions:
+                  Select a role persona to test workspace features and permission boundaries:
                 </div>
               </div>
 
@@ -674,10 +676,10 @@ function LoginContent() {
             <form onSubmit={handleStandardSignIn}>
               <div style={{ marginBottom: "16px" }}>
                 <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
-                  Sign in with Operator Key
+                  Sign in to your workspace
                 </h2>
                 <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
-                  Authenticate to your assigned tenant boundary:
+                  Enter your email and credentials to continue:
                 </div>
               </div>
 
@@ -708,7 +710,7 @@ function LoginContent() {
 
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <label style={{ fontSize: "12px", fontWeight: 600 }}>Operator Key / Password</label>
+                    <label style={{ fontSize: "12px", fontWeight: 600 }}>Password / Access Key</label>
                     <button
                       type="button"
                       onClick={() => setActiveTab("recovery")}
@@ -721,7 +723,7 @@ function LoginContent() {
                         padding: 0,
                       }}
                     >
-                      Forgot key?
+                      Forgot password?
                     </button>
                   </div>
                   <div className="input" style={{ height: "36px", padding: 0 }}>
@@ -751,7 +753,7 @@ function LoginContent() {
                 disabled={isLoading}
                 style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13.5px", cursor: "pointer" }}
               >
-                {isLoading ? "Verifying signature…" : "Continue with Operator Key"}
+                {isLoading ? "Signing in…" : "Sign in"}
               </button>
 
               <div
@@ -868,12 +870,12 @@ function LoginContent() {
                   {isSsoLoading ? (
                     <>
                       <span className="dot" style={{ background: "var(--brand)" }} />
-                      Okta...
+                      Connecting SSO...
                     </>
                   ) : (
                     <>
                       <span>🔑</span>
-                      SSO (Okta)
+                      Sign in with SSO
                     </>
                   )}
                 </button>
@@ -892,7 +894,7 @@ function LoginContent() {
                   ) : (
                     <>
                       <span>⚡</span>
-                      Passkey FIDO2
+                      Sign in with Passkey
                     </>
                   )}
                 </button>
@@ -900,15 +902,15 @@ function LoginContent() {
             </form>
           )}
 
-          {/* TAB 3: RESET KEY & 6-DIGIT MFA (Blueprint Page 12) */}
+          {/* TAB 3: PASSWORD RECOVERY */}
           {activeTab === "recovery" && (
             <form onSubmit={handleRecoverySubmit}>
               <div style={{ marginBottom: "16px" }}>
                 <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
-                  Reset Key &amp; Session Recovery
+                  Reset your password
                 </h2>
                 <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
-                  Rotate compromised operator key using MFA recovery token:
+                  Enter your email and 6-digit verification code to regain access:
                 </div>
               </div>
 
@@ -1009,7 +1011,7 @@ function LoginContent() {
                 disabled={isLoading}
                 style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13px", cursor: "pointer" }}
               >
-                {isLoading ? "Verifying MFA Token…" : "Rotate Operator Key & Enter"}
+                {isLoading ? "Verifying code…" : "Verify code & reset password"}
               </button>
             </form>
           )}

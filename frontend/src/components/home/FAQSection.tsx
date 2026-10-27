@@ -10,29 +10,29 @@ interface FAQItem {
 
 const FAQS: FAQItem[] = [
   {
-    question: "What is NVIDIA MODEL (ProofStack)?",
+    question: "What is ProofStack?",
     answer:
-      "ProofStack is an autonomous DevSecOps verification engine engineered for the Nebius x NVIDIA Global AI Hackathon. It pairs NVIDIA Nemotron 70B reasoning with an uncompromising 8-gate deterministic interlock. The core invariant is simple: generative models propose candidate code repairs, while deterministic compilers, AST diff analyzers, and active exploit oracles make the authoritative pass/fail decisions.",
+      "ProofStack is a security verification platform designed to remediate code vulnerabilities with evidence. It uses NVIDIA Nemotron to generate candidate repairs, and subjects every candidate to deterministic compiler gates, linter rules, and containerized exploit tests before creating a pull request.",
   },
   {
-    question: "What kinds of security workflows does it support?",
+    question: "How does ProofStack verify candidate patches?",
     answer:
-      "ProofStack automates full-lifecycle vulnerability remediation: dynamic adversarial exploit probing (12 CWE vectors against live ephemeral containers), AST-guided patch synthesis for SQL injection (CWE-89), cross-site scripting (CWE-79), path traversal (CWE-22), and hardcoded secrets (CWE-798), zero-regression verification, and notarization in an immutable HMAC-SHA256 Merkle evidence ledger.",
+      "Generative models only propose fixes; deterministic tools decide whether code is accepted. Each candidate patch is compiled, checked for style regressions with Ruff, re-tested against the original exploit payload in an isolated container, and verified against unit test suites. If any check fails, the patch is rejected.",
   },
   {
-    question: "How does the Sentinel AI assistant help developers and auditors?",
+    question: "What vulnerability types are tested?",
     answer:
-      "Sentinel AI is a movable, floating intelligent assistant accessible throughout the platform. It provides contextual root-cause vulnerability analysis, dispatches automated DAST test suites, asserts RBAC and tenant isolation invariants, explains unified diffs, and synthesizes parameterized AST patch recommendations on demand.",
+      "The platform includes dynamic DAST exploit probes for 12 common CWE vectors, including SQL injection (CWE-89), IDOR/broken object-level authorization (CWE-639), path traversal (CWE-22), SSRF (CWE-918), and hardcoded credentials (CWE-798).",
   },
   {
-    question: "How can users inspect findings and cryptographic evidence?",
+    question: "What is the cryptographic evidence ledger?",
     answer:
-      "Users can explore active vulnerability findings in the Findings Explorer or launch the 6-tab Remediation Cockpit to inspect Monaco side-by-side diffs, AST safety reports, and live curl probe logs. Every verified remediation is notarized in the Cryptographic Ledger with parent block hashes, HMAC-SHA256 signatures, and interactive tamper-detection simulation.",
+      "Every test run, container probe result, and accepted patch diff is hashed and recorded with HMAC-SHA256 signatures in an append-only audit trail. This provides auditors with a verifiable record of why a fix was accepted and proves that the evidence has not been modified after the fact.",
   },
   {
-    question: "What authentication and access options are supported?",
+    question: "How can reviewers evaluate the platform?",
     answer:
-      "ProofStack supports instant 1-click Role-Based Access Control (RBAC) personas (Developer, Auditor, Admin, Super Admin) for hackathon evaluation, standard work email and operator key sign-in, and OAuth 2.0 integration via Google and GitHub.",
+      "You can inspect findings and diffs directly in the Remediation Cockpit or sign in using pre-configured evaluation personas (Developer, Auditor, Admin, Super Admin) to test role-based access control and live features without manual setup.",
   },
 ];
 
@@ -85,7 +85,7 @@ export default function FAQSection() {
             letterSpacing: "-0.025em",
           }}
         >
-          Everything you need to know about ProofStack.
+          Frequently Asked Questions
         </h2>
 
         <p
@@ -97,7 +97,7 @@ export default function FAQSection() {
             lineHeight: 1.5,
           }}
         >
-          Clear answers on deterministic verification, live DAST exploit testing, and cryptographic evidence notarization.
+          Technical answers on how deterministic verification, containerized DAST probes, and audit logging work.
         </p>
       </div>
 

@@ -49,11 +49,11 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
     },
     {
       title: "2. Competing Hypotheses Drafted",
-      subtitle: "Nemotron-3-Super generates 2 candidate caching strategies",
+      subtitle: "Nemotron 70B generates 2 candidate caching strategies",
       code: `# Candidate A: naive redis cache keyed by cart_id\ncache_key = f"cart:{cart_id}"\n\n# Candidate B: tenant-isolated cache with salted tenant token\ncache_key = f"{tenant_id}:{cart_id}"`,
       badge: "HYPOTHESES READY",
       badgeColor: "warn",
-      metrics: "Nemotron 3 Ultra → Lightning synthesis · 2 sandboxes booted",
+      metrics: "Nemotron 70B synthesis · 2 container sandboxes booted",
     },
     {
       title: "3. Gate 1 Correctness & Gate 2 Performance",
@@ -64,7 +64,7 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
       metrics: "Both speedup gates cleared without functional regressions",
     },
     {
-      title: "4. Gate 3 Security (Zero-Compromise Invariant)",
+      title: "4. Gate 3 Security (Tenant Isolation Invariant)",
       subtitle: "Candidate A caught leaking tenant data; Candidate B verified safe",
       code: `[GATE G3 SECURITY]\nCandidate A · naive cache:\n  FAIL: Exploit probe demonstrated tenant B can read tenant A pricing!\n  REJECTED: IDOR Vulnerability (CWE-639 / T1-3)\n\nCandidate B · tenant-isolated:\n  PASS: Exploit probe confirmed zero cross-tenant leakage.\n  ACCEPTED: 3/3 Gates passed!`,
       badge: "IDOR BLOCKED",

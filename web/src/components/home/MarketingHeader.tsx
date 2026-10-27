@@ -213,7 +213,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 gap: "6px",
               }}
             >
-              <span>Launch Cockpit</span>
+              <span>Open Cockpit</span>
               <ArrowRight size={13} />
             </Link>
 

@@ -340,7 +340,7 @@ export default function HeroShowcaseTriad() {
                 }}
               >
                 <div style={{ fontSize: "11px", color: "var(--ink3, #71807A)" }}>
-                  Zero-Hallucination Rate
+                  Deterministic Gate Pass Rate
                 </div>
                 <div
                   style={{
@@ -355,7 +355,7 @@ export default function HeroShowcaseTriad() {
                   100.0%
                 </div>
                 <div style={{ fontSize: "11px", color: "var(--brand-deep, #167A58)", fontWeight: 500 }}>
-                  Deterministic AST validation verified
+                  Compiler, linter &amp; test gates verified
                 </div>
               </div>
 

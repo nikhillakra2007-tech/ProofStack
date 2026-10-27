@@ -115,7 +115,7 @@ export default function CoreProductSections() {
               marginBottom: "10px",
             }}
           >
-            Core Capabilities · 3 Pillars of Truth
+            Core Capabilities · Architectural Breakdown
           </div>
           <h2
             className="headline-semgrep"
@@ -135,9 +135,10 @@ export default function CoreProductSections() {
               margin: 0,
             }}
           >
-            Traditional scanners overwhelm developers with theoretical warnings.
-            ProofStack executes active dynamic probes and enforces deterministic AST
-            gates to guarantee zero false positives.
+            Static analysis tools often produce high rates of false positives.
+            ProofStack confirms vulnerabilities by replaying dynamic exploit probes
+            in isolated containers and verifying fixes against deterministic compiler
+            gates before merging.
           </p>
         </div>
 
@@ -181,7 +182,7 @@ export default function CoreProductSections() {
                 }}
               >
                 <Terminal size={13} style={{ color: "var(--brand)" }} />
-                Adversarial Proof Engine
+                Live Exploit Testing
               </div>
               <h3
                 style={{
@@ -193,7 +194,7 @@ export default function CoreProductSections() {
                   letterSpacing: "-0.015em",
                 }}
               >
-                12-Vector Dynamic DAST Sandbox
+                12-Vector Dynamic DAST Probing
               </h3>
               <p
                 style={{
@@ -203,8 +204,9 @@ export default function CoreProductSections() {
                   margin: "0 0 16px 0",
                 }}
               >
-                Before proposing a fix, ProofStack dispatches active exploit payloads
-                against isolated ephemeral containers to prove genuine vulnerability.
+                Before proposing a fix, ProofStack dispatches exploit payloads
+                against ephemeral container targets to confirm the vulnerability is
+                actively reachable.
               </p>
 
               {/* Vector Selector Pills */}
@@ -357,7 +359,7 @@ export default function CoreProductSections() {
                 }}
               >
                 <FileCheck2 size={13} style={{ color: "var(--brand)" }} />
-                Zero Hallucinations
+                Compiler &amp; Test Verification
               </div>
               <h3
                 style={{
@@ -379,8 +381,9 @@ export default function CoreProductSections() {
                   margin: "0 0 16px 0",
                 }}
               >
-                AI models synthesize candidate patches, but zero diffs merge without
-                clearing 8 automated checks. If a single gate fails, the commit is rejected.
+                Generative models propose candidate patches, but deterministic gates
+                decide. Every proposed diff must pass AST syntax compilation, Ruff
+                linting, negative exploit replays, and unit test suites.
               </p>
 
               {/* Checklist */}
@@ -474,7 +477,7 @@ export default function CoreProductSections() {
                 }}
               >
                 <Lock size={13} style={{ color: "var(--brand)" }} />
-                Immutable Audit Provenance
+                Tamper-Evident History
               </div>
               <h3
                 style={{
@@ -495,9 +498,9 @@ export default function CoreProductSections() {
                   margin: 0,
                 }}
               >
-                Every verification verdict and AST diff is hashed into an append-only Merkle
-                chain. Any retroactive modification breaks subsequent block anchors, instantaneously
-                quarantining downstream releases.
+                Every verification verdict and patch diff is hashed into an append-only
+                ledger. Any retroactive tampering invalidates downstream block hashes
+                and flags the change immediately.
               </p>
             </div>
 
@@ -506,7 +509,7 @@ export default function CoreProductSections() {
               className="btn-pill-secondary"
               style={{ height: "40px", padding: "0 20px", fontSize: "13px" }}
             >
-              <span>Verify Merkle Chain</span>
+              <span>Verify Ledger Audit Trail</span>
               <ChevronRight size={14} />
             </Link>
           </div>
@@ -537,7 +540,7 @@ export default function CoreProductSections() {
               marginBottom: "10px",
             }}
           >
-            Workflow · How ProofStack Works
+            Remediation Workflow · Step-by-Step
           </div>
           <h2
             className="headline-semgrep"
@@ -546,7 +549,7 @@ export default function CoreProductSections() {
               margin: "0 0 14px 0",
             }}
           >
-            <span>From alert to mathematically sealed PR.</span>
+            <span>From vulnerability alert to verified pull request.</span>
           </h2>
           <p
             style={{
@@ -556,7 +559,7 @@ export default function CoreProductSections() {
               margin: 0,
             }}
           >
-            A high-assurance pipeline built to eliminate manual triage and guarantee zero regressions.
+            An end-to-end pipeline designed to reproduce vulnerabilities, synthesize targeted fixes, and verify code safety deterministically.
           </p>
         </div>
 
@@ -571,30 +574,30 @@ export default function CoreProductSections() {
           {[
             {
               step: "01",
-              title: "Target Ingestion",
-              desc: "Tree-sitter builds control flow graphs and identifies taint sinks from SAST alerts.",
+              title: "Taint & Alert Ingestion",
+              desc: "AST parsers map control flow graphs to identify vulnerable taint sinks from incoming SAST alerts.",
               snippetLabel: "AST PARSER",
               snippet: "sink: cursor.execute(query)\ntype: TaintSink.SQL_RAW",
             },
             {
               step: "02",
-              title: "Oracle Probing",
-              desc: "Executes 12 CWE dynamic fuzzing probes against ephemeral test containers to prove exploitability.",
+              title: "Dynamic Exploit Probe",
+              desc: "Replays targeted HTTP probes against isolated test containers to verify exploitability.",
               snippetLabel: "PROBE PAYLOAD",
               snippet: "curl -i GET /workspaces/8819 \\\n  -H 'X-Probe: IDOR-TEST'",
             },
             {
               step: "03",
-              title: "Constrained Synthesis",
-              desc: "NVIDIA Nemotron 70B generates deterministic AST diffs scoped exclusively to vulnerable statements.",
+              title: "Constrained Patch Synthesis",
+              desc: "NVIDIA Nemotron generates scoped candidate diffs restricted to the affected statement.",
               snippetLabel: "AST DIFF ENGINE",
               snippet: "+ if tenant != session.tenant:\n+     raise Forbidden(403)",
             },
             {
               step: "04",
-              title: "8-Gate Seal",
-              desc: "Executes syntax parsers, regression suites, and appends signed block to HMAC-SHA256 ledger.",
-              snippetLabel: "MERKLE SEAL",
+              title: "Deterministic Gate Verification",
+              desc: "Runs compiler checks, linter rules, negative exploit replays, and signs the verification ledger.",
+              snippetLabel: "LEDGER SEAL",
               snippet: "SEAL-SHA256-c77a9142\nVERDICT: 8/8 PASS",
             },
           ].map((item, index) => (
@@ -800,8 +803,8 @@ export default function CoreProductSections() {
               margin: "0 auto 28px",
             }}
           >
-            Launch the live cockpit to review real findings, run adversarial
-            DAST reproductions, or sign in using any of the 4 pre-configured demo judge accounts.
+            Launch the remediation cockpit to inspect real findings, run containerized
+            DAST reproductions, or sign in with any of the 4 pre-configured evaluation personas.
           </p>
           <div
             style={{
@@ -821,7 +824,7 @@ export default function CoreProductSections() {
                 fontSize: "14px",
               }}
             >
-              <span>Launch Live Cockpit</span>
+              <span>Open Remediation Cockpit</span>
               <ArrowRight size={15} />
             </Link>
 
@@ -834,7 +837,7 @@ export default function CoreProductSections() {
                 fontSize: "14px",
               }}
             >
-              <span>Sign In with Demo Role</span>
+              <span>Sign In with Evaluation Persona</span>
             </Link>
           </div>
         </div>

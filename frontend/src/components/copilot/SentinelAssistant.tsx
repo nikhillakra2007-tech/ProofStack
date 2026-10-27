@@ -71,7 +71,7 @@ const FRESH_WELCOME_MESSAGE: ChatMessage = {
   sender: "sentinel",
   name: "Sentinel AI",
   time: "Just now",
-  text: "Hello! I am Sentinel, your Autonomous Security Copilot powered by NVIDIA Nemotron 70B. I can audit endpoints for OWASP flaws, dispatch live containerized DAST probes, explain IDOR boundaries, or synthesize compiler-verified defensive patches. How can I assist you?",
+  text: "Hi, I'm Sentinel. I can help you inspect vulnerability evidence, replay DAST exploit probes against test containers, review AST diffs, or check gate verification results. What would you like to review?",
 };
 
 const INITIAL_SESSIONS: SavedSession[] = [
@@ -92,7 +92,7 @@ const INITIAL_SESSIONS: SavedSession[] = [
         sender: "sentinel",
         name: "Sentinel AI",
         time: "10:15 AM",
-        text: "Zero-Compromise Gauntlet audit complete. Detected an N+1 query loop across 5,000 orders and raw string concatenation in orders.py. I synthesized an eager-loading patch via NVIDIA Nemotron:",
+        text: "Audit complete. Detected an N+1 query loop across 5,000 orders and raw string concatenation in orders.py. Here is the synthesized eager-loading patch:",
         hasCard: true,
         cardData: {
           title: "T1-2: N+1 Explosion & SQL Injection Remediated",
@@ -119,7 +119,7 @@ const INITIAL_SESSIONS: SavedSession[] = [
         sender: "sentinel",
         name: "Sentinel AI",
         time: "04:31 PM",
-        text: "Dispatched automated DevTools scanner. Detected missing Content-Security-Policy (D-01) and wildcards in script-src (D-02). Generated strict nonce-based header configuration in next.config.js.",
+        text: "Dispatched automated scanner. Detected missing Content-Security-Policy (D-01) and wildcards in script-src (D-02). Generated strict nonce-based header configuration in next.config.js.",
         hasCard: true,
         cardData: {
           title: "D-01 / D-02: Strict CSP Applied",
@@ -132,9 +132,9 @@ const INITIAL_SESSIONS: SavedSession[] = [
 ];
 
 const SUGGESTED_PROMPTS = [
-  "Audit workspace billing endpoint for cross-tenant IDOR leaks",
-  "Run active DAST probe on /api/v1/auth and assert RS256 algorithm enforcement",
-  "Synthesize parameterized SQL fix for unescaped query filter",
+  "Inspect billing endpoint for cross-tenant IDOR access",
+  "Run container DAST probe on /api/v1/auth",
+  "Review parameterized SQL fix for unescaped query filter",
 ];
 
 export default function SentinelAssistant() {
@@ -905,7 +905,7 @@ export default function SentinelAssistant() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ask Sentinel to audit code, probe flaws..."
+              placeholder="Ask Sentinel to review findings, inspect diffs, or replay probes..."
               style={{
                 flex: 1,
                 height: "34px",

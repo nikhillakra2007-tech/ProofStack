@@ -65,7 +65,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             color: "var(--heading-primary, #344E48)",
           }}
         >
-          NVIDIA Nemotron 70B Reasoning · 8-Gate Interlock
+          NVIDIA Nemotron 70B · Compiler & Test Verified Gates
         </span>
       </div>
 
@@ -86,10 +86,10 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             letterSpacing: "-0.03em",
           }}
         >
-          <span>Code security without false positives.</span>
+          <span>Security findings backed by evidence.</span>
           <br />
           <span className="headline-accent">
-            Verified evidence developers and auditors trust.
+            Fixes verified by compiler gates and live tests.
           </span>
         </h1>
       </div>
@@ -107,9 +107,10 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
           margin: "0 0 32px 0",
         }}
       >
-        ProofStack pairs 12-vector active DAST exploitation with an 8-gate
-        deterministic AST interlock and HMAC-SHA256 evidence ledger — turning
-        speculative AI suggestions into mathematically verified, regression-free fixes.
+        ProofStack identifies security flaws, proves them with live container probes,
+        and synthesizes scoped patches using NVIDIA Nemotron. Before anything merges,
+        8 deterministic compiler, linter, and test gates verify that the vulnerability
+        is gone and existing code still works.
       </p>
 
       {/* 4. Action Buttons (Pill CTAs) */}
@@ -133,7 +134,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             fontSize: "14px",
           }}
         >
-          <span>Launch Live Cockpit</span>
+          <span>Open Remediation Cockpit</span>
           <ArrowRight size={15} />
         </Link>
 
@@ -183,19 +184,19 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
       >
         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
           <CheckCircle2 size={13} style={{ color: "var(--brand, #20C9A6)" }} />
-          12 CWE DAST Probes
+          12 CWE Container Probes
         </span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
           <CheckCircle2 size={13} style={{ color: "var(--brand, #20C9A6)" }} />
-          Zero-Hallucination 8-Gate Interlock
+          8 Compiler &amp; Test Gates
         </span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
           <CheckCircle2 size={13} style={{ color: "var(--brand, #20C9A6)" }} />
-          HMAC-SHA256 Merkle Ledger
+          Signed Audit Ledger
         </span>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
           <CheckCircle2 size={13} style={{ color: "var(--brand, #20C9A6)" }} />
-          Python 3.11 / 3.12 Sandboxes
+          Isolated Container Sandboxes
         </span>
       </div>
 
