@@ -197,7 +197,7 @@ function LoginContent() {
             <BrandLogo size="md" showTagline={true} />
           </div>
 
-          <div style={{ marginTop: "32px" }}>
+          <div style={{ marginTop: "24px" }}>
             <span
               className="chip brand"
               style={{
@@ -205,19 +205,19 @@ function LoginContent() {
                 padding: "3px 8px",
                 letterSpacing: ".04em",
                 borderRadius: "14px",
-                marginBottom: "12px",
+                marginBottom: "10px",
                 display: "inline-block",
               }}
             >
-              EVALUATION &amp; WORKSPACE GATEWAY
+              VERIFICATION PIPELINE
             </span>
             <h1
               style={{
                 fontFamily: "var(--f-display)",
-                fontSize: "38px",
-                lineHeight: 1.1,
+                fontSize: "32px",
+                lineHeight: 1.15,
                 letterSpacing: "-.02em",
-                margin: "0 0 12px 0",
+                margin: "0 0 10px 0",
                 color: "var(--side-ink)",
               }}
             >
@@ -225,98 +225,238 @@ function LoginContent() {
             </h1>
             <p
               style={{
-                fontSize: "14px",
+                fontSize: "13px",
                 lineHeight: 1.5,
                 color: "var(--side-mute)",
                 margin: 0,
                 maxWidth: "460px",
               }}
             >
-              Deterministic verification for software security. Candidate AI repairs
-              are tested against live container exploit probes and verified across
-              8 compiler and test gates.
+              We don&apos;t let language models commit code directly to production.
+              Nemotron drafts candidate fixes — deterministic compilers, linters,
+              and live exploit probes decide what merges.
             </p>
           </div>
 
-          {/* Compact Live Proof Card (INV-4821) */}
+          {/* Visual Pipeline Flowchart */}
           <div
             style={{
-              padding: "12px 14px",
-              borderRadius: "9px",
-              background: "color-mix(in srgb, var(--side-ink) 5%, transparent)",
+              marginTop: "20px",
+              padding: "16px 18px",
+              borderRadius: "12px",
+              background: "color-mix(in srgb, var(--side-ink) 4%, transparent)",
               border: "1px solid var(--side-line)",
-              marginTop: "24px",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span className="mono" style={{ fontSize: "12px", fontWeight: 700, color: "var(--side-ink)" }}>
-                INV-4821 · orders.py:get_orders
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "14px",
+                paddingBottom: "8px",
+                borderBottom: "1px solid var(--side-line)",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--f-mono, monospace)",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "#6FD39B",
+                }}
+              >
+                Verification Flow
               </span>
               <span
                 style={{
+                  fontFamily: "var(--f-mono)",
                   fontSize: "10px",
-                  fontWeight: 700,
-                  color: "#6FD39B",
-                  background: "#163124",
                   padding: "2px 7px",
                   borderRadius: "4px",
+                  background: "#163124",
+                  color: "#6FD39B",
                   border: "1px solid #234E39",
+                  fontWeight: 600,
                 }}
               >
-                ✓ ACCEPTED · 3/3 GATES PASSED
+                5-STAGE INTERLOCK
               </span>
             </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "8px" }}>
-              <b style={{ fontSize: "19px", color: "var(--term-pass, #6FD39B)" }}>4.8x faster</b>
-              <span className="mono" style={{ fontSize: "11px", color: "var(--side-mute)" }}>
-                428 ms → 89 ms (+74.2% ΔPerf)
-              </span>
-            </div>
-            <div className="mono" style={{ fontSize: "10.5px", color: "var(--side-mute)", marginTop: "4px" }}>
-              joinedload eager queries · identity predicates preserved · 0 regressions
-            </div>
-          </div>
 
-          {/* 3 Concise Trust Points */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "24px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
-                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+            {/* Stage 1 */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "rgba(224, 86, 36, 0.15)",
+                    border: "1px solid rgba(224, 86, 36, 0.4)",
+                    color: "#F0825B",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    fontFamily: "var(--f-mono)",
+                  }}
+                >
+                  1
+                </div>
+                <div style={{ width: "2px", height: "20px", background: "var(--side-line)", margin: "2px 0" }} />
               </div>
-              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>Deterministic Gates:</b> Automated checks verify syntax correctness, zero linter regressions, and passing test suites.
+              <div style={{ flex: 1, paddingBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--side-ink)" }}>Vulnerability Alert Ingestion</b>
+                  <span className="mono" style={{ fontSize: "9.5px", color: "var(--side-mute)" }}>Tree-sitter AST</span>
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "1px" }}>
+                  Parses taint source and sink (e.g. CWE-639 IDOR, CWE-89 SQLi)
+                </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
-                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+            {/* Stage 2 */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "rgba(235, 179, 58, 0.15)",
+                    border: "1px solid rgba(235, 179, 58, 0.4)",
+                    color: "#EBB33A",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    fontFamily: "var(--f-mono)",
+                  }}
+                >
+                  2
+                </div>
+                <div style={{ width: "2px", height: "20px", background: "var(--side-line)", margin: "2px 0" }} />
               </div>
-              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>Cryptographic Ledger:</b> Every test verdict and patch diff is hashed into an HMAC-SHA256 audit record.
+              <div style={{ flex: 1, paddingBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--side-ink)" }}>Live Container DAST Probe</b>
+                  <span className="mono" style={{ fontSize: "9.5px", color: "#EBB33A" }}>HTTP 200 PROVEN</span>
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "1px" }}>
+                  Replays exploit payload in isolated sandbox to confirm reachability
+                </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-              <div style={{ color: "#6FD39B", marginTop: "2px", flexShrink: 0 }}>
-                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+            {/* Stage 3 */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "rgba(32, 201, 166, 0.15)",
+                    border: "1px solid rgba(32, 201, 166, 0.4)",
+                    color: "var(--brand)",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    fontFamily: "var(--f-mono)",
+                  }}
+                >
+                  3
+                </div>
+                <div style={{ width: "2px", height: "20px", background: "var(--side-line)", margin: "2px 0" }} />
               </div>
-              <div style={{ fontSize: "12.5px", lineHeight: 1.4, color: "var(--side-ink)" }}>
-                <b>NVIDIA Nemotron 70B:</b> Contextual security patches scoped strictly to the affected code statement.
+              <div style={{ flex: 1, paddingBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--side-ink)" }}>Nemotron 70B Scoped Patch</b>
+                  <span className="mono" style={{ fontSize: "9.5px", color: "var(--side-mute)" }}>AST DIFF</span>
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "1px" }}>
+                  Generates minimal defensive repair restricted to vulnerable node
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 4 */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "#163124",
+                    border: "1px solid #234E39",
+                    color: "#6FD39B",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    fontFamily: "var(--f-mono)",
+                  }}
+                >
+                  4
+                </div>
+                <div style={{ width: "2px", height: "20px", background: "var(--side-line)", margin: "2px 0" }} />
+              </div>
+              <div style={{ flex: 1, paddingBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--side-ink)" }}>8 Deterministic Compiler Gates</b>
+                  <span className="mono" style={{ fontSize: "9.5px", color: "#6FD39B" }}>8/8 PASS</span>
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "1px" }}>
+                  Compile ✓ · Ruff style ✓ · Exploit replay 403 ✓ · Unit tests ✓
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 5 */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "6px",
+                    background: "rgba(111, 211, 155, 0.2)",
+                    border: "1px solid #6FD39B",
+                    color: "#6FD39B",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    fontFamily: "var(--f-mono)",
+                  }}
+                >
+                  ✓
+                </div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--side-ink)" }}>HMAC-SHA256 Evidence Notarized</b>
+                  <span className="mono" style={{ fontSize: "9.5px", color: "#6FD39B" }}>SEALED</span>
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "1px" }}>
+                  Signed block appended to audit ledger · Pull Request ready
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Note */}
-        <div className="mono" style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "24px" }}>
-          NVIDIA Nemotron 70B · ProofStack Verification Engine
+        <div className="mono" style={{ fontSize: "11px", color: "var(--side-mute)", marginTop: "20px" }}>
+          Deterministic gates decide · Generative models propose
         </div>
       </section>
 
@@ -553,7 +693,7 @@ function LoginContent() {
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
-                    Split-diff Monaco inspection, live custom code edits, and rootless microVM execution.
+                    Split-diff Monaco code reviews, live patch edits, and rootless microVM retests.
                   </div>
                 </div>
 
@@ -590,7 +730,7 @@ function LoginContent() {
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
-                    Live DAST findings, OWASP automated checks, tamper testing, and cryptographic verification.
+                    Inspect live DAST probes, test cryptographic tamper resistance, and verify HMAC ledger proofs.
                   </div>
                 </div>
 
@@ -627,7 +767,7 @@ function LoginContent() {
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
-                    19-Problem benchmark catalog, test suites, token budget allocation, and policy enforcement.
+                    Manage benchmark test suites, token budgets, and automated policy gates.
                   </div>
                 </div>
 
@@ -664,7 +804,7 @@ function LoginContent() {
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
-                    Complete platform control plane: microVM telemetry, emergency policy overrides, and fleet health.
+                    Fleet control plane: microVM telemetry, emergency overrides, and cluster health.
                   </div>
                 </div>
               </div>
@@ -673,88 +813,88 @@ function LoginContent() {
 
           {/* TAB 2: WORK EMAIL SIGN IN */}
           {activeTab === "signin" && (
-             <form onSubmit={handleStandardSignIn}>
-               <div style={{ marginBottom: "16px" }}>
-                 <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
-                   Sign in to your workspace
-                 </h2>
-                 <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
-                   Enter your email and credentials to continue:
-                 </div>
-               </div>
+            <form onSubmit={handleStandardSignIn}>
+              <div style={{ marginBottom: "16px" }}>
+                <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "0 0 4px", color: "var(--ink)" }}>
+                  Sign in to your workspace
+                </h2>
+                <div style={{ fontSize: "12.5px", color: "var(--ink2)" }}>
+                  Enter your email and credentials to continue:
+                </div>
+              </div>
 
-               <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
-                 <div>
-                   <label style={{ display: "block", fontSize: "12px", fontWeight: 600, marginBottom: "6px" }}>
-                     Work Email
-                   </label>
-                   <div className="input" style={{ height: "36px", padding: 0 }}>
-                     <input
-                       type="email"
-                       value={email}
-                       onChange={(e) => setEmail(e.target.value)}
-                       required
-                       style={{
-                         width: "100%",
-                         height: "100%",
-                         border: "none",
-                         background: "transparent",
-                         outline: "none",
-                         padding: "0 10px",
-                         fontSize: "13px",
-                         color: "var(--ink)",
-                       }}
-                     />
-                   </div>
-                 </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, marginBottom: "6px" }}>
+                    Work Email
+                  </label>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "13px",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                </div>
 
-                 <div>
-                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                     <label style={{ fontSize: "12px", fontWeight: 600 }}>Password / Access Key</label>
-                     <button
-                       type="button"
-                       onClick={() => setActiveTab("recovery")}
-                       style={{
-                         background: "none",
-                         border: "none",
-                         color: "var(--brand)",
-                         fontSize: "11.5px",
-                         cursor: "pointer",
-                         padding: 0,
-                       }}
-                     >
-                       Forgot password?
-                     </button>
-                   </div>
-                   <div className="input" style={{ height: "36px", padding: 0 }}>
-                     <input
-                       type="password"
-                       value={password}
-                       onChange={(e) => setPassword(e.target.value)}
-                       required
-                       style={{
-                         width: "100%",
-                         height: "100%",
-                         border: "none",
-                         background: "transparent",
-                         outline: "none",
-                         padding: "0 10px",
-                         fontSize: "13px",
-                         color: "var(--ink)",
-                       }}
-                     />
-                   </div>
-                 </div>
-               </div>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                    <label style={{ fontSize: "12px", fontWeight: 600 }}>Password / Access Key</label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("recovery")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--brand)",
+                        fontSize: "11.5px",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="input" style={{ height: "36px", padding: 0 }}>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        padding: "0 10px",
+                        fontSize: "13px",
+                        color: "var(--ink)",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
 
-               <button
-                 type="submit"
-                 className="btn"
-                 disabled={isLoading}
-                 style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13.5px", cursor: "pointer" }}
-               >
-                 {isLoading ? "Signing in…" : "Sign in"}
-               </button>
+              <button
+                type="submit"
+                className="btn"
+                disabled={isLoading}
+                style={{ width: "100%", height: "38px", justifyContent: "center", fontSize: "13.5px", cursor: "pointer" }}
+              >
+                {isLoading ? "Signing in…" : "Sign in"}
+              </button>
 
               <div
                 style={{

@@ -185,35 +185,18 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
 
             <Link
               href="/login"
-              style={{
-                fontFamily: "var(--f-ui, 'Inter', sans-serif)",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "var(--ink2)",
-                textDecoration: "none",
-                padding: "6px 14px",
-                borderRadius: "9999px",
-                transition: "color 150ms ease, background 150ms ease",
-              }}
-              className="hover:text-[var(--ink)] hover:bg-[var(--surface-green)]"
-            >
-              Sign in
-            </Link>
-
-            <Link
-              href="/cockpit/TASK9142"
               className="btn-pill-primary"
               style={{
                 height: "36px",
-                padding: "0 16px",
-                fontSize: "12.5px",
+                padding: "0 18px",
+                fontSize: "13px",
                 textDecoration: "none",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
               }}
             >
-              <span>Open Cockpit</span>
+              <span>Sign in</span>
               <ArrowRight size={13} />
             </Link>
 
@@ -283,25 +266,6 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         <Link
           href="/login"
           onClick={() => setMobileMenuOpen(false)}
-          style={{
-            padding: "12px 14px",
-            borderRadius: "8px",
-            border: "1px solid var(--line)",
-            background: "var(--surface)",
-            color: "var(--heading-primary)",
-            fontWeight: 600,
-            textDecoration: "none",
-            textAlign: "center",
-            fontSize: "14px",
-            transition: "all 180ms ease",
-          }}
-        >
-          Sign in
-        </Link>
-
-        <Link
-          href="/cockpit/TASK9142"
-          onClick={() => setMobileMenuOpen(false)}
           className="btn-pill-primary"
           style={{
             height: "42px",
@@ -310,7 +274,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
             textDecoration: "none",
           }}
         >
-          <span>Launch Cockpit</span>
+          <span>Sign in</span>
           <ArrowRight size={14} />
         </Link>
       </div>

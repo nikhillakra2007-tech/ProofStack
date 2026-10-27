@@ -30,7 +30,7 @@
 | **📜 Cryptographic Ledger** | **[proofstack-cockpit.vercel.app/ledger](https://proofstack-cockpit.vercel.app/ledger)** | Immutable HMAC-SHA256 Merkle chain with tamper detection simulator |
 | **🛡️ Findings Registry** | **[proofstack-cockpit.vercel.app/findings](https://proofstack-cockpit.vercel.app/findings)** | Triaged CWE vulnerability catalog, root cause analysis & status |
 | **📚 Knowledge Library** | **[proofstack-cockpit.vercel.app/library](https://proofstack-cockpit.vercel.app/library)** | Zero-Compromise policy guides, truth hierarchy, and audit specs |
-| **🔐 Role Gateway (RBAC)** | **[proofstack-cockpit.vercel.app/login](https://proofstack-cockpit.vercel.app/login)** | 1-click role authentication: Developer, Auditor, Admin, Super Admin |
+| **🔐 Role Gateway (RBAC)** | **[proofstack-cockpit.vercel.app/login](https://proofstack-cockpit.vercel.app/login)** | Interactive 5-stage Verification Pipeline flowchart & 1-click evaluation access for Developer, Auditor, Admin, Super Admin |
 
 ---
 
@@ -46,9 +46,10 @@ ProofStack's public interface and cockpit are engineered for maximum signal, str
 - **Route-Aware Behavior**: Automatically closes on navigation and stays completely hidden on unauthenticated login surfaces (`/login`).
 - **Real Multi-Session Interaction**: Preserves chat histories, session switching, error states, and inline Nemotron 70B verified AST patch cards.
 
-### 2. Desktop Section Navigation & 1-Click Theme Switcher
+### 2. Desktop Section Navigation, Streamlined Header & Flowchart Auth Gateway
 - **Dedicated Desktop Header**: Full horizontal navigation with the product brand lockup and direct section links: `Overview` (`#overview`), `Product` (`#product`), `Capabilities` (`#capabilities`), `How it works` (`#workflow`), and `FAQ` (`#faq`).
-- **Smooth Section Anchoring**: Smooth offset scrolling (`scroll-mt-20`) so section headings are never obscured by the fixed header.
+- **Streamlined Call-to-Action**: Clean high-contrast `Sign in →` pill directly in the header, keeping the landing page distraction-free while guiding operators into the workspace.
+- **Verification Pipeline Flowchart (`/login`)**: Connected 5-stage visual verification diagram explaining exactly how alerts pass through live DAST containers, Nemotron AST patching, 8 deterministic compiler gates, and HMAC cryptographic notarization before merging.
 - **Instant 1-Click Theme Toggle**: Fast 1-click Sun/Moon toggle button transitioning directly between light and dark modes with zero dropdown friction and persistent theme storage.
 - **Mobile Responsive Drawer**: Clean, animated slide-in drawer exclusively on screens under `860px`, leaving the desktop navigation bar completely unhindered.
 
