@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
 import { UserRole } from "@/lib/types";
+import BrandLogo from "@/components/common/BrandLogo";
 
 function LoginContent() {
   const router = useRouter();
@@ -13,7 +14,6 @@ function LoginContent() {
   const redirectParam = searchParams.get("redirect") || "/dashboard";
 
   const { loginAs, setSessionData } = useAuth();
-  const { resolvedTheme, toggleTheme } = useTheme();
 
   // Tab mode: 'judge' | 'signin' | 'recovery'
   const [activeTab, setActiveTab] = useState<"judge" | "signin" | "recovery">("judge");
@@ -183,21 +183,8 @@ function LoginContent() {
       >
         {/* Top: Brand Header */}
         <div>
-          <div className="brand" style={{ padding: 0 }}>
-            <div className="logo">
-              <svg
-                style={{ width: "18px", height: "18px", fill: "none", stroke: "currentColor", strokeWidth: 2 }}
-                viewBox="0 0 24 24"
-              >
-                <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                <polyline points="2 17 12 22 22 17" />
-                <polyline points="2 12 12 17 22 12" />
-              </svg>
-            </div>
-            <div>
-              <b style={{ fontSize: "16px", color: "var(--side-ink)" }}>ProofStack</b>
-              <span style={{ fontSize: "11px", color: "var(--side-mute)" }}>Autonomous Verification Engine</span>
-            </div>
+          <div style={{ marginBottom: "12px" }}>
+            <BrandLogo size="md" showTagline={true} />
           </div>
 
           <div style={{ marginTop: "32px" }}>
@@ -344,31 +331,9 @@ function LoginContent() {
             >
               ← Back to Public Site
             </button>
-            <button
-              type="button"
-              className="iconbtn"
-              onClick={toggleTheme}
-              title={`Switch to ${resolvedTheme === "light" ? "dark" : "light"} mode`}
-              style={{ width: "30px", height: "30px" }}
-            >
-              {resolvedTheme === "light" ? (
-                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              ) : (
-                <svg style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="4" />
-                  <line x1="12" y1="2" x2="12" y2="4" />
-                  <line x1="12" y1="20" x2="12" y2="22" />
-                  <line x1="4.9" y1="4.9" x2="6.3" y2="6.3" />
-                  <line x1="17.7" y1="17.7" x2="19.1" y2="19.1" />
-                  <line x1="2" y1="12" x2="4" y2="12" />
-                  <line x1="20" y1="12" x2="22" y2="12" />
-                  <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
-                  <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
-                </svg>
-              )}
-            </button>
+            <span className="chip pass" style={{ fontSize: "10px" }}>
+              Secure Gateway
+            </span>
           </div>
 
           {/* Mode Switcher Tabs */}

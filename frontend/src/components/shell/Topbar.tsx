@@ -84,7 +84,6 @@ export default function Topbar({
   const pathname = usePathname();
   const router = useRouter();
   const { role, activeMember, allMembers, switchMember } = useAuth();
-  const { resolvedTheme, toggleTheme } = useTheme();
   const roleDef = ROLES[role] || ROLES.developer;
 
   // Notification state
@@ -696,33 +695,6 @@ export default function Topbar({
           </div>
         )}
       </div>
-
-      {/* Sun/Moon Theme Toggle */}
-      <button
-        type="button"
-        className="iconbtn"
-        onClick={toggleTheme}
-        title={`Switch to ${resolvedTheme === "light" ? "dark" : "light"} mode`}
-        aria-label="Toggle color theme"
-      >
-        {resolvedTheme === "light" ? (
-          <svg className="i" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        ) : (
-          <svg className="i" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="4" />
-            <line x1="12" y1="2" x2="12" y2="4" />
-            <line x1="12" y1="20" x2="12" y2="22" />
-            <line x1="4.9" y1="4.9" x2="6.3" y2="6.3" />
-            <line x1="17.7" y1="17.7" x2="19.1" y2="19.1" />
-            <line x1="2" y1="12" x2="4" y2="12" />
-            <line x1="20" y1="12" x2="22" y2="12" />
-            <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
-            <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
-          </svg>
-        )}
-      </button>
 
       {/* Quick Team Member / Persona Switcher Pill */}
       <div style={{ position: "relative" }} ref={memberSwitcherRef}>

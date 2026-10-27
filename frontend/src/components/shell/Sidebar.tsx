@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES, TeamMember } from "@/lib/roles";
+import BrandLogo from "@/components/common/BrandLogo";
 
 interface SidebarProps {
   onOpenNewTaskModal?: () => void;
@@ -140,61 +141,17 @@ export default function Sidebar({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
                 textDecoration: "none",
                 color: "inherit",
                 minWidth: 0,
                 overflow: "hidden",
               }}
             >
-              <div
-                className="logo"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "8px",
-                  background: "var(--accent)",
-                  color: "var(--accent-ink)",
-                  display: "grid",
-                  placeItems: "center",
-                  flex: "none",
-                }}
-              >
-                <svg className="i" style={{ width: "18px", height: "18px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                  <polyline points="2 17 12 22 22 17" />
-                  <polyline points="2 12 12 17 22 12" />
-                </svg>
-              </div>
-              <div style={{ minWidth: 0, overflow: "hidden" }}>
-                <b style={{ fontFamily: "var(--f-display)", fontSize: "17px", fontWeight: 700, whiteSpace: "nowrap", display: "block", lineHeight: 1.1 }}>
-                  ProofStack
-                </b>
-                <span style={{ fontSize: "9.5px", color: "var(--side-mute)", whiteSpace: "nowrap", display: "block" }}>
-                  DevSecOps Engine
-                </span>
-              </div>
+              <BrandLogo size="sm" showTagline={true} />
             </Link>
           ) : (
             <Link href="/" title="ProofStack Autonomous Engine" style={{ textDecoration: "none", color: "inherit" }}>
-              <div
-                className="logo"
-                style={{
-                  width: "34px",
-                  height: "34px",
-                  borderRadius: "8px",
-                  background: "var(--accent)",
-                  color: "var(--accent-ink)",
-                  display: "grid",
-                  placeItems: "center",
-                }}
-              >
-                <svg className="i" style={{ width: "18px", height: "18px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                  <polyline points="2 17 12 22 22 17" />
-                  <polyline points="2 12 12 17 22 12" />
-                </svg>
-              </div>
+              <BrandLogo size="icon" />
             </Link>
           )}
 

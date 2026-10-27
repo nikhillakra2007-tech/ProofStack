@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@/lib/roles";
+import BrandLogo from "@/components/common/BrandLogo";
 
 interface SidebarProps {
   onOpenNewTaskModal?: () => void;
@@ -32,18 +33,8 @@ export default function Sidebar({ onOpenNewTaskModal }: SidebarProps) {
   return (
     <aside className="side" style={{ width: "248px", flex: "none" }}>
       {/* Brand block (PDF p. 11 #1) */}
-      <Link href="/" className="brand" style={{ cursor: "pointer", textDecoration: "none" }}>
-        <div className="logo">
-          <svg className="i" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" />
-            <polyline points="2 17 12 22 22 17" />
-            <polyline points="2 12 12 17 22 12" />
-          </svg>
-        </div>
-        <div>
-          <b>ProofStack</b>
-          <span>Autonomous DevSecOps Engine</span>
-        </div>
+      <Link href="/" style={{ cursor: "pointer", textDecoration: "none", padding: "2px 6px 18px", display: "block" }}>
+        <BrandLogo size="md" showTagline={true} />
       </Link>
 
       {/* WORKSPACE group */}

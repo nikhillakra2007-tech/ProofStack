@@ -576,35 +576,39 @@ export default function SettingsPage() {
           {/* SUB-PAGE 1: APPEARANCE */}
           {activeSubnav === "appearance" && (
             <>
-              {/* Theme Selector */}
+              {/* Theme Indicator (Permanent Light System) */}
               <div className="card">
-                <h3 style={{ margin: "0 0 3px", fontSize: "14px" }}>Theme</h3>
-                <div className="sub" style={{ marginBottom: "12px" }}>
-                  Follows your system by default. Stored per user.
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <h3 style={{ margin: 0, fontSize: "14px", fontWeight: 700 }}>Theme Mode</h3>
+                  <span className="chip pass" style={{ fontSize: "10.5px" }}>Permanent Light</span>
                 </div>
-                <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
-                  {/* Light */}
+                <div className="sub" style={{ marginBottom: "12px" }}>
+                  Semgrep-inspired high-contrast cybersecurity light theme is enforced across all public and authenticated interfaces.
+                </div>
+                <div
+                  style={{
+                    border: "1px solid var(--line)",
+                    borderRadius: "9px",
+                    padding: "14px 16px",
+                    background: "var(--surface)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "14px",
+                  }}
+                >
                   <div
-                    onClick={() => setTheme("light")}
                     style={{
-                      border:
-                        theme === "light"
-                          ? "1px solid var(--brand)"
-                          : "1px solid var(--line)",
-                      boxShadow:
-                        theme === "light"
-                          ? "inset 0 0 0 1px var(--brand)"
-                          : "none",
-                      borderRadius: "9px",
-                      padding: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      background: "var(--surface)",
-                      cursor: "pointer",
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "8px",
+                      background: "var(--brand-surface, #EAF4EE)",
+                      color: "var(--brand)",
+                      display: "grid",
+                      placeItems: "center",
+                      flexShrink: 0,
                     }}
                   >
-                    <svg className="i" viewBox="0 0 24 24">
+                    <svg className="i" viewBox="0 0 24 24" style={{ width: "20px", height: "20px" }}>
                       <circle cx="12" cy="12" r="4" />
                       <line x1="12" y1="2" x2="12" y2="4" />
                       <line x1="12" y1="20" x2="12" y2="22" />
@@ -615,63 +619,14 @@ export default function SettingsPage() {
                       <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
                       <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
                     </svg>
-                    <b style={{ fontSize: "13px" }}>Light</b>
                   </div>
-
-                  {/* Dark */}
-                  <div
-                    onClick={() => setTheme("dark")}
-                    style={{
-                      border:
-                        theme === "dark"
-                          ? "1px solid var(--brand)"
-                          : "1px solid var(--line)",
-                      boxShadow:
-                        theme === "dark"
-                          ? "inset 0 0 0 1px var(--brand)"
-                          : "none",
-                      borderRadius: "9px",
-                      padding: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      background: "var(--surface)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <svg className="i" viewBox="0 0 24 24">
-                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                    <b style={{ fontSize: "13px" }}>Dark</b>
-                  </div>
-
-                  {/* System */}
-                  <div
-                    onClick={() => setTheme("system")}
-                    style={{
-                      border:
-                        theme === "system"
-                          ? "1px solid var(--brand)"
-                          : "1px solid var(--line)",
-                      boxShadow:
-                        theme === "system"
-                          ? "inset 0 0 0 1px var(--brand)"
-                          : "none",
-                      borderRadius: "9px",
-                      padding: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      background: "var(--surface)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <svg className="i" viewBox="0 0 24 24">
-                      <rect x="2" y="3" width="20" height="14" rx="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" />
-                      <line x1="12" y1="17" x2="12" y2="21" />
-                    </svg>
-                    <b style={{ fontSize: "13px" }}>System</b>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>
+                      Light Theme Active (#FAFAF8 / #17211D)
+                    </div>
+                    <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "2px" }}>
+                      High contrast, zero glare, and precise code readability. System dark preferences are prevented from altering the interface.
+                    </div>
                   </div>
                 </div>
               </div>

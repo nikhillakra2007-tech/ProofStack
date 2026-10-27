@@ -1,37 +1,40 @@
 "use client";
 
 import React, { useState } from "react";
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import MarketingHeader from "@/components/home/MarketingHeader";
 import MarketingHero from "@/components/home/MarketingHero";
-import ScrollStorySections from "@/components/home/ScrollStorySections";
+import CoreProductSections from "@/components/home/CoreProductSections";
 import TourModal from "@/components/home/TourModal";
 
 export default function PublicHomePage() {
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--bg)",
-        color: "var(--ink)",
-        overflowX: "hidden",
-      }}
-    >
-      {/* Sticky Marketing Header (64px, 56px on scroll) */}
-      <MarketingHeader onOpenTour={() => setIsTourModalOpen(true)} />
+    <SmoothScrollProvider>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "var(--bg, #FAFAFA)",
+          color: "var(--ink, #263A35)",
+          overflowX: "hidden",
+        }}
+      >
+        {/* Section A: Sticky Semgrep-Style Header with In-Page Scroll-Spy Navigation */}
+        <MarketingHeader onOpenTour={() => setIsTourModalOpen(true)} />
 
-      {/* Hero Section (Above the Fold) */}
-      <MarketingHero onOpenTour={() => setIsTourModalOpen(true)} />
+        {/* Section B: Semgrep Composition Hero with Massive Framed Product Visual */}
+        <MarketingHero onOpenTour={() => setIsTourModalOpen(true)} />
 
-      {/* 14-Section Scroll Story */}
-      <ScrollStorySections />
+        {/* Sections C, D, E, F, G & Footer: Capabilities, Showcase, Workflow, Trust, Final CTA & Footer */}
+        <CoreProductSections />
 
-      {/* Interactive 2-Minute Tour Modal */}
-      <TourModal
-        isOpen={isTourModalOpen}
-        onClose={() => setIsTourModalOpen(false)}
-      />
-    </div>
+        {/* Interactive Tour Modal */}
+        <TourModal
+          isOpen={isTourModalOpen}
+          onClose={() => setIsTourModalOpen(false)}
+        />
+      </div>
+    </SmoothScrollProvider>
   );
 }

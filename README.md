@@ -1,12 +1,13 @@
-# ProofStack (Sentinel Gate & Cockpit)
+# ProofStack (Autonomous Verification Engine & Cockpit)
 
 [![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://proofstack-cockpit.vercel.app)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://proofstack-cockpit.vercel.app)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
 [![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://proofstack-cockpit.vercel.app)
 [![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app/ledger)
+[![Design System](https://img.shields.io/badge/Design_System-Semgrep_Light_V2-20C9A6?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app)
 
-> **Autonomous Verification Engine with Zero-Compromise Gate & Live-Target DAST**  
+> **Autonomous Verification Engine with Zero-Compromise Gate, Live-Target DAST & Merkle Ledger**  
 > *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*  
 >
 > 🚀 **Live Production Platform**: **[https://proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)**  
@@ -14,11 +15,11 @@
 
 ---
 
-## 🌐 Live Production Endpoints
+## 🌐 Live Production Endpoints (Vercel)
 
 | View | Live Production URL | Description |
 | :--- | :--- | :--- |
-| **🏠 Platform Landing** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Marketing hero, scroll-driven story, architecture showcase |
+| **🏠 Platform Landing (V2)** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Semgrep-inspired V2 showcase, 3-panel coordinated hero triad, interactive DAST lab |
 | **📊 Operations Dashboard** | **[proofstack-cockpit.vercel.app/dashboard](https://proofstack-cockpit.vercel.app/dashboard)** | Real-time telemetry, remediation throughput, active task monitoring |
 | **🕹️ Remediation Cockpit** | **[proofstack-cockpit.vercel.app/cockpit/TASK9142](https://proofstack-cockpit.vercel.app/cockpit/TASK9142)** | 6-tab deep cockpit with Monaco side-by-side diff & 8-gate interlock |
 | **🔬 Interactive Studio** | **[proofstack-cockpit.vercel.app/studio](https://proofstack-cockpit.vercel.app/studio)** | Code repair playground with live AST verification and telemetry |
@@ -27,50 +28,68 @@
 | **📜 Cryptographic Ledger** | **[proofstack-cockpit.vercel.app/ledger](https://proofstack-cockpit.vercel.app/ledger)** | Immutable HMAC-SHA256 Merkle chain with tamper detection simulator |
 | **🛡️ Findings Registry** | **[proofstack-cockpit.vercel.app/findings](https://proofstack-cockpit.vercel.app/findings)** | Triaged CWE vulnerability catalog, root cause analysis & status |
 | **📚 Knowledge Library** | **[proofstack-cockpit.vercel.app/library](https://proofstack-cockpit.vercel.app/library)** | Zero-Compromise policy guides, truth hierarchy, and audit specs |
-| **🔐 RBAC Gateway** | **[proofstack-cockpit.vercel.app/login](https://proofstack-cockpit.vercel.app/login)** | 1-click role authentication: Developer, Auditor, Admin, Super Admin |
+| **🔐 Role Gateway (RBAC)** | **[proofstack-cockpit.vercel.app/login](https://proofstack-cockpit.vercel.app/login)** | 1-click role authentication: Developer, Auditor, Admin, Super Admin |
+
+---
+
+## 🎯 V2 Semgrep-Inspired Design Architecture
+
+ProofStack's public interface was completely re-architected following the aesthetic and visual hierarchy of modern cybersecurity leaders like [Semgrep](https://semgrep.dev/):
+
+### 1. Coordinated 3-Panel Hero Showcase Triad
+Positioned directly beneath the centered hero headline, this prominent triad spans the viewport width with layered visual depth:
+- **Panel 1 — Security Overview (Left, ~28%)**: Displays fleet posture rating (`98.4/100`), scan throughput, segmented severity distribution (3 Critical, 4 High, 6 Medium, 8 Remediated), 8-gate verification status (`8/8 PASS`), and cryptographic Merkle proof block height (`#142`).
+- **Panel 2 — Findings Explorer (Center Primary Focal Point, ~42%)**: Clean, readable table displaying active vulnerability findings with verified CWE IDs (CWE-89, CWE-22, CWE-79, CWE-798), CVSS scores, affected files, line numbers, and live search/status filters. Clicking any row interactively updates Panel 3.
+- **Panel 3 — Evidence & AI Remediation (Right, ~30%)**: Displays live exploit oracle evidence, Nemotron 70B's synthesized AST unified diff with zero hallucinations, 8-gate deterministic checklist, and a deep link to the Cockpit.
+
+### 2. Interactive DAST Probing Lab
+- A functional terminal panel demonstrating ProofStack's dynamic exploit verification.
+- **Live Probe Execution**: Interactive button simulating real-time exploit execution against ephemeral container targets.
+- **Payload vs. Response Diff**: Toggleable tabs comparing raw HTTP request payloads against dynamic vulnerability assertions.
+- **1-Click Copy**: Instant clipboard copy for reproducible bash curl commands.
+
+### 3. Split-Pane Cockpit Showcase
+- Multi-tabbed workspace preview showing the **Remediation Cockpit**, **Custom Rule Studio** (YAML/AST pattern syntax), and **Live DAST Ephemeral Pods**.
+- Features an interactive toggle between **Pre-Patch Baseline** (raw vulnerable SQL concatenation) and **Nemotron AST Patch** (`cursor.execute(query, params)`).
+
+### 4. Custom Geometric Brand Identity & Smooth Navigation
+- **Custom Brand Logo**: Custom SVG mark featuring an outer protective shield (`#344E48`), neural synthesis node graph (`#20C9A6`), and cryptographic verification diamond (`#5E7D73`).
+- **Semgrep Light Palette**: Built on `#FAFAFA` neutral background, `#FFFFFF` rounded card surfaces, `#344E48` forest headings, `#5E7D73` muted sage subheadings, and `#20C9A6` mint accents. 100% light-mode permanent.
+- **Lenis Smooth Motion**: Inertia scrolling with full SSR safety and `prefers-reduced-motion` compliance.
+- **Sticky Header & Scroll-Spy**: 60px fixed header with IntersectionObserver section tracking and offset-adjusted anchor jumps.
 
 ---
 
 ## 📸 Platform Interface & Screenshots
 
-### 1. Platform Landing & Live Story Engine
-Interactive scroll-driven platform hero detailing autonomous verification, deterministic gating, and evidence synthesis:
+### 1. Platform Landing & Semgrep Showcase Triad
 ![Platform Landing & Story Engine](docs/screenshots/landing_hero.png)
 
 ### 2. Autonomous Operations Dashboard
-Real-time operations center tracking MTTR, gate throughput, active tasks, and fleet vulnerability distribution:
 ![Operations Dashboard](docs/screenshots/dashboard.png)
 
 ### 3. Remediation Cockpit & Monaco Diff Viewer
-Deep 6-tab verification cockpit featuring side-by-side AST syntax diffs, deterministic gate progression, and live evidence logs:
 ![Remediation Cockpit](docs/screenshots/cockpit.png)
 
 ### 4. Interactive Studio Playground
-Real-time AST repair workbench allowing engineers to execute gate runs, inspect runtime telemetry, and verify candidate patches:
 ![Interactive Studio Playground](docs/screenshots/studio.png)
 
 ### 5. Multi-Tenant Control Plane
-System administration cockpit monitoring runner pools, container sandboxes, database transactions, and broker queues:
 ![Control Plane](docs/screenshots/control_plane.png)
 
 ### 6. 12-Vector DAST Exploit Sandbox
-Adversarial exploit validation suite testing candidate patches against real-world CWE payloads in isolated execution environments:
 ![12-Vector DAST Sandbox](docs/screenshots/dast.png)
 
 ### 7. Cryptographic Evidence Ledger
-Immutable HMAC-SHA256 audit ledger tracking all remediation decisions with real-time cryptographic tamper detection:
 ![Cryptographic Evidence Ledger](docs/screenshots/ledger.png)
 
 ### 8. Vulnerability Triage & Findings Registry
-Comprehensive security findings index categorized by severity, exploit vector, and verification status:
 ![Vulnerability Triage & Findings Registry](docs/screenshots/findings.png)
 
 ### 9. Policy & Verification Library
-Documentation and specification center for the Zero-Compromise truth hierarchy, verification thresholds, and governance invariants:
 ![Knowledge Library](docs/screenshots/library.png)
 
 ### 10. Role Authentication Gateway
-Dedicated access clearance routing operators strictly into their authorized workspace (Developer, Auditor, Admin, Super Admin):
 ![Role Clearance Gateway](docs/screenshots/login.png)
 
 ---
@@ -197,7 +216,6 @@ Open your browser at `http://localhost:3000`.
 ---
 
 ### 5. Running with Docker Compose (PostgreSQL 16 + Redis 7)
-If you prefer running production-grade PostgreSQL and Redis locally:
 ```bash
 # Start PostgreSQL and Redis containers with health checks
 docker compose up -d

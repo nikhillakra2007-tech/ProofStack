@@ -1,5 +1,3 @@
-import "../styles/tokens.css";
-import "../styles/app-components.css";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 
@@ -14,16 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="light" data-palette="cobalt-ledger">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body style={{ margin: 0, padding: 0 }}>
+    <html lang="en" data-theme="light" data-palette="proofstack-light">
+      <body>
         <AppShell>{children}</AppShell>
       </body>
     </html>
