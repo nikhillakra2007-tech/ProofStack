@@ -14,9 +14,9 @@ export default function BrandLogo({
   className = "",
 }: BrandLogoProps) {
   // Dimensions
-  const iconSize = size === "sm" ? 24 : size === "lg" ? 40 : 32;
-  const titleSize = size === "sm" ? "14.5px" : size === "lg" ? "20px" : "16px";
-  const badgeSize = size === "sm" ? "8.5px" : size === "lg" ? "10.5px" : "9.5px";
+  const iconSize = size === "sm" ? 26 : size === "lg" ? 42 : 32;
+  const titleSize = size === "sm" ? "16px" : size === "lg" ? "22px" : "18px";
+  const badgeSize = size === "sm" ? "9.5px" : size === "lg" ? "11px" : "10px";
 
   const LogoIcon = (
     <svg
@@ -87,7 +87,7 @@ export default function BrandLogo({
           <span
             style={{
               fontFamily: "var(--f-display, 'Inter', sans-serif)",
-              fontWeight: 600,
+              fontWeight: 700,
               fontSize: titleSize,
               letterSpacing: "-0.02em",
               color: "var(--heading-primary, #344E48)",

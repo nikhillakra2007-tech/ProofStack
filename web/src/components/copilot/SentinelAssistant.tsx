@@ -140,8 +140,25 @@ const SUGGESTED_PROMPTS = [
 export default function SentinelAssistant() {
   const { isCopilotOpen, setIsCopilotOpen } = useTheme();
 
-  // Position state (null = default bottom-right)
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  // Position state with localStorage persistence and viewport boundary clamping
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("proofstack:sentinel_pos");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed.x === "number" && typeof parsed.y === "number") {
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            const clampedX = Math.max(12, Math.min(winW - 416, parsed.x));
+            const clampedY = Math.max(12, Math.min(winH - 576, parsed.y));
+            return { x: clampedX, y: clampedY };
+          }
+        }
+      } catch {}
+    }
+    return null;
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -253,6 +270,12 @@ export default function SentinelAssistant() {
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {}
+
+      if (position && typeof window !== "undefined") {
+        try {
+          localStorage.setItem("proofstack:sentinel_pos", JSON.stringify(position));
+        } catch {}
+      }
     }
   };
 

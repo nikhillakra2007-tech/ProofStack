@@ -38,17 +38,19 @@
 
 ProofStack's public interface and cockpit are engineered for maximum signal, strict visual hierarchy, and instant comprehension:
 
-### 1. Sentinel AI — Movable, Floating Assistant
+### 1. Sentinel AI — Single-Instance Floating Assistant
 - **Distinct Cybersecurity Identity**: Named **Sentinel AI** with an original neural-shield SVG insignia (`#20C9A6` and `#344E48`).
-- **Floating Launcher**: Fixed bottom-right launcher with accessible focus rings, status pip, and hover tooltip.
+- **Single-Instance Guarantee**: Fixed bottom-right launcher automatically hides while the assistant window is active, eliminating duplicate or ghost launchers.
 - **Draggable & Viewport Constrained**: Movable panel draggable via its header with pointer capture, strict boundary constraints preventing off-screen movement, and automatic window-resize repositioning.
-- **Responsive Sheet**: Automatically collapses to a full-width bottom sheet on mobile screens (`< 640px`) with touch-friendly handles.
+- **Position Persistence**: Restores user-defined floating coordinates across page reloads via `localStorage` (`proofstack:sentinel_pos`).
+- **Route-Aware Behavior**: Automatically closes on navigation and stays completely hidden on unauthenticated login surfaces (`/login`).
 - **Real Multi-Session Interaction**: Preserves chat histories, session switching, error states, and inline Nemotron 70B verified AST patch cards.
 
-### 2. Complete Light, Dark & System Theme System
-- **3-Mode Preference**: Seamlessly toggle between **Light**, **Dark**, and **System Default** (synced with OS `prefers-color-scheme`).
-- **Semantic Color Tokens**: Deep charcoal-mint surfaces (`#0C1210` / `#141E1B`) in dark mode, Semgrep warm off-white (`#FAFAF8`) in light mode. Zero neon glare or pure black.
-- **Accessible Controls**: Embedded theme toggles in the marketing header, authenticated topbar, and settings appearance tab with instant persistence in `localStorage`.
+### 2. Desktop Section Navigation & 1-Click Theme Switcher
+- **Dedicated Desktop Header**: Full horizontal navigation with the product brand lockup and direct section links: `Overview` (`#overview`), `Product` (`#product`), `Capabilities` (`#capabilities`), `How it works` (`#workflow`), and `FAQ` (`#faq`).
+- **Smooth Section Anchoring**: Smooth offset scrolling (`scroll-mt-20`) so section headings are never obscured by the fixed header.
+- **Instant 1-Click Theme Toggle**: Fast 1-click Sun/Moon toggle button transitioning directly between light and dark modes with zero dropdown friction and persistent theme storage.
+- **Mobile Responsive Drawer**: Clean, animated slide-in drawer exclusively on screens under `860px`, leaving the desktop navigation bar completely unhindered.
 
 ### 3. Coordinated 3-Panel Hero Showcase Triad
 - **Panel 1 — Security Overview (Left, ~28%)**: Fleeting posture rating (`98.4/100`), scan throughput, segmented severity distribution, 8-gate verification status (`8/8 PASS`), and cryptographic block height (`#142`).
@@ -58,7 +60,14 @@ ProofStack's public interface and cockpit are engineered for maximum signal, str
 ### 4. Interactive DAST Probing Lab & 4-Step Pipeline
 - **Interactive Probing Lab**: Run live simulated curl dynamic exploit requests with real-time response payload assertions.
 - **4-Step Pipeline**: Explains Discovery & AST Parsing -> Dynamic Ephemeral DAST -> Nemotron Remediation -> Merkle Ledger Notarization in a tight, scannable format.
-- **Lenis Smooth Motion**: Butter-smooth inertia scrolling with fixed header offset (`-76px`) and `prefers-reduced-motion` compliance.
+
+### 5. Interactive FAQ Accordion
+- **Architecture & Security FAQs**: Pre-loaded with 5 core questions addressing deterministic verification, live DAST exploit testing, Sentinel AI capabilities, cryptographic evidence ledger integrity, and judge/developer authentication options.
+- **Accessible & Animated**: Smooth height and chevron transitions with full keyboard navigability and ARIA state management.
+
+### 6. Production OAuth 2.0 & Role-Based Access Control
+- **Social SSO Integrations**: Official Google and GitHub OAuth 2.0 authentication endpoints (`/api/auth/oauth/[provider]` and `/api/auth/callback/[provider]`) with CSRF state protection, code exchange, and profile verification.
+- **1-Click Judge & Auditor Personas**: Rapid local/demo testing with built-in instant access for Developer, Auditor, Security Admin, and Super Admin roles.
 
 ---
 
@@ -233,6 +242,24 @@ python scripts/seed_demo.py
 # Start backend
 python -m uvicorn backend.server:app --port 8765 --reload
 ```
+
+### Optional: Social OAuth 2.0 Configuration
+To enable live Google and GitHub social logins in the web cockpit, add the following to your environment (`.env.local` or Vercel Project Settings):
+
+```bash
+# Google OAuth 2.0 Credentials
+GOOGLE_CLIENT_ID="your_google_client_id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# GitHub OAuth App Credentials
+GITHUB_CLIENT_ID="your_github_client_id"
+GITHUB_CLIENT_SECRET="your_github_client_secret"
+
+# Canonical Application Origin
+NEXT_PUBLIC_APP_URL="https://proofstack-cockpit.vercel.app"
+```
+
+*Note: If OAuth credentials are not set, the login screen clearly informs the user and allows immediate 1-click authentication through the judge/auditor demo personas.*
 
 ---
 

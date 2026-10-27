@@ -130,6 +130,11 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
     setIsIngestModalOpen,
   ]);
 
+  // Close copilot assistant whenever route changes
+  useEffect(() => {
+    setIsCopilotOpen(false);
+  }, [pathname, setIsCopilotOpen]);
+
   // Public marketing homepage and home page have their own full-bleed layouts
   if (pathname === "/home" || pathname === "/") {
     return (
@@ -141,13 +146,11 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Login page has its own standalone 2-panel layout
+  // Login page has its own standalone 2-panel layout (assistant hidden on unauthenticated pages)
   if (pathname === "/login") {
     return (
       <div className="ps nosidebar app-frame" style={{ width: "100%", height: "100vh" }}>
         {children}
-        <CopilotFab />
-        <AICopilotDrawer />
       </div>
     );
   }

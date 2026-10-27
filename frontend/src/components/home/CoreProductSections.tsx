@@ -16,9 +16,9 @@ import {
   Copy,
   Check,
   RefreshCw,
-  Cpu,
   FileCode,
 } from "lucide-react";
+import FAQSection from "./FAQSection";
 
 export default function CoreProductSections() {
   // Interactive DAST Probe Vector in Capabilities
@@ -700,10 +700,15 @@ export default function CoreProductSections() {
       </section>
 
       {/* =========================================================================
-          SECTION 4 — FINAL CALL TO ACTION & TRUST INVARIANTS
+          SECTION 4 — FREQUENTLY ASKED QUESTIONS (ACCORDION)
+      ========================================================================= */}
+      <FAQSection />
+
+      {/* =========================================================================
+          SECTION 5 — FINAL CALL TO ACTION & TRUST INVARIANTS
       ========================================================================= */}
       <section
-        id="action"
+        id="cockpit"
         style={{
           padding: "64px 24px 80px",
           maxWidth: "1080px",

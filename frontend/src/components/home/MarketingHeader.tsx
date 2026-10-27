@@ -11,21 +11,22 @@ interface MarketingHeaderProps {
 }
 
 const SECTION_LINKS = [
-  { id: "hero", label: "Overview" },
+  { id: "overview", label: "Overview" },
+  { id: "product", label: "Product" },
   { id: "capabilities", label: "Capabilities" },
-  { id: "workflow", label: "Workflow" },
-  { id: "action", label: "Cockpit" },
+  { id: "workflow", label: "How it works" },
+  { id: "faq", label: "FAQ" },
 ];
 
 export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
-  const [activeSection, setActiveSection] = useState<string>("hero");
+  const [activeSection, setActiveSection] = useState<string>("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Scroll detection for backdrop effect
+  // Scroll detection for backdrop blur and subtle border
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -48,7 +49,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         });
       },
       {
-        rootMargin: "-20% 0px -60% 0px",
+        rootMargin: "-15% 0px -55% 0px",
         threshold: 0,
       }
     );
@@ -56,6 +57,18 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
     sectionElements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
+
+  // Smooth scroll handler with 70px offset for sticky header
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const elem = document.getElementById(targetId);
+    if (elem) {
+      const top = elem.getBoundingClientRect().top + window.scrollY - 68;
+      window.scrollTo({ top, behavior: "smooth" });
+      setActiveSection(targetId);
+      setMobileMenuOpen(false);
+    }
+  };
 
   return (
     <>
@@ -66,12 +79,12 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
           left: 0,
           right: 0,
           zIndex: 100,
-          height: "60px",
+          height: "64px",
           background: isScrolled
-            ? "color-mix(in srgb, var(--bg) 92%, transparent)"
-            : "color-mix(in srgb, var(--bg) 80%, transparent)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
+            ? "color-mix(in srgb, var(--bg) 94%, transparent)"
+            : "color-mix(in srgb, var(--bg) 84%, transparent)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
           borderBottom: isScrolled
             ? "1px solid var(--line)"
             : "1px solid transparent",
@@ -91,31 +104,25 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
             justifyContent: "space-between",
           }}
         >
-          {/* Brand Lockup */}
+          {/* Brand Lockup: Logo immediately to the left of the website name, horizontally aligned */}
           <Link
-            href="#hero"
+            href="#overview"
+            onClick={(e) => handleNavClick(e, "overview")}
             style={{
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
+              cursor: "pointer",
             }}
+            aria-label="ProofStack NVIDIA MODEL Home"
           >
-            <BrandLogo size="sm" showTagline={false} />
+            <BrandLogo size="md" showTagline={false} />
           </Link>
 
-          {/* Center: In-Page Section Pills (Desktop) */}
+          {/* Center: In-Page Section Links (Desktop Navigation - Guaranteed Visible) */}
           <nav
-            style={{
-              display: "none",
-              alignItems: "center",
-              gap: "4px",
-              background: "var(--surface)",
-              padding: "4px 6px",
-              borderRadius: "9999px",
-              border: "1px solid var(--line-subtle, var(--line))",
-              boxShadow: "var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.03))",
-            }}
-            className="md:flex"
+            className="header-desktop-nav"
+            aria-label="Landing page section navigation"
           >
             {SECTION_LINKS.map((link) => {
               const isActive = activeSection === link.id;
@@ -123,9 +130,10 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 <a
                   key={link.id}
                   href={`#${link.id}`}
+                  onClick={(e) => handleNavClick(e, link.id)}
                   className={`nav-pill ${isActive ? "active" : ""}`}
                   style={{
-                    fontSize: "12.5px",
+                    fontSize: "13px",
                     padding: "5px 14px",
                     fontWeight: isActive ? 600 : 500,
                     color: isActive
@@ -134,6 +142,9 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                     background: isActive
                       ? "var(--surface-green)"
                       : "transparent",
+                    textDecoration: "none",
+                    borderRadius: "9999px",
+                    transition: "all 140ms ease",
                   }}
                 >
                   {link.label}
@@ -144,7 +155,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
 
           {/* Right Action Group */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {/* Theme Selector (Light / Dark / System) */}
+            {/* Simple 1-Click Light/Dark Toggle */}
             <ThemeSelector compact={true} />
 
             {onOpenTour && (
@@ -177,10 +188,10 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
               style={{
                 fontFamily: "var(--f-ui, 'Inter', sans-serif)",
                 fontSize: "13px",
-                fontWeight: 500,
+                fontWeight: 600,
                 color: "var(--ink2)",
                 textDecoration: "none",
-                padding: "6px 12px",
+                padding: "6px 14px",
                 borderRadius: "9999px",
                 transition: "color 150ms ease, background 150ms ease",
               }}
@@ -196,18 +207,22 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 height: "36px",
                 padding: "0 16px",
                 fontSize: "12.5px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
               <span>Launch Cockpit</span>
               <ArrowRight size={13} />
             </Link>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Button (Strictly hidden on desktop via .header-mobile-btn) */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="header-mobile-btn"
               style={{
-                display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
                 width: "36px",
@@ -218,8 +233,8 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 color: "var(--ink)",
                 cursor: "pointer",
               }}
-              className="md:hidden"
               aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -227,12 +242,12 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         </div>
       </header>
 
-      {/* Mobile Drawer with Smooth Reveal */}
+      {/* Mobile Drawer with Smooth Reveal & Clean Links */}
       {mobileMenuOpen && (
         <div
           style={{
             position: "fixed",
-            top: "60px",
+            top: "64px",
             left: 0,
             right: 0,
             bottom: 0,
@@ -241,45 +256,30 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
             padding: "24px 20px",
             display: "flex",
             flexDirection: "column",
-            gap: "14px",
+            gap: "10px",
             borderBottom: "1px solid var(--line)",
             overflowY: "auto",
             animation: "fadeIn 150ms ease-out",
           }}
-          className="md:hidden"
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <span
-              style={{
-                fontFamily: "var(--f-mono, monospace)",
-                fontSize: "10.5px",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                color: "var(--ink3)",
-                marginBottom: "4px",
-              }}
-            >
-              Section Jump
-            </span>
-            {SECTION_LINKS.map((link) => (
+          <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink3)", marginBottom: "4px" }}>
+            Sections
+          </div>
+          {SECTION_LINKS.map((link) => {
+            const isActive = activeSection === link.id;
+            return (
               <a
                 key={link.id}
                 href={`#${link.id}`}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, link.id)}
                 style={{
+                  fontSize: "15px",
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? "var(--brand)" : "var(--heading-primary)",
                   padding: "10px 14px",
                   borderRadius: "8px",
-                  background:
-                    activeSection === link.id
-                      ? "var(--surface-green)"
-                      : "transparent",
-                  color:
-                    activeSection === link.id
-                      ? "var(--heading-primary)"
-                      : "var(--ink)",
-                  fontWeight: activeSection === link.id ? 600 : 500,
-                  fontSize: "14px",
+                  background: isActive ? "var(--surface-green)" : "var(--surface)",
+                  border: `1px solid ${isActive ? "var(--brand)" : "var(--line)"}`,
                   textDecoration: "none",
                   display: "flex",
                   alignItems: "center",
@@ -287,68 +287,45 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 }}
               >
                 <span>{link.label}</span>
-                {activeSection === link.id && (
-                  <span
-                    style={{
-                      width: "6px",
-                      height: "6px",
-                      borderRadius: "50%",
-                      background: "var(--brand)",
-                    }}
-                  />
-                )}
+                {isActive && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--brand)" }} />}
               </a>
-            ))}
-          </div>
+            );
+          })}
 
-          <div
+          <div style={{ height: "1px", background: "var(--line)", margin: "10px 0" }} />
+
+          <Link
+            href="/login"
+            onClick={() => setMobileMenuOpen(false)}
             style={{
-              paddingTop: "16px",
-              borderTop: "1px solid var(--line)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
+              padding: "12px 14px",
+              borderRadius: "8px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              color: "var(--heading-primary)",
+              fontWeight: 600,
+              textDecoration: "none",
+              textAlign: "center",
+              fontSize: "14px",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 6px" }}>
-              <span style={{ fontSize: "13px", color: "var(--ink2)", fontWeight: 500 }}>Color Theme</span>
-              <ThemeSelector compact={false} />
-            </div>
+            Sign in
+          </Link>
 
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "40px",
-                borderRadius: "9999px",
-                border: "1px solid var(--line)",
-                background: "var(--surface)",
-                color: "var(--ink)",
-                fontWeight: 500,
-                fontSize: "13.5px",
-                textDecoration: "none",
-              }}
-            >
-              Sign In (4 Judge Demo Accounts)
-            </Link>
-
-            <Link
-              href="/cockpit/TASK9142"
-              onClick={() => setMobileMenuOpen(false)}
-              className="btn-pill-primary"
-              style={{
-                height: "40px",
-                fontSize: "13.5px",
-                width: "100%",
-              }}
-            >
-              <span>Launch Live Cockpit</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
+          <Link
+            href="/cockpit/TASK9142"
+            onClick={() => setMobileMenuOpen(false)}
+            className="btn-pill-primary"
+            style={{
+              height: "42px",
+              justifyContent: "center",
+              fontSize: "14px",
+              textDecoration: "none",
+            }}
+          >
+            <span>Launch Cockpit</span>
+            <ArrowRight size={14} />
+          </Link>
         </div>
       )}
     </>

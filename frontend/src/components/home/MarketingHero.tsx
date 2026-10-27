@@ -17,7 +17,7 @@ interface MarketingHeroProps {
 export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
   return (
     <section
-      id="hero"
+      id="overview"
       style={{
         padding: "60px 24px 80px",
         maxWidth: "1280px",
@@ -25,6 +25,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        scrollMarginTop: "80px",
       }}
     >
       {/* 1. Eyebrow Badge */}
@@ -194,7 +195,9 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
       </div>
 
       {/* 6. Massive Semgrep-Style Product Visual Showcase (Triad Panels) */}
-      <HeroShowcaseTriad />
+      <div id="product" style={{ width: "100%", scrollMarginTop: "80px" }}>
+        <HeroShowcaseTriad />
+      </div>
     </section>
   );
 }
