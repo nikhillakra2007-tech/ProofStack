@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export default function CisoRolePage() {
-  const { user } = useAuth();
+  const { session } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const [emergencyOverride, setEmergencyOverride] = useState(false);
 

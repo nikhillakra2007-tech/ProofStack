@@ -4,7 +4,16 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { MOCK_CATALOG, MOCK_GATES, getProblemLogs } from "@/lib/mockData";
 import { CatalogProblem, GateStatus } from "@/lib/types";
-import { commitPatchToLedger, getLedgerBlocks, StoredLedgerBlock } from "@/lib/ledgerStore";
+import {
+  commitPatchToLedger,
+  getLedgerBlocks,
+  StoredLedgerBlock,
+  submitPatchForAudit,
+  approveAndSealPatch,
+  rejectAuditPatch,
+  getAuditQueue,
+  AuditQueueItem,
+} from "@/lib/ledgerStore";
 import { useAuth } from "@/context/AuthContext";
 
 const CUSTOM_PROBLEM_FIXTURE: CatalogProblem = {
@@ -52,7 +61,7 @@ function StudioContent() {
   const searchParams = useSearchParams();
   const paramProblem = searchParams.get("problem");
   const isCustomQuery = searchParams.get("mode") === "custom" || paramProblem?.toUpperCase() === "CUSTOM-1";
-  const { role } = useAuth();
+  const { role, activeMember, isDeveloper, isAuditor } = useAuth();
 
   const catalogWithCustom = [...MOCK_CATALOG, CUSTOM_PROBLEM_FIXTURE];
 
@@ -250,25 +259,80 @@ function StudioContent() {
     }, 500);
   };
 
-  // Cross-Workspace SHA-256 Ledger Commitment
+  // Developer-to-Auditor Approval Handoff & Ledger Commitment
   const handleAcceptPatch = async () => {
     setIsProcessing(true);
     try {
-      const block = await commitPatchToLedger({
-        problemId: selectedProblem.id,
-        patchTitle: `${selectedProblem.title} (Defensive Patch)`,
-        speedupDelta: selectedProblem.metrics?.safe.delta || "+74.2%",
-      });
-      setToastMessage(
-        `Defensive patch accepted & committed to SHA-256 Ledger (Block #${block.index}).`
-      );
-      setToastLink({
-        text: `View Block #${block.index} in Ledger →`,
-        href: "/ledger",
-      });
+      if (role === "developer") {
+        // Step A: Developer submits patch for Security Auditor verification
+        submitPatchForAudit({
+          problemId: selectedProblem.id,
+          problemTitle: selectedProblem.title,
+          filename: targetFilename,
+          developerId: activeMember.id,
+          developerName: activeMember.name,
+          developerAvatar: activeMember.avatar,
+          speedupDelta: activeMetrics.delta || "+74.2%",
+          latencyBefore: selectedProblem.metrics?.baseline.latency || "428ms",
+          latencyAfter: selectedProblem.metrics?.safe.latency || "12ms",
+          patchCode: candidateDisplayCode,
+        });
+        setToastMessage(
+          "Patch referred to Security Auditor for final verification."
+        );
+        setToastLink({
+          text: "View Audit Status in Dashboard →",
+          href: "/dashboard",
+        });
+      } else if (role === "auditor") {
+        // Step B: Auditor audits & approves, committing to SHA-256 Ledger
+        const queue = getAuditQueue();
+        const pending = queue.find(
+          (i) => i.problemId === selectedProblem.id && i.status === "PENDING_AUDIT"
+        );
+        if (pending) {
+          const { block } = await approveAndSealPatch(pending.id, activeMember.name);
+          setToastMessage(
+            `🛡️ Audit Approved: Patch sealed & committed to SHA-256 Ledger (Block #${block.index}).`
+          );
+          setToastLink({
+            text: `View Block #${block.index} in Ledger →`,
+            href: "/ledger",
+          });
+        } else {
+          const block = await commitPatchToLedger({
+            problemId: selectedProblem.id,
+            patchTitle: `${selectedProblem.title} (Auditor Approved)`,
+            actor: `auditor/${activeMember.name.toLowerCase().replace(/\s+/g, ".")}`,
+            speedupDelta: selectedProblem.metrics?.safe.delta || "+74.2%",
+          });
+          setToastMessage(
+            `🛡️ Audit Approved: Patch sealed & committed to SHA-256 Ledger (Block #${block.index}).`
+          );
+          setToastLink({
+            text: `View Block #${block.index} in Ledger →`,
+            href: "/ledger",
+          });
+        }
+      } else {
+        // Super Admin / Admin direct commit
+        const block = await commitPatchToLedger({
+          problemId: selectedProblem.id,
+          patchTitle: `${selectedProblem.title} (Admin Direct Commit)`,
+          actor: `admin/${activeMember.name.toLowerCase().replace(/\s+/g, ".")}`,
+          speedupDelta: selectedProblem.metrics?.safe.delta || "+74.2%",
+        });
+        setToastMessage(
+          `Defensive patch accepted & committed to SHA-256 Ledger (Block #${block.index}).`
+        );
+        setToastLink({
+          text: `View Block #${block.index} in Ledger →`,
+          href: "/ledger",
+        });
+      }
     } catch {
-      setToastMessage("Patch accepted & committed to SHA-256 Ledger.");
-      setToastLink({ text: "View Ledger →", href: "/ledger" });
+      setToastMessage("Patch processed successfully.");
+      setToastLink({ text: "View Dashboard →", href: "/dashboard" });
     } finally {
       setIsProcessing(false);
     }
@@ -688,12 +752,40 @@ function StudioContent() {
                 className="btn sm"
                 onClick={handleAcceptPatch}
                 disabled={isRepairing || !isSafeMode || isProcessing}
-                title="Commit cryptographically signed block to SHA-256 evidence chain"
+                title={
+                  role === "developer"
+                    ? "Submit verified defensive patch to Security Auditor for formal invariant audit & ledger seal"
+                    : role === "auditor"
+                    ? "Approve 8/8 gates and seal defensive patch into SHA-256 Merkle Ledger"
+                    : "Commit cryptographically signed block to SHA-256 evidence chain"
+                }
+                style={{
+                  background: role === "auditor" ? "var(--pass)" : undefined,
+                  color: role === "auditor" ? "#fff" : undefined,
+                }}
               >
-                <svg className="i" viewBox="0 0 24 24">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Accept Patch &amp; Commit to Ledger
+                {role === "developer" ? (
+                  <>
+                    <svg className="i" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    ✅ Submit Patch for Security Audit (OK)
+                  </>
+                ) : role === "auditor" ? (
+                  <>
+                    <svg className="i" viewBox="0 0 24 24">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    🛡️ Audit OK — Approve &amp; Seal to Ledger
+                  </>
+                ) : (
+                  <>
+                    <svg className="i" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Accept Patch &amp; Commit to Ledger
+                  </>
+                )}
               </button>
               <button
                 type="button"
@@ -764,6 +856,7 @@ function StudioContent() {
                 borderRight: "1px solid var(--line)",
                 overflowX: "auto",
                 minHeight: "380px",
+                minWidth: 0,
               }}
             >
               <div className="bar">Baseline · {targetFilename}</div>
@@ -789,13 +882,16 @@ function StudioContent() {
             {/* Candidate Column (Dynamic to selected problem & snippet mode) */}
             {isCustomMode ? (
               <div
+                className="code"
                 style={{
                   border: 0,
                   borderRadius: 0,
                   display: "flex",
                   flexDirection: "column",
                   minHeight: "380px",
-                  background: "var(--term-bg, #0d1117)",
+                  minWidth: 0,
+                  background: "var(--surface)",
+                  overflow: "hidden",
                 }}
               >
                 <div
@@ -804,39 +900,55 @@ function StudioContent() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    padding: "6px 10px",
+                    padding: "6px 12px",
+                    background: "var(--surface2)",
+                    borderBottom: "1px solid var(--line)",
                   }}
                 >
-                  <span style={{ fontSize: "11px", fontWeight: 600 }}>
+                  <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--ink)" }}>
                     Editable Candidate Code · {targetFilename}
                   </span>
                   <button
                     type="button"
-                    className="btn sm"
+                    className="btn btn-primary sm"
                     onClick={handleRunCode}
                     disabled={isProcessing}
-                    style={{ height: "22px", fontSize: "10.5px", padding: "0 8px" }}
+                    style={{
+                      height: "24px",
+                      fontSize: "11px",
+                      padding: "0 10px",
+                      fontWeight: 600,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      backgroundColor: "#1D4ED8",
+                      color: "#FFFFFF",
+                      borderRadius: "6px",
+                      border: "none",
+                      cursor: isProcessing ? "not-allowed" : "pointer",
+                    }}
                   >
-                    <svg className="i" viewBox="0 0 24 24" style={{ width: "11px", height: "11px" }}>
+                    <svg className="i" viewBox="0 0 24 24" style={{ width: "11px", height: "11px", fill: "currentColor" }}>
                       <polygon points="6 3 20 12 6 21" />
                     </svg>
-                    Run Code ↵
+                    {isProcessing ? "Running..." : "Run Code ↵"}
                   </button>
                 </div>
 
-                <div style={{ position: "relative", flex: 1, display: "flex", minHeight: "340px" }}>
+                <div style={{ position: "relative", flex: 1, display: "flex", minHeight: "340px", background: "var(--surface)", minWidth: 0 }}>
                   <div
                     style={{
-                      width: "36px",
-                      padding: "8px 4px",
+                      width: "38px",
+                      padding: "8px 6px",
                       fontFamily: "var(--f-mono)",
                       fontSize: "11.5px",
                       lineHeight: "20px",
                       textAlign: "right",
-                      color: "var(--ink2)",
+                      color: "var(--ink3)",
                       userSelect: "none",
                       borderRight: "1px solid var(--line)",
-                      background: "var(--surface)",
+                      background: "var(--surface2)",
+                      flexShrink: 0,
                     }}
                   >
                     {customCode.split("\n").map((_, i) => (
@@ -850,39 +962,45 @@ function StudioContent() {
                     placeholder="# Enter or paste custom Python code..."
                     style={{
                       flex: 1,
+                      minWidth: 0,
                       border: "none",
                       outline: "none",
-                      background: "transparent",
+                      background: "var(--surface)",
                       color: "var(--ink)",
                       fontFamily: "var(--f-mono)",
                       fontSize: "11.5px",
                       lineHeight: "20px",
-                      padding: "8px 10px",
+                      padding: "8px 12px",
                       resize: "none",
                       whiteSpace: "pre",
                       overflowWrap: "normal",
                       overflowX: "auto",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
 
                 <div
                   style={{
-                    padding: "5px 10px",
+                    padding: "6px 12px",
                     fontSize: "10.5px",
                     color: "var(--ink2)",
                     background: "var(--surface2)",
                     borderTop: "1px solid var(--line)",
                     display: "flex",
                     justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  <span>⚡ MicroVM Sandbox: Python 3.11 · POST /api/run</span>
-                  <span>{customCode.split("\n").length} lines</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981", display: "inline-block" }}></span>
+                    MicroVM Sandbox: Python 3.11 · POST /api/run
+                  </span>
+                  <span style={{ fontWeight: 500 }}>{customCode.split("\n").length} lines</span>
                 </div>
               </div>
             ) : (
-              <div className="code" style={{ border: 0, borderRadius: 0, overflowX: "auto", minHeight: "380px" }}>
+              <div className="code" style={{ border: 0, borderRadius: 0, overflowX: "auto", minHeight: "380px", minWidth: 0 }}>
                 <div className="bar">
                   {isRepairing
                     ? "Synthesizing Iteration 2..."
@@ -1084,7 +1202,7 @@ function StudioContent() {
                       id: "G5",
                       name: "Performance Speedup",
                       pass: isSafeMode ? true : isNaiveMode ? failingGateId !== "G5" : false,
-                      desc: isSafeMode ? `${activeMetrics.delta} above noise ceiling` : isNaiveMode && failingGateId === "G5" ? selectedProblem.failingGateReason : "Below noise floor",
+                      desc: isSafeMode ? `${activeMetrics.delta} Verified Speedup` : isNaiveMode && failingGateId === "G5" ? selectedProblem.failingGateReason : "Statistically Insignificant",
                     },
                     {
                       id: "G6",

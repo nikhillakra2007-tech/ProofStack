@@ -26,6 +26,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [gKeyPressed, setGKeyPressed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const roleDef = ROLES[role] || ROLES.developer;
 
@@ -154,7 +155,11 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="ps app-frame">
       {/* 248px Left Sidebar */}
-      <Sidebar onOpenNewTaskModal={() => setIsIngestModalOpen(true)} />
+      <Sidebar
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        onOpenNewTaskModal={() => setIsIngestModalOpen(true)}
+      />
 
       {/* Main Area: Topbar (56px), Page Content (1fr), Footer (34px) */}
       <div className="main">
@@ -162,6 +167,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           onOpenNewTaskModal={() => setIsIngestModalOpen(true)}
           onToggleCopilot={() => setIsCopilotOpen(!isCopilotOpen)}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
 
         <main className="page" id="main-content">

@@ -109,11 +109,18 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
 
   const handleLaunch = () => {
     onClose();
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      router.push("/login?redirect=/dashboard");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("proofstack_auth_active");
+        localStorage.removeItem("proofstack_session");
+        localStorage.removeItem("proofstack_role");
+        localStorage.removeItem("proofstack_user");
+        document.cookie = "ps_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "proofstack_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "ps_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      } catch {}
     }
+    router.push("/login");
   };
 
   const step = steps[currentStep];

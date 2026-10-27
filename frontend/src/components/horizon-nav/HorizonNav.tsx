@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import { ROLES, UserRole } from "@/lib/auth";
+import { ROLES } from "@/lib/roles";
+import { UserRole } from "@/lib/types";
 import { useCurtain } from "@/components/layout/CurtainTransition";
 import { BrandLogo } from "@/components/brand-logo/BrandLogo";
 import { 
@@ -15,7 +16,7 @@ import {
 export function HorizonNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { session, role, logout, isAuthenticated } = useAuth();
+  const { session, role, activeMember, logout, isAuthenticated } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const roleDef = ROLES[role] || ROLES.developer;
 
@@ -317,17 +318,15 @@ export function HorizonNav() {
                     width: "22px",
                     height: "22px",
                     borderRadius: "6px",
-                    background: roleDef.badgeColor || "var(--primary)",
-                    color: "#030712",
-                    fontSize: "10px",
-                    fontWeight: 700,
+                    background: "var(--surface2)",
+                    fontSize: "13px",
                     display: "grid",
                     placeItems: "center",
                   }}
                 >
-                  {role.slice(0, 2).toUpperCase()}
+                  {activeMember ? activeMember.avatar : role.slice(0, 2).toUpperCase()}
                 </div>
-                <span className="hidden sm:inline font-mono">{roleDef.label}</span>
+                <span className="hidden sm:inline font-mono">{activeMember ? activeMember.name : roleDef.label}</span>
                 <ChevronDown style={{ width: "12px", height: "12px", opacity: 0.6 }} />
               </button>
 
@@ -368,7 +367,7 @@ export function HorizonNav() {
                       <button
                         onClick={(e) => {
                           setRoleMenuOpen(false);
-                          handleNavClick(e, roleDef.defaultPath, `${roleDef.label} Hub`);
+                          handleNavClick(e, roleDef.primaryRoute || "/dashboard", `${roleDef.label} Hub`);
                         }}
                         style={{
                           width: "100%",

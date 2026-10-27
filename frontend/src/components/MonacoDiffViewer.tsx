@@ -1,12 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useState } from "react";
-
-const DiffEditor = dynamic(
-  () => import("@monaco-editor/react").then((mod) => mod.DiffEditor),
-  { ssr: false, loading: () => <div className="h-96 flex items-center justify-center font-mono text-xs text-ink-500">Loading Monaco Diff Engine...</div> }
-);
+import React from "react";
 
 interface MonacoDiffViewerProps {
   originalCode: string;
@@ -20,24 +14,70 @@ export default function MonacoDiffViewer({
   language = "python",
 }: MonacoDiffViewerProps) {
   return (
-    <div className="h-96 w-full border border-hairline rounded-lg overflow-hidden bg-ink-950">
-      <DiffEditor
-        height="100%"
-        language={language}
-        original={originalCode}
-        modified={modifiedCode}
-        theme="vs-dark"
-        options={{
-          readOnly: true,
-          renderSideBySide: true,
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          fontSize: 12,
-          fontFamily: "JetBrains Mono, monospace",
-          lineNumbers: "on",
-          renderWhitespace: "selection",
-        }}
-      />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "12px",
+        height: "380px",
+        width: "100%",
+        borderRadius: "8px",
+        overflow: "hidden",
+        border: "1px solid var(--line)",
+        background: "var(--surface2)",
+        padding: "12px",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <div className="eyebrow" style={{ fontSize: "10px", marginBottom: "6px" }}>
+          Baseline Code
+        </div>
+        <textarea
+          readOnly
+          value={originalCode}
+          spellCheck={false}
+          data-language={language}
+          style={{
+            flex: 1,
+            width: "100%",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            borderRadius: "6px",
+            padding: "10px",
+            color: "var(--ink)",
+            fontFamily: "var(--f-mono, 'JetBrains Mono', monospace)",
+            fontSize: "12px",
+            lineHeight: "1.45",
+            resize: "none",
+            outline: "none",
+          }}
+        />
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <div className="eyebrow" style={{ fontSize: "10px", marginBottom: "6px" }}>
+          Candidate Defensive Patch
+        </div>
+        <textarea
+          readOnly
+          value={modifiedCode}
+          spellCheck={false}
+          data-language={language}
+          style={{
+            flex: 1,
+            width: "100%",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            borderRadius: "6px",
+            padding: "10px",
+            color: "var(--ink)",
+            fontFamily: "var(--f-mono, 'JetBrains Mono', monospace)",
+            fontSize: "12px",
+            lineHeight: "1.45",
+            resize: "none",
+            outline: "none",
+          }}
+        />
+      </div>
     </div>
   );
 }

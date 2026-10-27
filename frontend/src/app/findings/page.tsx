@@ -791,7 +791,7 @@ function FindingsContent() {
                       <td>
                         <b>{f.title}</b>
                       </td>
-                      <td className="m">{f.location}</td>
+                      <td className="m">📄 {f.location}</td>
                       <td>{f.category}</td>
                       <td className="m">{f.source}</td>
                       <td>
@@ -872,8 +872,13 @@ function FindingsContent() {
               {selectedFinding.description}
             </p>
 
-            <div className="mono" style={{ margin: "12px 0", fontSize: "11.5px", color: "var(--ink2)" }}>
-              {selectedFinding.location} · Truth Rank {selectedFinding.truthRank || 1}
+            <div style={{ margin: "12px 0", fontSize: "12px", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+              <span className="chip brand" style={{ fontSize: "11px", padding: "2px 8px" }}>
+                📄 {selectedFinding.location}
+              </span>
+              <span className="chip" style={{ fontSize: "11px", padding: "2px 8px" }}>
+                Priority #{selectedFinding.truthRank || 1}
+              </span>
             </div>
 
             <div className="grid" style={{ gap: "8px", marginBottom: "12px" }}>

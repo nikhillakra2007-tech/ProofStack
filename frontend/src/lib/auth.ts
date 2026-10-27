@@ -1,5 +1,5 @@
 import { UserRole, UserSession } from "./types";
-import { ROLES, TENANT_UUID } from "./roles";
+import { ROLES, TENANT_UUID, DEFAULT_MEMBER_BY_ROLE, getTeamMemberById, TEAM_MEMBERS } from "./roles";
 
 export interface RolePreset {
   label: string;
@@ -19,7 +19,7 @@ export const JUDGE_PRESETS: RolePreset[] = [
     badge: "super_admin",
     description: ROLES.super_admin.description,
     canOverridePolicy: true,
-    landingPath: ROLES.super_admin.primaryRoute,
+    landingPath: "/dashboard",
   },
   {
     label: ROLES.admin.label,
@@ -28,7 +28,7 @@ export const JUDGE_PRESETS: RolePreset[] = [
     badge: "admin",
     description: ROLES.admin.description,
     canOverridePolicy: false,
-    landingPath: ROLES.admin.primaryRoute,
+    landingPath: "/dashboard",
   },
   {
     label: ROLES.developer.label,
@@ -37,7 +37,7 @@ export const JUDGE_PRESETS: RolePreset[] = [
     badge: "developer",
     description: ROLES.developer.description,
     canOverridePolicy: false,
-    landingPath: ROLES.developer.primaryRoute,
+    landingPath: "/dashboard",
   },
   {
     label: ROLES.auditor.label,
@@ -46,7 +46,7 @@ export const JUDGE_PRESETS: RolePreset[] = [
     badge: "auditor",
     description: ROLES.auditor.description,
     canOverridePolicy: false,
-    landingPath: ROLES.auditor.primaryRoute,
+    landingPath: "/dashboard",
   },
 ];
 
@@ -60,6 +60,15 @@ export function getStoredSession(): UserSession | null {
     try {
       const parsed = JSON.parse(stored);
       if (parsed && parsed.role && ROLES[parsed.role as UserRole]) {
+        // Ensure member metadata exists
+        if (!parsed.memberId || !parsed.name || !parsed.avatar) {
+          const defaultMemberId = DEFAULT_MEMBER_BY_ROLE[parsed.role as UserRole] || "nitin-pandey";
+          const member = getTeamMemberById(defaultMemberId);
+          parsed.memberId = member.id;
+          parsed.name = member.name;
+          parsed.avatar = member.avatar;
+          parsed.email = member.email;
+        }
         return parsed;
       }
     } catch {
@@ -74,10 +83,15 @@ export function getStoredSession(): UserSession | null {
       const role = match[1] as UserRole;
       const def = ROLES[role];
       if (def) {
+        const defaultMemberId = DEFAULT_MEMBER_BY_ROLE[role] || "nitin-pandey";
+        const member = getTeamMemberById(defaultMemberId);
         const session: UserSession = {
           userId: `usr_${def.role}`,
+          memberId: member.id,
+          name: member.name,
+          avatar: member.avatar,
           tenantId: def.tenantUuid,
-          email: def.email,
+          email: member.email,
           role: def.role,
           token: `jwt_rs256_${def.role}_token`,
           canOverridePolicy: def.canOverridePolicy,

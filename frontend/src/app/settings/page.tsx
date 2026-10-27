@@ -107,7 +107,7 @@ export default function SettingsPage() {
         </div>
         <div className="r">
           <span className="chip brand">
-            Tenant: {TENANT_UUID.slice(0, 8)}...
+            🏢 Global Root Workspace
           </span>
         </div>
       </div>

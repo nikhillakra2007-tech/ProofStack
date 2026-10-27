@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/lib/theme";
 
 interface ChatMessage {
@@ -9,6 +10,7 @@ interface ChatMessage {
   name: string;
   time: string;
   text: string;
+  isAuthGate?: boolean;
   hasCard?: boolean;
   cardData?: {
     title: string;
@@ -96,6 +98,8 @@ const SUGGESTED_PROMPTS = [
 ];
 
 export default function AICopilotDrawer() {
+  const pathname = usePathname();
+  const router = useRouter();
   const { isCopilotOpen, setIsCopilotOpen } = useTheme();
 
   // Sessions list initialized with local storage if available
@@ -124,6 +128,26 @@ export default function AICopilotDrawer() {
       } catch {}
     }
   }, [sessions]);
+
+  // Auth Protection: Immediately show lock card on public routes if unauthenticated
+  useEffect(() => {
+    if (!isCopilotOpen) return;
+    const isPublicRoute = pathname === "/" || pathname === "/home" || pathname === "/login";
+    const isAuthActive = typeof window !== "undefined" && localStorage.getItem("proofstack_auth_active") === "true";
+    const isAuthenticated = !isPublicRoute && isAuthActive;
+
+    if (!isAuthenticated) {
+      const lockCardMsg: ChatMessage = {
+        id: "auth_lock_initial",
+        sender: "copilot",
+        name: "ProofStack Co-Pilot",
+        time: "Just now",
+        text: "🔒 Sign In Required — To protect NVIDIA Nemotron 3 & Nebius Token Factory quotas, please sign in to your workspace persona before running AI Co-Pilot queries.",
+        isAuthGate: true,
+      };
+      setMessages([lockCardMsg]);
+    }
+  }, [isCopilotOpen, pathname]);
 
   if (!isCopilotOpen) return null;
 
@@ -181,6 +205,26 @@ export default function AICopilotDrawer() {
     const updatedMessagesWithUser = [...messages, userMsg];
     setMessages(updatedMessagesWithUser);
     setInputText("");
+
+    // AI CO-PILOT AUTHENTICATION GATE: Protect NVIDIA Nemotron & Nebius quotas
+    const isPublicRoute = pathname === "/" || pathname === "/home" || pathname === "/login";
+    const isAuthActive = typeof window !== "undefined" && localStorage.getItem("proofstack_auth_active") === "true";
+    const isAuthenticated = !isPublicRoute && isAuthActive;
+
+    if (!isAuthenticated) {
+      const gateMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: "copilot",
+        name: "ProofStack Co-Pilot",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        text: "🔒 Sign In Required — To protect NVIDIA Nemotron 3 & Nebius Token Factory quotas, please sign in to your workspace persona before running AI Co-Pilot queries.",
+        isAuthGate: true,
+      };
+
+      setMessages([...updatedMessagesWithUser, gateMsg]);
+      return;
+    }
+
     setIsTyping(true);
 
     setTimeout(() => {
@@ -481,6 +525,55 @@ export default function AICopilotDrawer() {
               }}
             >
               {m.text}
+
+              {/* Embedded Auth Gate Card when unauthenticated */}
+              {m.isAuthGate && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    padding: "14px 16px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+                    border: "1px solid #3B82F6",
+                    color: "#F8FAFC",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.3)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", fontWeight: 700, color: "#60A5FA", fontSize: "13px" }}>
+                    <span>🔒</span>
+                    <span>Sign In Required</span>
+                  </div>
+                  <p style={{ margin: "0 0 12px 0", fontSize: "12px", lineHeight: 1.5, color: "#CBD5E1" }}>
+                    To protect NVIDIA Nemotron 3 &amp; Nebius Token Factory quotas, please sign in to your workspace persona before running AI Co-Pilot queries.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCopilotOpen(false);
+                      router.push("/login");
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 14px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      backgroundColor: "#1D4ED8",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 8px rgba(29, 78, 216, 0.4)",
+                      transition: "background 120ms ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1E40AF")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1D4ED8")}
+                  >
+                    🔐 Sign In to Continue →
+                  </button>
+                </div>
+              )}
 
               {/* Embedded Verified Fix Card */}
               {m.hasCard && m.cardData && (

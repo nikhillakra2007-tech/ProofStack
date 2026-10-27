@@ -174,12 +174,19 @@ export default function ControlPlanePage() {
             </button>
           )}
 
-          <span className="chip brand">
-            <svg className="i" viewBox="0 0 24 24" style={{ width: "12px", height: "12px" }}>
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            Role: {role}
+          <span
+            className="chip brand"
+            style={{
+              fontSize: "11.5px",
+              fontWeight: 600,
+              padding: "4px 12px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            {isSuperAdmin ? "🏢 Global Root Workspace" : "⚙️ Operations Workspace"}
           </span>
         </div>
       </div>
@@ -550,6 +557,7 @@ export default function ControlPlanePage() {
                 padding: "7px 0",
                 borderBottom: "1px solid var(--line)",
                 fontSize: "12px",
+                color: "var(--ink)",
               }}
             >
               <span style={{ color: "var(--brand)" }}>
@@ -557,8 +565,8 @@ export default function ControlPlanePage() {
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </span>
-              <span>
-                <b className="mono">{g.id}:</b> {g.name}
+              <span style={{ color: "var(--ink)" }}>
+                <b className="mono" style={{ color: "var(--ink)", fontWeight: 600 }}>{g.id}:</b> {g.name}
               </span>
               <span style={{ marginLeft: "auto" }} className="row">
                 <span className="chip" style={{ fontSize: "9.5px", height: "18px" }}>
@@ -578,10 +586,10 @@ export default function ControlPlanePage() {
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700 }}>
+            <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--ink)" }}>
               Team Token Usage &amp; Contribution Audit
             </h3>
-            <p className="sub" style={{ margin: "3px 0 0", fontSize: "12px" }}>
+            <p className="sub" style={{ margin: "3px 0 0", fontSize: "12px", color: "var(--ink2)" }}>
               Active developers, auditors, and admins with allocated token quotas and task execution metrics.
             </p>
           </div>
@@ -614,17 +622,17 @@ export default function ControlPlanePage() {
               {members.map((m) => {
                 const pct = Math.min(100, Math.round((m.tokensConsumed / m.tokenQuota) * 100));
                 return (
-                  <tr key={m.id} style={{ opacity: m.status === "Suspended" ? 0.6 : 1 }}>
+                  <tr key={m.id} style={{ opacity: m.status === "Suspended" ? 0.6 : 1, color: "var(--ink)" }}>
                     <td>
-                      <b>{m.name}</b>
-                      <div className="sub" style={{ fontSize: "11px" }}>{m.roleTitle}</div>
+                      <b style={{ color: "var(--ink)", fontWeight: 600 }}>{m.name}</b>
+                      <div className="sub" style={{ fontSize: "11px", color: "var(--ink2)" }}>{m.roleTitle}</div>
                     </td>
-                    <td className="mono" style={{ fontSize: "12px" }}>{m.email}</td>
-                    <td className="mono" style={{ fontSize: "12.5px" }}>{m.tasksExecuted} tasks</td>
-                    <td className="mono" style={{ fontSize: "12.5px" }}>{m.contributionTime}</td>
+                    <td className="mono" style={{ fontSize: "12px", color: "var(--ink2)" }}>{m.email}</td>
+                    <td className="mono" style={{ fontSize: "12.5px", color: "var(--ink)" }}>{m.tasksExecuted} tasks</td>
+                    <td className="mono" style={{ fontSize: "12.5px", color: "var(--ink)" }}>{m.contributionTime}</td>
                     <td>
-                      <div className="mono" style={{ fontSize: "11.5px", marginBottom: "4px" }}>
-                        <b>{m.tokensConsumed.toLocaleString()}</b> / {m.tokenQuota.toLocaleString()} ({pct}%)
+                      <div className="mono" style={{ fontSize: "11.5px", marginBottom: "4px", color: "var(--ink)" }}>
+                        <b style={{ color: "var(--ink)" }}>{m.tokensConsumed.toLocaleString()}</b> / {m.tokenQuota.toLocaleString()} ({pct}%)
                       </div>
                       <div
                         style={{

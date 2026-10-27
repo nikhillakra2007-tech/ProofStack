@@ -1,194 +1,597 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { ROLES } from "@/lib/roles";
+import { ROLES, TeamMember } from "@/lib/roles";
 
 interface SidebarProps {
   onOpenNewTaskModal?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export default function Sidebar({ onOpenNewTaskModal }: SidebarProps) {
+export default function Sidebar({
+  onOpenNewTaskModal,
+  isMobileOpen,
+  onCloseMobile,
+}: SidebarProps) {
   const pathname = usePathname();
-  const { session, role, logout } = useAuth();
+  const router = useRouter();
+  const { role, activeMember, allMembers, switchMember, logout } = useAuth();
+  const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement>(null);
+
+  // Persistent sidebar collapse state (width 72px vs 260px)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return localStorage.getItem("proofstack_sidebar_collapsed") === "true";
+      } catch {}
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.style.setProperty(
+        "--side-w",
+        isCollapsed ? "72px" : "260px"
+      );
+    }
+  }, [isCollapsed]);
+
+  const toggleCollapsed = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("proofstack_sidebar_collapsed", String(next));
+      } catch {}
+      return next;
+    });
+  };
+
   const roleDef = ROLES[role] || ROLES.developer;
 
-  // Initials for avatar
-  const initials = role === "super_admin"
-    ? "SA"
-    : role === "admin"
-    ? "AD"
-    : role === "developer"
-    ? "LD"
-    : "SE";
+  // Click outside to close switcher popover
+  useEffect(() => {
+    const handleDocClick = (e: MouseEvent) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target as Node)) {
+        setIsSwitcherOpen(false);
+      }
+    };
+    if (isSwitcherOpen) {
+      document.addEventListener("mousedown", handleDocClick);
+    }
+    return () => document.removeEventListener("mousedown", handleDocClick);
+  }, [isSwitcherOpen]);
 
   const isRouteActive = (route: string) => {
     if (route === "/") return pathname === "/";
     return pathname.startsWith(route);
   };
 
+  const handleSelectMember = (member: TeamMember) => {
+    switchMember(member.id);
+    setIsSwitcherOpen(false);
+    if (onCloseMobile) onCloseMobile();
+    router.push("/dashboard");
+  };
+
+  // Strict link visibility rules:
+  // - Developer sees: Dashboard, Studio, Cockpit, Settings
+  // - Security Auditor sees: Dashboard, Findings, Ledger, Cockpit, Settings
+  // - Workspace Admin sees: Dashboard, Control Plane, 19-Catalog, Findings, Settings
+  // - Super Admin sees: Dashboard, Control Plane, Ledger, Settings
+  const showStudio = role === "developer";
+  const showCockpit = role === "developer" || role === "auditor";
+  const showFindings = role === "auditor" || role === "admin";
+  const showLedger = role === "auditor" || role === "super_admin";
+  const showCatalog = role === "admin";
+  const showControlPlane = role === "admin" || role === "super_admin";
+
   return (
-    <aside className="side" style={{ width: "248px", flex: "none" }}>
-      {/* Brand block (PDF p. 11 #1) */}
-      <Link href="/" className="brand" style={{ cursor: "pointer", textDecoration: "none" }}>
-        <div className="logo">
-          <svg className="i" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" />
-            <polyline points="2 17 12 22 22 17" />
-            <polyline points="2 12 12 17 22 12" />
-          </svg>
-        </div>
-        <div>
-          <b>ProofStack</b>
-          <span>Autonomous DevSecOps Engine</span>
-        </div>
-      </Link>
-
-      {/* WORKSPACE group */}
-      <div className="navgrp" style={{ paddingTop: "6px" }}>
-        Workspace
-      </div>
-
-      {/* Dashboard */}
-      <Link
-        href="/dashboard"
-        className={`nav ${pathname === "/dashboard" ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" />
-          <rect x="14" y="14" width="7" height="7" rx="1.5" />
-        </svg>
-        <span>Dashboard</span>
-      </Link>
-
-      {/* Studio: hidden for Auditor */}
-      {roleDef.canAccessStudio && (
-        <Link
-          href="/studio"
-          className={`nav ${isRouteActive("/studio") ? "on" : ""}`}
-        >
-          <svg className="i" viewBox="0 0 24 24">
-            <polyline points="16 18 22 12 16 6" />
-            <polyline points="8 6 2 12 8 18" />
-          </svg>
-          <span>Studio</span>
-        </Link>
-      )}
-
-      {/* Cockpit */}
-      <Link
-        href="/cockpit/TASK9142"
-        className={`nav ${isRouteActive("/cockpit") ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-        <span>Cockpit</span>
-        <span className="tag">TASK9142</span>
-      </Link>
-
-      {/* Findings */}
-      <Link
-        href="/findings"
-        className={`nav ${isRouteActive("/findings") ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-          <line x1="12" y1="9" x2="12" y2="13" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-        <span>Findings</span>
-        <span className="tag">6</span>
-      </Link>
-
-      {/* Ledger */}
-      <Link
-        href="/ledger"
-        className={`nav ${isRouteActive("/ledger") ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <ellipse cx="12" cy="5" rx="9" ry="3" />
-          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-        </svg>
-        <span>Ledger</span>
-      </Link>
-
-      {/* REFERENCE group */}
-      <div className="navgrp">Reference</div>
-
-      {/* 19-Catalog */}
-      <Link
-        href="/catalog"
-        className={`nav ${isRouteActive("/catalog") ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-        </svg>
-        <span>19-Catalog</span>
-      </Link>
-
-      {/* ADMINISTRATION group */}
-      <div className="navgrp">Administration</div>
-
-      {/* Control Plane: visible ONLY to super_admin and admin */}
-      {roleDef.canAccessControlPlane && (
-        <Link
-          href="/control-plane"
-          className={`nav ${isRouteActive("/control-plane") ? "on" : ""}`}
-        >
-          <svg className="i" viewBox="0 0 24 24">
-            <line x1="4" y1="21" x2="4" y2="14" />
-            <line x1="4" y1="10" x2="4" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12" y2="3" />
-            <line x1="20" y1="21" x2="20" y2="16" />
-            <line x1="20" y1="12" x2="20" y2="3" />
-            <line x1="1" y1="14" x2="7" y2="14" />
-            <line x1="9" y1="8" x2="15" y2="8" />
-            <line x1="17" y1="16" x2="23" y2="16" />
-          </svg>
-          <span>Control Plane</span>
-        </Link>
-      )}
-
-      {/* Settings */}
-      <Link
-        href="/settings"
-        className={`nav ${isRouteActive("/settings") ? "on" : ""}`}
-      >
-        <svg className="i" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-        <span>Settings</span>
-      </Link>
-
-      {/* User Card (bottom-left) */}
-      <div className="sidefoot">
+    <>
+      {isMobileOpen && (
         <div
-          className="usercard"
-          style={{ cursor: "pointer" }}
-          onClick={() => logout()}
-          title="Click to sign out"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            zIndex: 199,
+          }}
+        />
+      )}
+      <aside
+        className={`side ${isMobileOpen ? "mobile-sidebar-open" : ""}`}
+        style={{
+          width: isCollapsed ? "72px" : "260px",
+          minWidth: isCollapsed ? "72px" : "260px",
+          maxWidth: isCollapsed ? "72px" : "260px",
+          padding: isCollapsed ? "16px 8px 14px" : "18px 14px 14px",
+          flex: "none",
+          position: "relative",
+          zIndex: 200,
+          transition: "width 200ms cubic-bezier(0.16, 1, 0.3, 1), min-width 200ms ease, max-width 200ms ease, padding 200ms ease, transform 200ms ease",
+          overflowX: "hidden",
+        }}
+      >
+        {/* Top Brand & Collapse/Expand Header */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: isCollapsed ? "column" : "row",
+            alignItems: "center",
+            justifyContent: isCollapsed ? "center" : "space-between",
+            gap: isCollapsed ? "8px" : "0",
+            padding: isCollapsed ? "0 0 14px" : "0 4px 16px",
+            borderBottom: "1px solid var(--side-line)",
+            marginBottom: "12px",
+          }}
         >
-          <div className="avatar">{initials}</div>
-          <div>
-            <b>{roleDef.label}</b>
-            <span>{roleDef.label.toUpperCase()}</span>
-          </div>
-          <svg className="i" viewBox="0 0 24 24" aria-label="Sign out">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          {!isCollapsed ? (
+            <Link
+              href="/"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                textDecoration: "none",
+                color: "inherit",
+                minWidth: 0,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                className="logo"
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "8px",
+                  background: "var(--accent)",
+                  color: "var(--accent-ink)",
+                  display: "grid",
+                  placeItems: "center",
+                  flex: "none",
+                }}
+              >
+                <svg className="i" style={{ width: "18px", height: "18px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+              </div>
+              <div style={{ minWidth: 0, overflow: "hidden" }}>
+                <b style={{ fontFamily: "var(--f-display)", fontSize: "17px", fontWeight: 700, whiteSpace: "nowrap", display: "block", lineHeight: 1.1 }}>
+                  ProofStack
+                </b>
+                <span style={{ fontSize: "9.5px", color: "var(--side-mute)", whiteSpace: "nowrap", display: "block" }}>
+                  DevSecOps Engine
+                </span>
+              </div>
+            </Link>
+          ) : (
+            <Link href="/" title="ProofStack Autonomous Engine" style={{ textDecoration: "none", color: "inherit" }}>
+              <div
+                className="logo"
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "8px",
+                  background: "var(--accent)",
+                  color: "var(--accent-ink)",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <svg className="i" style={{ width: "18px", height: "18px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+              </div>
+            </Link>
+          )}
+
+          {/* Crisp Collapse / Expand Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            title={isCollapsed ? "Expand sidebar (260px)" : "Collapse sidebar (72px)"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            style={{
+              background: "var(--side-line)",
+              border: "1px solid color-mix(in srgb, var(--side-ink) 14%, transparent)",
+              borderRadius: "6px",
+              width: "26px",
+              height: "26px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "var(--side-ink)",
+              fontSize: "12px",
+              fontWeight: 700,
+              flex: "none",
+              transition: "all 120ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "color-mix(in srgb, var(--side-ink) 15%, var(--side-line))")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--side-line)")}
+          >
+            {isCollapsed ? "»" : "«"}
+          </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation Group Header */}
+        {!isCollapsed && (
+          <div className="navgrp" style={{ paddingTop: "2px", paddingBottom: "6px" }}>
+            {role === "developer"
+              ? "Developer Workspace"
+              : role === "auditor"
+              ? "Auditor Workspace"
+              : role === "admin"
+              ? "Workspace Admin"
+              : "Super Admin Root"}
+          </div>
+        )}
+
+        {/* 1. Dashboard (Always visible) */}
+        <Link
+          href="/dashboard"
+          className={`nav ${pathname === "/dashboard" ? "on" : ""}`}
+          title={isCollapsed ? "Dashboard" : undefined}
+          onClick={onCloseMobile}
+          style={{
+            justifyContent: isCollapsed ? "center" : "flex-start",
+            padding: isCollapsed ? "0" : "0 10px",
+          }}
+        >
+          <svg className="i" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+          {!isCollapsed && <span>Dashboard</span>}
+        </Link>
+
+        {/* 2. Studio (Developer ONLY) */}
+        {showStudio && (
+          <Link
+            href="/studio"
+            className={`nav ${isRouteActive("/studio") ? "on" : ""}`}
+            title={isCollapsed ? "Studio" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+            {!isCollapsed && <span>Studio</span>}
+          </Link>
+        )}
+
+        {/* 3. Control Plane (Super Admin & Workspace Admin ONLY) */}
+        {showControlPlane && (
+          <Link
+            href="/control-plane"
+            className={`nav ${isRouteActive("/control-plane") ? "on" : ""}`}
+            title={isCollapsed ? "Control Plane" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <line x1="4" y1="21" x2="4" y2="14" />
+              <line x1="4" y1="10" x2="4" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12" y2="3" />
+              <line x1="20" y1="21" x2="20" y2="16" />
+              <line x1="20" y1="12" x2="20" y2="3" />
+              <line x1="1" y1="14" x2="7" y2="14" />
+              <line x1="9" y1="8" x2="15" y2="8" />
+              <line x1="17" y1="16" x2="23" y2="16" />
+            </svg>
+            {!isCollapsed && <span>Control Plane</span>}
+          </Link>
+        )}
+
+        {/* 4. 19-Catalog (Workspace Admin ONLY) */}
+        {showCatalog && (
+          <Link
+            href="/catalog"
+            className={`nav ${isRouteActive("/catalog") ? "on" : ""}`}
+            title={isCollapsed ? "19-Catalog" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            {!isCollapsed && <span>19-Catalog</span>}
+          </Link>
+        )}
+
+        {/* 5. Findings (Security Auditor & Workspace Admin) */}
+        {showFindings && (
+          <Link
+            href="/findings"
+            className={`nav ${isRouteActive("/findings") ? "on" : ""}`}
+            title={isCollapsed ? "Findings" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            {!isCollapsed && (
+              <>
+                <span>Findings</span>
+                <span className="tag">6</span>
+              </>
+            )}
+          </Link>
+        )}
+
+        {/* 6. Ledger (Security Auditor & Super Admin) */}
+        {showLedger && (
+          <Link
+            href="/ledger"
+            className={`nav ${isRouteActive("/ledger") ? "on" : ""}`}
+            title={isCollapsed ? "Ledger" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <ellipse cx="12" cy="5" rx="9" ry="3" />
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            </svg>
+            {!isCollapsed && <span>Ledger</span>}
+          </Link>
+        )}
+
+        {/* 7. Cockpit (Developer & Security Auditor) */}
+        {showCockpit && (
+          <Link
+            href="/cockpit/TASK9142"
+            className={`nav ${isRouteActive("/cockpit") ? "on" : ""}`}
+            title={isCollapsed ? "Cockpit" : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            {!isCollapsed && (
+              <>
+                <span>Cockpit</span>
+                <span className="tag">TASK9142</span>
+              </>
+            )}
+          </Link>
+        )}
+
+        {/* 8. Settings (Always visible) */}
+        <Link
+          href="/settings"
+          className={`nav ${isRouteActive("/settings") ? "on" : ""}`}
+          title={isCollapsed ? "Settings" : undefined}
+          onClick={onCloseMobile}
+          style={{
+            justifyContent: isCollapsed ? "center" : "flex-start",
+            padding: isCollapsed ? "0" : "0 10px",
+          }}
+        >
+          <svg className="i" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          {!isCollapsed && <span>Settings</span>}
+        </Link>
+
+        {/* User Card with Multi-User Avatar Switcher in Bottom */}
+        <div className="sidefoot" ref={switcherRef} style={{ position: "relative", marginTop: "auto" }}>
+          {/* Active persona preview card */}
+          <div
+            className="usercard"
+            style={{
+              cursor: "pointer",
+              transition: "background 100ms",
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "8px 0 0" : "8px 6px 0",
+            }}
+            onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
+            title={
+              isCollapsed
+                ? `${activeMember.name} (${roleDef.label}) · Click to switch persona`
+                : "Click to switch team persona or sign out"
+            }
+          >
+            <div
+              className="avatar"
+              style={{
+                fontSize: "17px",
+                display: "grid",
+                placeItems: "center",
+                background: "var(--surface2)",
+                border: "1.5px solid var(--line)",
+              }}
+            >
+              {activeMember.avatar}
+            </div>
+
+            {!isCollapsed && (
+              <>
+                <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                  <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }}>
+                    {activeMember.name}
+                  </b>
+                  <span style={{ fontSize: "10px", color: "var(--brand)", letterSpacing: "0.4px" }}>
+                    {roleDef.label.toUpperCase()} ▾
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    logout();
+                  }}
+                  title="Sign out"
+                  style={{ background: "transparent", border: "none", color: "var(--ink3)", cursor: "pointer", padding: "4px" }}
+                >
+                  <svg className="i" style={{ width: "14px", height: "14px" }} viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Persona Switcher Dropdown Popover */}
+          {isSwitcherOpen && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "calc(100% + 8px)",
+                left: isCollapsed ? "76px" : "4px",
+                width: "270px",
+                background: "var(--surface)",
+                border: "1px solid var(--line)",
+                borderRadius: "12px",
+                boxShadow: "0 18px 40px rgba(0, 0, 0, 0.28)",
+                zIndex: 1000,
+                padding: "10px",
+                animation: "fadeIn 120ms ease-out",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid var(--line)" }}>
+                <div>
+                  <b style={{ fontSize: "12px", color: "var(--ink)" }}>Switch Team Persona</b>
+                  <div style={{ fontSize: "10px", color: "var(--ink2)" }}>Role-based enterprise access</div>
+                </div>
+                <span className="chip brand" style={{ fontSize: "9px", padding: "1px 5px" }}>
+                  7 Personas
+                </span>
+              </div>
+
+              <div style={{ maxHeight: "280px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "4px" }}>
+                {allMembers.map((member) => {
+                  const isCurrent = member.id === activeMember.id;
+                  return (
+                    <div
+                      key={member.id}
+                      onClick={() => handleSelectMember(member)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "9px",
+                        padding: "6px 8px",
+                        borderRadius: "7px",
+                        background: isCurrent ? "color-mix(in srgb, var(--brand) 10%, var(--surface))" : "transparent",
+                        border: isCurrent ? "1px solid color-mix(in srgb, var(--brand) 40%, var(--line))" : "1px solid transparent",
+                        cursor: "pointer",
+                        transition: "all 90ms ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isCurrent) e.currentTarget.style.background = "var(--surface2)";
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isCurrent) e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <span style={{ fontSize: "17px", lineHeight: 1 }}>{member.avatar}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <b style={{ fontSize: "11.5px", color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {member.name}
+                          </b>
+                          <span style={{ fontSize: "9px", color: "var(--ink3)", textTransform: "capitalize" }}>
+                            {member.role.replace("_", " ")}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "10px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {member.email}
+                        </div>
+                      </div>
+                      {isCurrent && (
+                        <span style={{ color: "var(--brand)", fontSize: "12px", fontWeight: 700 }}>✓</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between" }}>
+                <button
+                  type="button"
+                  className="btn sm ghost"
+                  onClick={() => setIsSwitcherOpen(false)}
+                  style={{ fontSize: "11px", height: "26px", padding: "0 8px" }}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn sm danger"
+                  onClick={() => {
+                    setIsSwitcherOpen(false);
+                    logout();
+                  }}
+                  style={{ fontSize: "11px", height: "26px", padding: "0 8px" }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+      <style>{`
+        @media (max-width: 960px) {
+          aside.side {
+            position: fixed !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            transform: translateX(-100%);
+            box-shadow: none;
+          }
+          aside.side.mobile-sidebar-open {
+            transform: translateX(0) !important;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.45) !important;
+          }
+        }
+      `}</style>
+    </>
   );
 }

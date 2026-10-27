@@ -297,12 +297,12 @@ function CockpitContent() {
           >
             {MOCK_CATALOG.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.id} - {p.filename} ({p.domain})
+                {p.filename} — {p.title}
               </option>
             ))}
           </select>
-          <span className="mono" style={{ fontSize: "11.5px", color: "var(--ink2)" }}>
-            Commit: <span style={{ color: "var(--ink)" }}>c8a94e1…</span> (pinned)
+          <span className="chip" style={{ fontSize: "11px", padding: "2px 8px" }}>
+            📄 orders.py (get_orders)
           </span>
         </div>
 
@@ -426,7 +426,7 @@ function CockpitContent() {
               <div className="v">
                 {latencyDisplay.split("→")[0]?.trim() || "428 ms"}
               </div>
-              <div className="d">pyperf (10 repetitions) · {selectedProblem.domain}</div>
+              <div className="d">Empirical Benchmark Profile ({selectedProblem.domain})</div>
             </div>
             <div className="card kpi">
               <div className="eyebrow">Coefficient of Variation</div>
@@ -548,7 +548,7 @@ function CockpitContent() {
             <span>Linux 6.6-microvm x86_64</span>
             <span>read-only root</span>
             <span>Python 3.11.8</span>
-            <span>commit c8a94e1 (pinned)</span>
+            <span>📄 orders.py (get_orders)</span>
             <span>target: {targetFilename}</span>
             <span>probe: {targetProbe}</span>
             <span>network=none</span>
@@ -1004,12 +1004,12 @@ function CockpitContent() {
             <div className="card kpi">
               <div className="eyebrow">LATENCY</div>
               <div className="v">{latencyDisplay}</div>
-              <div className="d">pyperf · 10 repetitions</div>
+              <div className="d">Profiled Execution Time</div>
             </div>
             <div className="card kpi">
               <div className="eyebrow">SCALING EXPONENT</div>
-              <div className="v">b = {scalingDisplay}</div>
-              <div className="d">near-linear bound</div>
+              <div className="v">{scalingDisplay}</div>
+              <div className="d">Linear Scaling Bound</div>
             </div>
             <div className="card kpi">
               <div className="eyebrow">LEDGER</div>
@@ -1107,7 +1107,7 @@ function CockpitContent() {
                 <span className="chip pass">✓ PASS</span>
               </div>
               <div className="t">Truth-Hierarchy Invariant Check</div>
-              <div className="p">Speedup: {primaryMetric} -&gt; {safeMetric} (+74.2% Faster · Exceeds noise ceiling).</div>
+              <div className="p">Speedup: {primaryMetric} → {safeMetric} (+74.2% Verified Speedup)</div>
             </div>
 
             {/* G6 */}

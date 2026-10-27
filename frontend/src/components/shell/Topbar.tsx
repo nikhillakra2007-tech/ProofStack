@@ -13,6 +13,7 @@ interface TopbarProps {
   onOpenCommandPalette: () => void;
   onOpenNewTaskModal: () => void;
   onToggleCopilot: () => void;
+  onToggleMobileSidebar?: () => void;
 }
 
 interface NotificationItem {
@@ -78,10 +79,11 @@ export default function Topbar({
   onOpenCommandPalette,
   onOpenNewTaskModal,
   onToggleCopilot,
+  onToggleMobileSidebar,
 }: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role } = useAuth();
+  const { role, activeMember, allMembers, switchMember } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
   const roleDef = ROLES[role] || ROLES.developer;
 
@@ -89,6 +91,10 @@ export default function Topbar({
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  // Persona switcher state
+  const [isMemberSwitcherOpen, setIsMemberSwitcherOpen] = useState(false);
+  const memberSwitcherRef = useRef<HTMLDivElement>(null);
 
   // Google Search-style bar state
   const [searchQuery, setSearchQuery] = useState("");
@@ -100,7 +106,7 @@ export default function Topbar({
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Click outside listener for notifications and search dropdown
+  // Click outside listener for notifications, search dropdown, and member switcher
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -108,6 +114,9 @@ export default function Topbar({
       }
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
         setIsSearchFocused(false);
+      }
+      if (memberSwitcherRef.current && !memberSwitcherRef.current.contains(e.target as Node)) {
+        setIsMemberSwitcherOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -217,6 +226,36 @@ export default function Topbar({
 
   return (
     <header className="top" style={{ position: "relative" }}>
+      {/* Mobile Sidebar Hamburger Toggle */}
+      {onToggleMobileSidebar && (
+        <button
+          type="button"
+          className="mobile-topbar-hamburger"
+          onClick={onToggleMobileSidebar}
+          aria-label="Toggle Navigation Sidebar"
+          style={{
+            display: "none",
+            background: "var(--surface2)",
+            border: "1px solid var(--line)",
+            borderRadius: "6px",
+            width: "32px",
+            height: "32px",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color: "var(--ink)",
+            flex: "none",
+            marginRight: "6px",
+          }}
+        >
+          <svg style={{ width: "18px", height: "18px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      )}
+
       {/* Breadcrumb */}
       {getBreadcrumb()}
 
@@ -684,6 +723,128 @@ export default function Topbar({
           </svg>
         )}
       </button>
+
+      {/* Quick Team Member / Persona Switcher Pill */}
+      <div style={{ position: "relative" }} ref={memberSwitcherRef}>
+        <button
+          type="button"
+          onClick={() => setIsMemberSwitcherOpen(!isMemberSwitcherOpen)}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "0 10px",
+            height: "32px",
+            borderRadius: "9999px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            cursor: "pointer",
+            transition: "all 120ms ease",
+          }}
+          title="Switch team member persona (judging mode)"
+        >
+          <span style={{ fontSize: "15px", lineHeight: 1 }}>{activeMember.avatar}</span>
+          <b style={{ fontSize: "12px", color: "var(--ink)", maxWidth: "110px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {activeMember.name}
+          </b>
+          <span
+            className="chip brand"
+            style={{ fontSize: "9px", padding: "1px 5px", textTransform: "uppercase" }}
+          >
+            {roleDef.label}
+          </span>
+          <span style={{ fontSize: "9px", color: "var(--ink3)" }}>▾</span>
+        </button>
+
+        {/* Persona Dropdown Menu */}
+        {isMemberSwitcherOpen && (
+          <div
+            style={{
+              position: "absolute",
+              top: "calc(100% + 8px)",
+              right: 0,
+              width: "290px",
+              background: "var(--surface)",
+              border: "1px solid var(--line)",
+              borderRadius: "12px",
+              boxShadow: "0 18px 40px rgba(0, 0, 0, 0.28)",
+              zIndex: 1100,
+              padding: "10px",
+              animation: "fadeIn 120ms ease-out",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+                paddingBottom: "6px",
+                borderBottom: "1px solid var(--line)",
+              }}
+            >
+              <div>
+                <b style={{ fontSize: "12px", color: "var(--ink)" }}>Switch Team Persona</b>
+                <div style={{ fontSize: "10px", color: "var(--ink2)" }}>Role-based enterprise access</div>
+              </div>
+              <span className="chip brand" style={{ fontSize: "9px", padding: "1px 5px" }}>
+                7 Personas
+              </span>
+            </div>
+
+            <div style={{ maxHeight: "310px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "4px" }}>
+              {allMembers.map((member) => {
+                const isCurrent = member.id === activeMember.id;
+                return (
+                  <div
+                    key={member.id}
+                    onClick={() => {
+                      switchMember(member.id);
+                      setIsMemberSwitcherOpen(false);
+                      router.push("/dashboard");
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "9px",
+                      padding: "7px 9px",
+                      borderRadius: "7px",
+                      background: isCurrent ? "color-mix(in srgb, var(--brand) 10%, var(--surface))" : "transparent",
+                      border: isCurrent ? "1px solid color-mix(in srgb, var(--brand) 40%, var(--line))" : "1px solid transparent",
+                      cursor: "pointer",
+                      transition: "all 90ms ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isCurrent) e.currentTarget.style.background = "var(--surface2)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isCurrent) e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <span style={{ fontSize: "18px", lineHeight: 1 }}>{member.avatar}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <b style={{ fontSize: "12px", color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {member.name}
+                        </b>
+                        <span style={{ fontSize: "9.5px", color: "var(--brand)", textTransform: "capitalize" }}>
+                          {member.role.replace("_", " ")}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "10.5px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {member.email}
+                      </div>
+                    </div>
+                    {isCurrent && (
+                      <span style={{ color: "var(--brand)", fontSize: "12px", fontWeight: 700 }}>✓</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 5-Step Interactive Tour Guide Modal */}
       <TourGuideModal

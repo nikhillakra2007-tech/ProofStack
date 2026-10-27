@@ -20,7 +20,7 @@ interface MerkleBlock {
 }
 
 export default function AuditorRolePage() {
-  const { user } = useAuth();
+  const { session } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const [tamperTriggered, setTamperTriggered] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);

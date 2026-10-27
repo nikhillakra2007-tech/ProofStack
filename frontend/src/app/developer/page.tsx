@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export default function DeveloperRolePage() {
-  const { session, role, switchRole } = useAuth();
+  const { session, role } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const [selectedLanguage, setSelectedLanguage] = useState<"typescript" | "python" | "rust">("typescript");
   const [isSynthesizing, setIsSynthesizing] = useState(false);

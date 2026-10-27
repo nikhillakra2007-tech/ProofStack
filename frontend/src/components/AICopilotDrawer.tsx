@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Bot,
   X,
@@ -34,6 +34,7 @@ interface ChatMessage {
   sender: "user" | "copilot";
   timestamp: string;
   text: string;
+  isAuthGate?: boolean;
   card?: MessageCard;
 }
 
@@ -49,6 +50,7 @@ export default function AICopilotDrawer({
   onApplyFixToStudio,
 }: AICopilotDrawerProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -81,6 +83,25 @@ export default function AICopilotDrawer({
 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+
+    // AI CO-PILOT AUTHENTICATION GATE: Protect NVIDIA Nemotron & Nebius quotas
+    const isPublicRoute = pathname === "/" || pathname === "/home" || pathname === "/login";
+    const isAuthActive = typeof window !== "undefined" && localStorage.getItem("proofstack_auth_active") === "true";
+    const isAuthenticated = !isPublicRoute && isAuthActive;
+
+    if (!isAuthenticated) {
+      const gateMsg: ChatMessage = {
+        id: `bot_gate_${Date.now()}`,
+        sender: "copilot",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        text: "🔒 Sign In Required — To protect NVIDIA Nemotron 3 & Nebius Token Factory quotas, please sign in to your workspace persona before running AI Co-Pilot queries.",
+        isAuthGate: true,
+      };
+
+      setMessages((prev) => [...prev, gateMsg]);
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -222,6 +243,29 @@ export default function AICopilotDrawer({
               }`}
             >
               <p>{msg.text}</p>
+
+              {/* Authentication Gate Card when unauthenticated */}
+              {msg.isAuthGate && (
+                <div className="mt-3 p-3 bg-slate-900 border border-blue-500 rounded-lg text-white">
+                  <div className="flex items-center gap-2 mb-1.5 font-bold text-blue-400 text-xs">
+                    <span>🔒</span>
+                    <span>Sign In Required</span>
+                  </div>
+                  <p className="text-xs text-slate-300 mb-2.5 leading-relaxed">
+                    To protect NVIDIA Nemotron 3 &amp; Nebius Token Factory quotas, please sign in to your workspace persona before running AI Co-Pilot queries.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      router.push("/login");
+                    }}
+                    className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold text-xs transition-colors"
+                  >
+                    🔐 Sign In to Continue →
+                  </button>
+                </div>
+              )}
 
               {/* In-chat Interactive Card */}
               {msg.card && (

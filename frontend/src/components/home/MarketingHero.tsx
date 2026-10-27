@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/lib/theme";
 import { downloadEvidenceReport } from "@/lib/evidenceExport";
 
 interface MarketingHeroProps {
@@ -12,16 +13,24 @@ interface MarketingHeroProps {
 export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
   const router = useRouter();
   const { loginAs, isAuthenticated } = useAuth();
+  const { resolvedTheme } = useTheme();
   const [isReplaying, setIsReplaying] = useState(false);
   const [replayStep, setReplayStep] = useState(6);
   const [replayToast, setReplayToast] = useState<string | null>(null);
 
   const handleOpenLiveDemo = () => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      router.push("/login?redirect=/dashboard");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("proofstack_auth_active");
+        localStorage.removeItem("proofstack_session");
+        localStorage.removeItem("proofstack_role");
+        localStorage.removeItem("proofstack_user");
+        document.cookie = "ps_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "proofstack_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "ps_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      } catch {}
     }
+    router.push("/login");
   };
 
   const handleReplay = () => {
@@ -60,11 +69,131 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
         maxWidth: "1400px",
         margin: "0 auto",
         width: "100%",
+        overflow: "hidden",
       }}
     >
+      {/* Subtle Industry-Grade Architectural Background Visual (Cyber-Mesh & Sage-Ivory Glow) */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "-30px",
+          left: "-30px",
+          right: "-30px",
+          bottom: "-30px",
+          pointerEvents: "none",
+          overflow: "hidden",
+          zIndex: 0,
+        }}
+      >
+        {/* SVG Architectural Cyber-Mesh Grid */}
+        <svg
+          width="100%"
+          height="100%"
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.65,
+            animation: "heroMeshFloat 22s ease-in-out infinite alternate",
+          }}
+        >
+          <defs>
+            <pattern id="hero-cyber-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+              <path
+                d="M 44 0 L 0 0 0 44"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeOpacity="0.08"
+                style={{ color: "var(--brand)" }}
+              />
+              <circle cx="0" cy="0" r="1.5" fill="currentColor" fillOpacity="0.22" style={{ color: "var(--brand)" }} />
+              <circle cx="44" cy="44" r="1.5" fill="currentColor" fillOpacity="0.22" style={{ color: "var(--brand)" }} />
+            </pattern>
+            <pattern id="hero-circuits" width="176" height="176" patternUnits="userSpaceOnUse">
+              <path
+                d="M 22 0 L 22 44 L 66 44 M 132 88 L 132 132 L 88 132 M 0 154 L 44 154"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeDasharray="4 6"
+                strokeOpacity="0.14"
+                style={{ color: "var(--brand)" }}
+              />
+              <circle cx="66" cy="44" r="2.5" fill="currentColor" fillOpacity="0.3" style={{ color: "var(--brand)" }} />
+              <circle cx="88" cy="132" r="2.5" fill="currentColor" fillOpacity="0.3" style={{ color: "var(--brand)" }} />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-cyber-grid)" />
+          <rect width="100%" height="100%" fill="url(#hero-circuits)" />
+        </svg>
+
+        {/* Soft Sage-Green Radial Gradient Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            top: "5%",
+            left: "20%",
+            width: "560px",
+            height: "560px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, color-mix(in srgb, var(--brand) 16%, transparent) 0%, rgba(74, 106, 79, 0.06) 50%, transparent 72%)",
+            filter: "blur(60px)",
+            animation: "heroGlowPulse 10s ease-in-out infinite alternate",
+          }}
+        />
+
+        {/* Soft Warm Ivory Radial Gradient Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            top: "-15%",
+            right: "8%",
+            width: "620px",
+            height: "520px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, color-mix(in srgb, var(--surface2) 85%, transparent) 0%, rgba(246, 241, 230, 0.45) 50%, transparent 75%)",
+            filter: "blur(50px)",
+            animation: "heroGlowPulse 14s ease-in-out infinite alternate-reverse",
+          }}
+        />
+
+        {/* Ambient Floating Scanning Ray (Autonomous Verification Engine feel) */}
+        <div
+          style={{
+            position: "absolute",
+            left: "0",
+            right: "0",
+            height: "1px",
+            background: "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--brand) 35%, transparent) 50%, transparent 100%)",
+            animation: "heroScanRay 8s ease-in-out infinite",
+          }}
+        />
+
+        <style>{`
+          @keyframes heroMeshFloat {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-7px) rotate(0.2deg) scale(1.008); }
+            100% { transform: translateY(5px) rotate(-0.2deg) scale(0.995); }
+          }
+          @keyframes heroGlowPulse {
+            0% { opacity: 0.55; transform: scale(0.96); }
+            100% { opacity: 0.92; transform: scale(1.06); }
+          }
+          @keyframes heroScanRay {
+            0% { top: 0%; opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { top: 100%; opacity: 0; }
+          }
+        `}</style>
+      </div>
+
       {/* 2-Column Hero Grid */}
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           display: "grid",
           gridTemplateColumns: "1.05fr 1.15fr",
           gap: "40px",
@@ -103,7 +232,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               lineHeight: 1.08,
               letterSpacing: "-.02em",
               fontWeight: 600,
-              color: "var(--ink)",
+              color: resolvedTheme === "dark" ? "#F8FAFC" : "#111827",
               margin: "0 0 20px 0",
             }}
           >
@@ -117,7 +246,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             style={{
               fontSize: "16px",
               lineHeight: 1.55,
-              color: "var(--ink2)",
+              color: resolvedTheme === "dark" ? "#CBD5E1" : "#374151",
               maxWidth: "540px",
               margin: "0 0 28px 0",
             }}
@@ -131,13 +260,21 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px", flexWrap: "wrap" }}>
             <button
               type="button"
-              className="btn lg"
+              className="btn lg btn-primary"
               onClick={handleOpenLiveDemo}
               style={{
                 cursor: "pointer",
-                padding: "0 22px",
+                padding: "12px 24px",
                 fontSize: "14px",
                 fontWeight: 600,
+                backgroundColor: "#1D4ED8",
+                color: "#FFFFFF",
+                borderRadius: "8px",
+                border: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(29, 78, 216, 0.25)",
               }}
             >
               Open live demo
@@ -145,12 +282,17 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
             <button
               type="button"
-              className="btn lg sec"
+              className="btn lg sec btn-secondary"
               onClick={onOpenTour}
               style={{
                 cursor: "pointer",
-                padding: "0 18px",
+                padding: "12px 20px",
                 fontSize: "14px",
+                fontWeight: 600,
+                backgroundColor: "#EFECE6",
+                border: "1px solid #D8D3C8",
+                color: "#141413",
+                borderRadius: "8px",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
@@ -405,9 +547,21 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
                 <button
                   type="button"
-                  className="btn sm sec"
+                  className="btn sm sec btn-secondary"
                   onClick={handleExportEvidence}
-                  style={{ fontSize: "11.5px" }}
+                  style={{
+                    fontSize: "11.5px",
+                    fontWeight: 600,
+                    backgroundColor: "#EFECE6",
+                    border: "1px solid #D8D3C8",
+                    color: "#141413",
+                    borderRadius: "6px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
                 >
                   <svg style={{ width: "12px", height: "12px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -419,10 +573,22 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
 
                 <button
                   type="button"
-                  className="btn sm sec"
+                  className="btn sm sec btn-secondary"
                   onClick={handleReplay}
                   disabled={isReplaying}
-                  style={{ fontSize: "11.5px" }}
+                  style={{
+                    fontSize: "11.5px",
+                    fontWeight: 600,
+                    backgroundColor: "#EFECE6",
+                    border: "1px solid #D8D3C8",
+                    color: "#141413",
+                    borderRadius: "6px",
+                    padding: "6px 12px",
+                    cursor: isReplaying ? "wait" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
                 >
                   <svg style={{ width: "12px", height: "12px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polygon points="5 3 19 12 5 21 5 3" />
