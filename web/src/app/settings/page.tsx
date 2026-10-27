@@ -576,58 +576,148 @@ export default function SettingsPage() {
           {/* SUB-PAGE 1: APPEARANCE */}
           {activeSubnav === "appearance" && (
             <>
-              {/* Theme Indicator (Permanent Light System) */}
+              {/* Theme Mode Selector (Light / Dark / System) */}
               <div className="card">
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
                   <h3 style={{ margin: 0, fontSize: "14px", fontWeight: 700 }}>Theme Mode</h3>
-                  <span className="chip pass" style={{ fontSize: "10.5px" }}>Permanent Light</span>
+                  <span className="chip pass" style={{ fontSize: "10.5px" }}>
+                    Active: {theme.toUpperCase()} {theme === "system" ? `(${resolvedTheme})` : ""}
+                  </span>
                 </div>
-                <div className="sub" style={{ marginBottom: "12px" }}>
-                  Semgrep-inspired high-contrast cybersecurity light theme is enforced across all public and authenticated interfaces.
+                <div className="sub" style={{ marginBottom: "16px" }}>
+                  Select your interface theme preference. System mode automatically aligns with your operating system dark/light configuration.
                 </div>
-                <div
-                  style={{
-                    border: "1px solid var(--line)",
-                    borderRadius: "9px",
-                    padding: "14px 16px",
-                    background: "var(--surface)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "14px",
-                  }}
-                >
-                  <div
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "14px" }}>
+                  {/* Light Option */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme("light")}
                     style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "8px",
-                      background: "var(--brand-surface, #EAF4EE)",
-                      color: "var(--brand)",
-                      display: "grid",
-                      placeItems: "center",
-                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 16px",
+                      borderRadius: "9px",
+                      border: theme === "light" ? "2px solid var(--brand)" : "1px solid var(--line)",
+                      background: theme === "light" ? "var(--brand-surface, rgba(32, 201, 166, 0.08))" : "var(--surface)",
+                      color: "var(--ink)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
                     }}
                   >
-                    <svg className="i" viewBox="0 0 24 24" style={{ width: "20px", height: "20px" }}>
-                      <circle cx="12" cy="12" r="4" />
-                      <line x1="12" y1="2" x2="12" y2="4" />
-                      <line x1="12" y1="20" x2="12" y2="22" />
-                      <line x1="4.9" y1="4.9" x2="6.3" y2="6.3" />
-                      <line x1="17.7" y1="17.7" x2="19.1" y2="19.1" />
-                      <line x1="2" y1="12" x2="4" y2="12" />
-                      <line x1="20" y1="12" x2="22" y2="12" />
-                      <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
-                      <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>
-                      Light Theme Active (#FAFAF8 / #17211D)
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "8px",
+                        background: theme === "light" ? "var(--brand)" : "var(--line)",
+                        color: theme === "light" ? "#FFFFFF" : "var(--ink2)",
+                        display: "grid",
+                        placeItems: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <svg className="i" viewBox="0 0 24 24" style={{ width: "18px", height: "18px" }}>
+                        <circle cx="12" cy="12" r="4" />
+                        <line x1="12" y1="2" x2="12" y2="4" />
+                        <line x1="12" y1="20" x2="12" y2="22" />
+                        <line x1="4.9" y1="4.9" x2="6.3" y2="6.3" />
+                        <line x1="17.7" y1="17.7" x2="19.1" y2="19.1" />
+                        <line x1="2" y1="12" x2="4" y2="12" />
+                        <line x1="20" y1="12" x2="22" y2="12" />
+                        <line x1="4.9" y1="19.1" x2="6.3" y2="17.7" />
+                        <line x1="17.7" y1="6.3" x2="19.1" y2="4.9" />
+                      </svg>
                     </div>
-                    <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "2px" }}>
-                      High contrast, zero glare, and precise code readability. System dark preferences are prevented from altering the interface.
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700 }}>Light Theme</div>
+                      <div style={{ fontSize: "11px", color: "var(--ink2)", marginTop: "2px" }}>Warm off-white, high contrast</div>
                     </div>
-                  </div>
+                  </button>
+
+                  {/* Dark Option */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme("dark")}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 16px",
+                      borderRadius: "9px",
+                      border: theme === "dark" ? "2px solid var(--brand)" : "1px solid var(--line)",
+                      background: theme === "dark" ? "var(--brand-surface, rgba(32, 201, 166, 0.08))" : "var(--surface)",
+                      color: "var(--ink)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "8px",
+                        background: theme === "dark" ? "var(--brand)" : "var(--line)",
+                        color: theme === "dark" ? "#FFFFFF" : "var(--ink2)",
+                        display: "grid",
+                        placeItems: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <svg className="i" viewBox="0 0 24 24" style={{ width: "18px", height: "18px" }}>
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700 }}>Dark Theme</div>
+                      <div style={{ fontSize: "11px", color: "var(--ink2)", marginTop: "2px" }}>Deep charcoal, mint accents</div>
+                    </div>
+                  </button>
+
+                  {/* System Option */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme("system")}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 16px",
+                      borderRadius: "9px",
+                      border: theme === "system" ? "2px solid var(--brand)" : "1px solid var(--line)",
+                      background: theme === "system" ? "var(--brand-surface, rgba(32, 201, 166, 0.08))" : "var(--surface)",
+                      color: "var(--ink)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "8px",
+                        background: theme === "system" ? "var(--brand)" : "var(--line)",
+                        color: theme === "system" ? "#FFFFFF" : "var(--ink2)",
+                        display: "grid",
+                        placeItems: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <svg className="i" viewBox="0 0 24 24" style={{ width: "18px", height: "18px" }}>
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700 }}>System Default</div>
+                      <div style={{ fontSize: "11px", color: "var(--ink2)", marginTop: "2px" }}>Follows OS color scheme</div>
+                    </div>
+                  </button>
                 </div>
               </div>
 

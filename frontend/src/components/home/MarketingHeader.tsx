@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import BrandLogo from "@/components/common/BrandLogo";
+import ThemeSelector from "@/components/common/ThemeSelector";
 import { ArrowRight, Menu, X, Play } from "lucide-react";
 
 interface MarketingHeaderProps {
@@ -12,9 +13,8 @@ interface MarketingHeaderProps {
 const SECTION_LINKS = [
   { id: "hero", label: "Overview" },
   { id: "capabilities", label: "Capabilities" },
-  { id: "showcase", label: "Showcase" },
-  { id: "workflow", label: "How It Works" },
-  { id: "trust", label: "Trust & Security" },
+  { id: "workflow", label: "Workflow" },
+  { id: "action", label: "Cockpit" },
 ];
 
 export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
@@ -48,7 +48,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         });
       },
       {
-        rootMargin: "-25% 0px -65% 0px", // Focus trigger zone in top third of viewport
+        rootMargin: "-20% 0px -60% 0px",
         threshold: 0,
       }
     );
@@ -68,12 +68,12 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
           zIndex: 100,
           height: "60px",
           background: isScrolled
-            ? "rgba(250, 250, 250, 0.94)"
-            : "rgba(250, 250, 250, 0.8)",
+            ? "color-mix(in srgb, var(--bg) 92%, transparent)"
+            : "color-mix(in srgb, var(--bg) 80%, transparent)",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
           borderBottom: isScrolled
-            ? "1px solid var(--line, #DCE3E0)"
+            ? "1px solid var(--line)"
             : "1px solid transparent",
           transition: "border-color 200ms ease, background 200ms ease",
           display: "flex",
@@ -109,11 +109,11 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
               display: "none",
               alignItems: "center",
               gap: "4px",
-              background: "var(--surface, #FFFFFF)",
+              background: "var(--surface)",
               padding: "4px 6px",
               borderRadius: "9999px",
-              border: "1px solid var(--line-subtle, #EDF2F0)",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+              border: "1px solid var(--line-subtle, var(--line))",
+              boxShadow: "var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.03))",
             }}
             className="md:flex"
           >
@@ -126,13 +126,13 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                   className={`nav-pill ${isActive ? "active" : ""}`}
                   style={{
                     fontSize: "12.5px",
-                    padding: "5px 13px",
+                    padding: "5px 14px",
                     fontWeight: isActive ? 600 : 500,
                     color: isActive
-                      ? "var(--heading-primary, #344E48)"
-                      : "var(--ink2, #42534E)",
+                      ? "var(--heading-primary)"
+                      : "var(--ink2)",
                     background: isActive
-                      ? "var(--surface-green, #E8F1EE)"
+                      ? "var(--surface-green)"
                       : "transparent",
                   }}
                 >
@@ -143,7 +143,10 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
           </nav>
 
           {/* Right Action Group */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Theme Selector (Light / Dark / System) */}
+            <ThemeSelector compact={true} />
+
             {onOpenTour && (
               <button
                 type="button"
@@ -153,14 +156,16 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                   alignItems: "center",
                   gap: "6px",
                   fontSize: "12.5px",
-                  color: "var(--ink2, #42534E)",
+                  color: "var(--ink2)",
                   padding: "6px 12px",
                   borderRadius: "9999px",
                   background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
                   fontWeight: 500,
                   transition: "all 150ms ease",
                 }}
-                className="lg:inline-flex hover:bg-[#E8F1EE]"
+                className="lg:inline-flex hover:bg-[var(--surface-green)]"
               >
                 <Play size={13} style={{ fill: "currentColor", opacity: 0.8 }} />
                 Tour
@@ -173,13 +178,13 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 fontFamily: "var(--f-ui, 'Inter', sans-serif)",
                 fontSize: "13px",
                 fontWeight: 500,
-                color: "var(--ink2, #42534E)",
+                color: "var(--ink2)",
                 textDecoration: "none",
                 padding: "6px 12px",
                 borderRadius: "9999px",
                 transition: "color 150ms ease, background 150ms ease",
               }}
-              className="hover:text-[#263A35] hover:bg-[#E8F1EE]"
+              className="hover:text-[var(--ink)] hover:bg-[var(--surface-green)]"
             >
               Sign in
             </Link>
@@ -208,9 +213,10 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 width: "36px",
                 height: "36px",
                 borderRadius: "8px",
-                border: "1px solid var(--line, #DCE3E0)",
-                background: "var(--surface, #FFFFFF)",
-                color: "var(--ink, #263A35)",
+                border: "1px solid var(--line)",
+                background: "var(--surface)",
+                color: "var(--ink)",
+                cursor: "pointer",
               }}
               className="md:hidden"
               aria-label="Toggle navigation menu"
@@ -221,7 +227,7 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
         </div>
       </header>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer with Smooth Reveal */}
       {mobileMenuOpen && (
         <div
           style={{
@@ -230,14 +236,15 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(250, 250, 250, 0.98)",
+            background: "color-mix(in srgb, var(--bg) 98%, transparent)",
             zIndex: 99,
             padding: "24px 20px",
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
-            borderBottom: "1px solid var(--line, #DCE3E0)",
+            gap: "14px",
+            borderBottom: "1px solid var(--line)",
             overflowY: "auto",
+            animation: "fadeIn 150ms ease-out",
           }}
           className="md:hidden"
         >
@@ -248,13 +255,12 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 fontSize: "10.5px",
                 fontWeight: 700,
                 textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                color: "var(--ink3, #71807A)",
+                letterSpacing: "0.08em",
+                color: "var(--ink3)",
                 marginBottom: "4px",
-                paddingLeft: "8px",
               }}
             >
-              Navigation
+              Section Jump
             </span>
             {SECTION_LINKS.map((link) => (
               <a
@@ -262,52 +268,85 @@ export default function MarketingHeader({ onOpenTour }: MarketingHeaderProps) {
                 href={`#${link.id}`}
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  background:
+                    activeSection === link.id
+                      ? "var(--surface-green)"
+                      : "transparent",
+                  color:
+                    activeSection === link.id
+                      ? "var(--heading-primary)"
+                      : "var(--ink)",
+                  fontWeight: activeSection === link.id ? 600 : 500,
+                  fontSize: "14px",
+                  textDecoration: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "12px 14px",
-                  borderRadius: "10px",
-                  fontSize: "14px",
-                  fontWeight: activeSection === link.id ? 600 : 500,
-                  color: "var(--ink, #263A35)",
-                  background:
-                    activeSection === link.id
-                      ? "var(--surface-green, #E8F1EE)"
-                      : "transparent",
-                  textDecoration: "none",
                 }}
               >
-                {link.label}
-                <ArrowRight size={14} style={{ opacity: 0.6 }} />
+                <span>{link.label}</span>
+                {activeSection === link.id && (
+                  <span
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "var(--brand)",
+                    }}
+                  />
+                )}
               </a>
             ))}
           </div>
 
           <div
             style={{
-              marginTop: "auto",
-              paddingTop: "20px",
-              borderTop: "1px solid var(--line, #DCE3E0)",
+              paddingTop: "16px",
+              borderTop: "1px solid var(--line)",
               display: "flex",
               flexDirection: "column",
               gap: "10px",
             }}
           >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 6px" }}>
+              <span style={{ fontSize: "13px", color: "var(--ink2)", fontWeight: 500 }}>Color Theme</span>
+              <ThemeSelector compact={false} />
+            </div>
+
             <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="btn-pill-secondary"
-              style={{ width: "100%", justifyContent: "center" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "40px",
+                borderRadius: "9999px",
+                border: "1px solid var(--line)",
+                background: "var(--surface)",
+                color: "var(--ink)",
+                fontWeight: 500,
+                fontSize: "13.5px",
+                textDecoration: "none",
+              }}
             >
-              Sign in to Workspace
+              Sign In (4 Judge Demo Accounts)
             </Link>
+
             <Link
               href="/cockpit/TASK9142"
               onClick={() => setMobileMenuOpen(false)}
               className="btn-pill-primary"
-              style={{ width: "100%", justifyContent: "center" }}
+              style={{
+                height: "40px",
+                fontSize: "13.5px",
+                width: "100%",
+              }}
             >
-              Launch Live Cockpit
+              <span>Launch Live Cockpit</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
         </div>

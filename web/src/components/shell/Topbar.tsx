@@ -8,6 +8,8 @@ import { useTheme } from "@/lib/theme";
 import { ROLES } from "@/lib/roles";
 import { MOCK_CATALOG } from "@/lib/mockData";
 import TourGuideModal from "./TourGuideModal";
+import ThemeSelector from "@/components/common/ThemeSelector";
+import { SentinelLogo } from "@/components/copilot/SentinelAssistant";
 
 interface TopbarProps {
   onOpenCommandPalette: () => void;
@@ -493,19 +495,20 @@ export default function Topbar({
         Public Site
       </Link>
 
-      {/* Clean AI Co-Pilot top-bar button */}
+      {/* Sentinel AI Assistant Topbar Trigger */}
       <button
         type="button"
         className="btn sec"
         onClick={onToggleCopilot}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "7px" }}
       >
-        <svg className="i" viewBox="0 0 24 24">
-          <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
-          <path d="M19 15l.7 1.8L21.5 17.5l-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z" />
-        </svg>
-        AI Co-Pilot <span className="dot" style={{ marginLeft: "2px" }} />
+        <SentinelLogo size={16} />
+        <span>Sentinel AI</span>
+        <span className="dot" style={{ marginLeft: "2px" }} />
       </button>
+
+      {/* Accessible Theme Selector (Light / Dark / System) */}
+      <ThemeSelector compact={true} />
 
       {/* Working Notification Bell Dropdown */}
       <div style={{ position: "relative" }} ref={notifRef}>

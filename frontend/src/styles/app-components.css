@@ -249,7 +249,7 @@ section[id] {
   height: 40px;
   padding: 0 20px;
   border-radius: 9999px;
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--f-ui);
   font-size: 13.5px;
@@ -258,13 +258,13 @@ section[id] {
   border: 1px solid var(--line);
   cursor: pointer;
   transition: all 180ms ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-pill-secondary:hover {
   background: var(--surface-green);
   border-color: var(--line-strong);
-  color: var(--ink);
+  color: var(--heading-primary);
   transform: translateY(-1px);
 }
 
@@ -284,7 +284,7 @@ section[id] {
 
 .nav-pill:hover {
   background: var(--surface-green);
-  color: var(--ink);
+  color: var(--heading-primary);
 }
 
 .nav-pill.active {
@@ -292,3 +292,48 @@ section[id] {
   color: var(--heading-primary);
   font-weight: 600;
 }
+
+/* Sentinel Assistant & Launcher Polish */
+.sentinel-launcher-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(0,0,0,0.18));
+  border-color: var(--brand);
+}
+
+.sentinel-launcher-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .sentinel-window {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    top: auto !important;
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    height: 80vh !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

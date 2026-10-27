@@ -801,14 +801,14 @@ export default function HeroShowcaseTriad() {
                     overflowX: "auto",
                   }}
                 >
-                  <div style={{ color: "#B42318", background: "rgba(180, 35, 24, 0.08)", padding: "1px 4px" }}>
+                  <div style={{ color: "var(--fail)", background: "rgba(180, 35, 24, 0.08)", padding: "1px 4px" }}>
                     {selectedFinding.patchDiff.del}
                   </div>
                   {selectedFinding.patchDiff.add.map((line, idx) => (
                     <div
                       key={idx}
                       style={{
-                        color: "#167A58",
+                        color: "var(--pass)",
                         background: "rgba(22, 122, 88, 0.08)",
                         padding: "1px 4px",
                         fontWeight: 600,
@@ -830,16 +830,16 @@ export default function HeroShowcaseTriad() {
                   fontFamily: "var(--f-mono)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#167A58" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--pass)" }}>
                   <CheckCircle2 size={11} /> AST Syntax Pass
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#167A58" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--pass)" }}>
                   <CheckCircle2 size={11} /> Linter Clean
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#167A58" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--pass)" }}>
                   <CheckCircle2 size={11} /> DAST Replay Pass
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#167A58" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--pass)" }}>
                   <CheckCircle2 size={11} /> Merkle Chained
                 </div>
               </div>

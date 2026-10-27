@@ -1,28 +1,10 @@
-/* ProofStack Design Tokens — Permanent Semgrep-Inspired Light Cybersecurity System
-   Palette Reference: Semgrep Screenshot Direction
-   - Background: #FAFAFA
-   - Primary Surface: #FFFFFF
-   - Soft Green Surface: #E8F1EE
-   - Subtle Warm Surface: #F4E8DC
-   - Subtle Cool Surface: #EAEBF5
-   - Primary Heading: #344E48 (dark green-charcoal, elegant regular/medium weight)
-   - Secondary Heading Accent: #5E7D73 (muted green-gray)
-   - Primary Text: #263A35
-   - Body Text: #42534E
-   - Muted Text: #71807A
-   - Brand Accent: #20C9A6 (bright mint green / cyan-mint for pill actions)
-   - Brand Hover: #17AF91
-   - Brand Dark / Ink: #172E27
-   - Borders: #DCE3E0
-   - Subtle Borders: #EDF2F0
-   - Status: Pass #167A58 / #20C9A6, Fail #B42318, Warning #9A6700
+/* ProofStack Design Tokens — Semgrep-Inspired Cyber Light & Deliberate Dark System
+   Supporting Light, Dark, and OS System Preferences
 */
 
 :root,
 [data-theme="light"],
-[data-theme="dark"],
-[data-palette="proofstack-light"],
-[data-palette="cobalt-ledger"] {
+.light {
   --bg: #FAFAFA;
   --surface: #FFFFFF;
   --surface2: #F1F4F0;
@@ -61,6 +43,9 @@
   --term-fail: #E5534B;
   --term-warn: #DFA030;
   --term-info: #20C9A6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.03);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.06);
   --f-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --f-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --f-mono: 'JetBrains Mono', 'DejaVu Sans Mono', Consolas, monospace;
@@ -69,38 +54,67 @@
   --radius-inner: 8px;
 }
 
-/* Light Palette overrides maintaining permanent light mode across all historical palette identifiers */
-[data-palette="sage-walnut"],
-[data-palette="blush-jet"],
-[data-palette="black-magenta"],
-[data-palette="charcoal-silver"],
-[data-palette="jet-amethyst-cyan"],
-[data-palette="beige-forest-citrus"],
-[data-palette="white-charcoal-taupe"],
-[data-palette="ivory-scarlet"],
-[data-palette="trueblue-jade"],
-[data-palette="cyan-ink"] {
-  --bg: #FAFAF8;
+/* Deliberate Dark Theme */
+[data-theme="dark"],
+.dark {
+  --bg: #0C1210;
+  --surface: #141E1B;
+  --surface2: #1B2924;
+  --surface-green: #172D25;
+  --surface-warm: #26211A;
+  --surface-cool: #181E29;
+  --line: #243831;
+  --line-strong: #334E45;
+  --line-subtle: #192722;
+  --heading-primary: #F0F7F4;
+  --heading-secondary: #98B3AA;
+  --ink: #E2ECE8;
+  --ink2: #A5BCB4;
+  --ink3: #728A82;
+  --brand: #20C9A6;
+  --brand-hover: #2AE4BD;
+  --brand-dark: #0A1310;
+  --brand-surface: #172D25;
+  --brand-ink: #0C1210;
+  --accent: #20C9A6;
+  --accent-hover: #2AE4BD;
+  --accent-ink: #0C1210;
+  --support: #E2ECE8;
+  --side: #0F1714;
+  --side-ink: #E2ECE8;
+  --side-mute: #98B3AA;
+  --side-line: #243831;
+  --pass: #20C9A6;
+  --pass-bright: #34E8C2;
+  --fail: #F87171;
+  --warn: #FBBF24;
+  --term-bg: #080D0B;
+  --term-ink: #E1EBE7;
+  --term-mute: #6C827A;
+  --term-pass: #20C9A6;
+  --term-fail: #F87171;
+  --term-warn: #FBBF24;
+  --term-info: #38BDF8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.5);
+}
+
+/* Palette Variations for Light Mode */
+[data-theme="light"][data-palette="cobalt-ledger"] {
+  --bg: #F6F1E6;
   --surface: #FFFFFF;
-  --surface2: #F1F4F0;
-  --line: #E3E8E3;
-  --line-strong: #CCD4CC;
-  --ink: #17211D;
-  --ink2: #59655F;
-  --ink3: #737D77;
-  --brand: #167A58;
-  --brand-hover: #116447;
-  --brand-surface: #EAF4EE;
-  --brand-ink: #FFFFFF;
-  --accent: #167A58;
-  --accent-hover: #116447;
-  --accent-ink: #FFFFFF;
-  --support: #17211D;
-  --side: #FAFAF8;
-  --side-ink: #17211D;
-  --side-mute: #59655F;
-  --side-line: #E3E8E3;
-  --pass: #167A58;
-  --fail: #B42318;
-  --warn: #9A6700;
+  --line: #E2DAC8;
+  --ink: #1B1F2A;
+  --brand: #1F3FBF;
+  --accent: #F26B1D;
+}
+
+[data-theme="light"][data-palette="sage-walnut"] {
+  --bg: #EDEFE3;
+  --surface: #F8F9F3;
+  --line: #D8DEC9;
+  --ink: #2A2620;
+  --brand: #4A6A4F;
+  --accent: #E8A33D;
 }

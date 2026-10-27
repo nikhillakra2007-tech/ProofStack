@@ -5,7 +5,8 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
 [![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://proofstack-cockpit.vercel.app)
 [![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app/ledger)
-[![Design System](https://img.shields.io/badge/Design_System-Semgrep_Light_V2-20C9A6?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app)
+[![Design System](https://img.shields.io/badge/Design_System-Light_|_Dark_|_System-20C9A6?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app)
+[![Sentinel AI](https://img.shields.io/badge/AI_Copilot-Sentinel_Movable_Assistant-10B981?style=for-the-badge&logo=probot&logoColor=white)](https://proofstack-cockpit.vercel.app)
 
 > **Autonomous Verification Engine with Zero-Compromise Gate, Live-Target DAST & Merkle Ledger**  
 > *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*  
@@ -19,7 +20,8 @@
 
 | View | Live Production URL | Description |
 | :--- | :--- | :--- |
-| **🏠 Platform Landing (V2)** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Semgrep-inspired V2 showcase, 3-panel coordinated hero triad, interactive DAST lab |
+| **🏠 Platform Landing** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Concise cybersecurity SaaS landing, 3-panel hero triad, interactive DAST lab, Sentinel AI launcher |
+| **🤖 Sentinel AI Copilot** | **[proofstack-cockpit.vercel.app](https://proofstack-cockpit.vercel.app)** | Movable, draggable AI assistant with multi-session history & Nemotron AST fix synthesis |
 | **📊 Operations Dashboard** | **[proofstack-cockpit.vercel.app/dashboard](https://proofstack-cockpit.vercel.app/dashboard)** | Real-time telemetry, remediation throughput, active task monitoring |
 | **🕹️ Remediation Cockpit** | **[proofstack-cockpit.vercel.app/cockpit/TASK9142](https://proofstack-cockpit.vercel.app/cockpit/TASK9142)** | 6-tab deep cockpit with Monaco side-by-side diff & 8-gate interlock |
 | **🔬 Interactive Studio** | **[proofstack-cockpit.vercel.app/studio](https://proofstack-cockpit.vercel.app/studio)** | Code repair playground with live AST verification and telemetry |
@@ -32,31 +34,31 @@
 
 ---
 
-## 🎯 V2 Semgrep-Inspired Design Architecture
+## 🎯 Architecture & User Experience
 
-ProofStack's public interface was completely re-architected following the aesthetic and visual hierarchy of modern cybersecurity leaders like [Semgrep](https://semgrep.dev/):
+ProofStack's public interface and cockpit are engineered for maximum signal, strict visual hierarchy, and instant comprehension:
 
-### 1. Coordinated 3-Panel Hero Showcase Triad
-Positioned directly beneath the centered hero headline, this prominent triad spans the viewport width with layered visual depth:
-- **Panel 1 — Security Overview (Left, ~28%)**: Displays fleet posture rating (`98.4/100`), scan throughput, segmented severity distribution (3 Critical, 4 High, 6 Medium, 8 Remediated), 8-gate verification status (`8/8 PASS`), and cryptographic Merkle proof block height (`#142`).
-- **Panel 2 — Findings Explorer (Center Primary Focal Point, ~42%)**: Clean, readable table displaying active vulnerability findings with verified CWE IDs (CWE-89, CWE-22, CWE-79, CWE-798), CVSS scores, affected files, line numbers, and live search/status filters. Clicking any row interactively updates Panel 3.
+### 1. Sentinel AI — Movable, Floating Assistant
+- **Distinct Cybersecurity Identity**: Named **Sentinel AI** with an original neural-shield SVG insignia (`#20C9A6` and `#344E48`).
+- **Floating Launcher**: Fixed bottom-right launcher with accessible focus rings, status pip, and hover tooltip.
+- **Draggable & Viewport Constrained**: Movable panel draggable via its header with pointer capture, strict boundary constraints preventing off-screen movement, and automatic window-resize repositioning.
+- **Responsive Sheet**: Automatically collapses to a full-width bottom sheet on mobile screens (`< 640px`) with touch-friendly handles.
+- **Real Multi-Session Interaction**: Preserves chat histories, session switching, error states, and inline Nemotron 70B verified AST patch cards.
+
+### 2. Complete Light, Dark & System Theme System
+- **3-Mode Preference**: Seamlessly toggle between **Light**, **Dark**, and **System Default** (synced with OS `prefers-color-scheme`).
+- **Semantic Color Tokens**: Deep charcoal-mint surfaces (`#0C1210` / `#141E1B`) in dark mode, Semgrep warm off-white (`#FAFAF8`) in light mode. Zero neon glare or pure black.
+- **Accessible Controls**: Embedded theme toggles in the marketing header, authenticated topbar, and settings appearance tab with instant persistence in `localStorage`.
+
+### 3. Coordinated 3-Panel Hero Showcase Triad
+- **Panel 1 — Security Overview (Left, ~28%)**: Fleeting posture rating (`98.4/100`), scan throughput, segmented severity distribution, 8-gate verification status (`8/8 PASS`), and cryptographic block height (`#142`).
+- **Panel 2 — Findings Explorer (Center Primary Focal Point, ~42%)**: Clean, readable table displaying active vulnerability findings with verified CWE IDs (CWE-89, CWE-22, CWE-79, CWE-798), CVSS scores, affected files, line numbers, and live search/status filters.
 - **Panel 3 — Evidence & AI Remediation (Right, ~30%)**: Displays live exploit oracle evidence, Nemotron 70B's synthesized AST unified diff with zero hallucinations, 8-gate deterministic checklist, and a deep link to the Cockpit.
 
-### 2. Interactive DAST Probing Lab
-- A functional terminal panel demonstrating ProofStack's dynamic exploit verification.
-- **Live Probe Execution**: Interactive button simulating real-time exploit execution against ephemeral container targets.
-- **Payload vs. Response Diff**: Toggleable tabs comparing raw HTTP request payloads against dynamic vulnerability assertions.
-- **1-Click Copy**: Instant clipboard copy for reproducible bash curl commands.
-
-### 3. Split-Pane Cockpit Showcase
-- Multi-tabbed workspace preview showing the **Remediation Cockpit**, **Custom Rule Studio** (YAML/AST pattern syntax), and **Live DAST Ephemeral Pods**.
-- Features an interactive toggle between **Pre-Patch Baseline** (raw vulnerable SQL concatenation) and **Nemotron AST Patch** (`cursor.execute(query, params)`).
-
-### 4. Custom Geometric Brand Identity & Smooth Navigation
-- **Custom Brand Logo**: Custom SVG mark featuring an outer protective shield (`#344E48`), neural synthesis node graph (`#20C9A6`), and cryptographic verification diamond (`#5E7D73`).
-- **Semgrep Light Palette**: Built on `#FAFAFA` neutral background, `#FFFFFF` rounded card surfaces, `#344E48` forest headings, `#5E7D73` muted sage subheadings, and `#20C9A6` mint accents. 100% light-mode permanent.
-- **Lenis Smooth Motion**: Inertia scrolling with full SSR safety and `prefers-reduced-motion` compliance.
-- **Sticky Header & Scroll-Spy**: 60px fixed header with IntersectionObserver section tracking and offset-adjusted anchor jumps.
+### 4. Interactive DAST Probing Lab & 4-Step Pipeline
+- **Interactive Probing Lab**: Run live simulated curl dynamic exploit requests with real-time response payload assertions.
+- **4-Step Pipeline**: Explains Discovery & AST Parsing -> Dynamic Ephemeral DAST -> Nemotron Remediation -> Merkle Ledger Notarization in a tight, scannable format.
+- **Lenis Smooth Motion**: Butter-smooth inertia scrolling with fixed header offset (`-76px`) and `prefers-reduced-motion` compliance.
 
 ---
 
