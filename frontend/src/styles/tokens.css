@@ -1,77 +1,83 @@
 /* ProofStack Design Tokens — Calm Professional Security Design System
    WCAG 2.2 AA Compliant Contrast in Light, Dark, and High-Contrast Modes
+   NVIDIA MODEL Premium Cybersecurity Palette
 */
 
 :root,
 [data-theme="light"],
 .light {
   /* Canvas & Elevated Surfaces */
-  --bg: #F8FAFC;
-  --bg-canvas: #F8FAFC;
+  --bg: #F5F7FA;
+  --bg-canvas: #F5F7FA;
   --surface: #FFFFFF;
-  --surface2: #F1F4F0;
+  --surface2: #EEF2F6;
   --surface3: #E2E8F0;
   --surface-raised: #FFFFFF;
-  --surface-green: #E6F4F1;
-  --surface-warm: #FDF6EE;
+  --surface-green: #F0F8E6;
+  --surface-warm: #FDF8EE;
   --surface-cool: #F0F4F8;
   --card-bg: #FFFFFF;
 
   /* Line & Separation Borders */
-  --line: #E2E8F0;
+  --line: #DCE3EC;
   --line-strong: #CBD5E1;
-  --line-subtle: #F1F5F9;
+  --line-subtle: #EEF2F6;
 
   /* Typography & Contrast Hierarchy */
-  --heading-primary: #0F172A;
+  --heading-primary: #172033;
   --heading-secondary: #334155;
-  --heading-color: #0F172A;
-  --ink: #0F172A;
-  --ink2: #334155;
-  --ink3: #64748B;
-  --ink-secondary: #334155;
+  --heading-color: #172033;
+  --ink: #172033;
+  --ink2: #586579;
+  --ink3: #8392A5;
+  --ink-secondary: #586579;
   --ink-body: #334155;
-  --ink-muted: #64748B;
+  --ink-muted: #8392A5;
   --body-color: #334155;
 
-  /* Primary Brand & Actions (Teal / Turquoise) */
-  --brand: #0D9488;
-  --brand-hover: #0F766E;
-  --brand-dark: #115E59;
-  --brand-surface: #E6F4F1;
+  /* Primary Brand & Actions (NVIDIA-Inspired Green & Deep Accents) */
+  --brand: #76B900;
+  --brand-hover: #5F9500;
+  --brand-dark: #477A00;
+  --brand-surface: #F0F8E6;
   --brand-ink: #FFFFFF;
-  --primary: #0D9488;
-  --primary-hover: #0F766E;
-  --primary-glow: rgba(13, 148, 136, 0.15);
-  --accent: #0D9488;
-  --accent-hover: #0F766E;
+  --primary: #76B900;
+  --primary-hover: #5F9500;
+  --primary-glow: rgba(118, 185, 0, 0.20);
+  --accent: #76B900;
+  --accent-hover: #5F9500;
   --accent-ink: #FFFFFF;
-  --support: #0F172A;
+  --support: #172033;
+
+  /* Secondary Technical Accent */
+  --accent-teal: #0F766E;
+  --accent-teal-hover: #115E59;
+  --accent-teal-surface: #E6F4F1;
 
   /* Sidebar Tokens */
   --side: #F8FAFC;
-  --side-ink: #0F172A;
-  --side-mute: #64748B;
-  --side-line: #E2E8F0;
+  --side-ink: #172033;
+  --side-mute: #586579;
+  --side-line: #DCE3EC;
 
-  /* Semantic State Indicators (Color + Icon/Label) */
-  --pass: #059669;
+  /* Semantic State Indicators */
+  --pass: #16845B;
   --pass-bright: #10B981;
-  --fail: #DC2626;
-  --warn: #B45309;
+  --fail: #C2414B;
+  --warn: #B7791F;
   --info: #0284C7;
 
   /* Color Palette Accents */
   --azure: #0369A1;
   --cyan: #0284C7;
-  --emerald: #059669;
-  --lime: #16A34A;
-  --gold: #D97706;
-  --amber: #B45309;
+  --emerald: #16845B;
+  --lime: #76B900;
+  --gold: #B7791F;
+  --amber: #B7791F;
   --violet: #6366F1;
-  --rose: #DC2626;
-  --crimson: #DC2626;
-  --fawn: #0D9488;
+  --rose: #C2414B;
+  --crimson: #C2414B;
+  --fawn: #76B900;
 
   /* Terminal Colors */
   --term-bg: #0F172A;
@@ -83,14 +89,24 @@
   --term-info: #38BDF8;
 
   /* Secondary Button Tokens */
-  --btn-sec-bg: #F1F5F9;
-  --btn-sec-color: #0F172A;
-  --btn-sec-border: #CBD5E1;
+  --btn-sec-bg: #EEF2F6;
+  --btn-sec-color: #172033;
+  --btn-sec-border: #DCE3EC;
+
+  /* Studio Workspace & Component Aliases */
+  --surface-base: var(--surface);
+  --surface-elevated: var(--surface-raised);
+  --surface-sunken: var(--surface2);
+  --border-subtle: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink2);
+  --text-muted: var(--ink3);
+  --status-danger: var(--fail);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(23, 32, 51, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(23, 32, 51, 0.07), 0 2px 4px -2px rgba(23, 32, 51, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(23, 32, 51, 0.08), 0 4px 6px -4px rgba(23, 32, 51, 0.03);
 
   /* Typography Scales */
   --f-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -103,31 +119,31 @@
   --radius-inner: 8px;
 }
 
-/* Deliberate Deep Slate / Navy Dark Theme */
+/* Deliberate Deep Charcoal / Blue-Black Dark Theme */
 [data-theme="dark"],
 .dark {
   /* Canvas & Elevated Surfaces */
-  --bg: #0A0F1D;
-  --bg-canvas: #0A0F1D;
-  --surface: #111C32;
-  --surface2: #182642;
-  --surface3: #1F3255;
-  --surface-raised: #182642;
-  --surface-green: #0E2922;
+  --bg: #070B14;
+  --bg-canvas: #070B14;
+  --surface: #0E1729;
+  --surface2: #131F36;
+  --surface3: #1A2946;
+  --surface-raised: #131F36;
+  --surface-green: #0E2918;
   --surface-warm: #261F17;
-  --surface-cool: #132238;
-  --card-bg: #111C32;
+  --surface-cool: #111A2E;
+  --card-bg: #0E1729;
 
   /* Line & Separation Borders */
-  --line: #1E2D4A;
-  --line-strong: #2D4268;
-  --line-subtle: #162238;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(118, 185, 0, 0.28);
+  --line-subtle: rgba(255, 255, 255, 0.05);
 
   /* Typography & Contrast Hierarchy */
   --heading-primary: #F8FAFC;
   --heading-secondary: #CBD5E1;
   --heading-color: #F8FAFC;
-  --ink: #F1F5F9;
+  --ink: #F8FAFC;
   --ink2: #94A3B8;
   --ink3: #64748B;
   --ink-secondary: #CBD5E1;
@@ -135,25 +151,30 @@
   --ink-muted: #64748B;
   --body-color: #94A3B8;
 
-  /* Primary Brand & Actions (Soft Teal / Turquoise) */
-  --brand: #14B8A6;
-  --brand-hover: #2DD4BF;
-  --brand-dark: #0F172A;
-  --brand-surface: #0E2922;
-  --brand-ink: #042F2E;
-  --primary: #14B8A6;
-  --primary-hover: #2DD4BF;
-  --primary-glow: rgba(20, 184, 166, 0.25);
-  --accent: #14B8A6;
-  --accent-hover: #2DD4BF;
-  --accent-ink: #042F2E;
-  --support: #F1F5F9;
+  /* Primary Brand & Actions (NVIDIA Green Accents) */
+  --brand: #76B900;
+  --brand-hover: #8BD600;
+  --brand-dark: #477A00;
+  --brand-surface: #0E2918;
+  --brand-ink: #070B14;
+  --primary: #76B900;
+  --primary-hover: #8BD600;
+  --primary-glow: rgba(118, 185, 0, 0.25);
+  --accent: #76B900;
+  --accent-hover: #8BD600;
+  --accent-ink: #070B14;
+  --support: #F8FAFC;
+
+  /* Secondary Technical Accent */
+  --accent-teal: #14B8A6;
+  --accent-teal-hover: #2DD4BF;
+  --accent-teal-surface: #0E2922;
 
   /* Sidebar Tokens */
-  --side: #0C1324;
-  --side-ink: #F1F5F9;
+  --side: #0A0F1D;
+  --side-ink: #F8FAFC;
   --side-mute: #94A3B8;
-  --side-line: #1E2D4A;
+  --side-line: rgba(255, 255, 255, 0.08);
 
   /* Semantic State Indicators */
   --pass: #10B981;
@@ -166,16 +187,16 @@
   --azure: #38BDF8;
   --cyan: #38BDF8;
   --emerald: #10B981;
-  --lime: #34D399;
+  --lime: #76B900;
   --gold: #F59E0B;
   --amber: #F59E0B;
   --violet: #818CF8;
   --rose: #F87171;
   --crimson: #EF4444;
-  --fawn: #14B8A6;
+  --fawn: #76B900;
 
   /* Terminal Colors */
-  --term-bg: #070B14;
+  --term-bg: #050810;
   --term-ink: #E2E8F0;
   --term-mute: #64748B;
   --term-pass: #10B981;
@@ -184,12 +205,22 @@
   --term-info: #38BDF8;
 
   /* Secondary Button Tokens */
-  --btn-sec-bg: #182642;
-  --btn-sec-color: #F1F5F9;
-  --btn-sec-border: #2D4268;
+  --btn-sec-bg: #131F36;
+  --btn-sec-color: #F8FAFC;
+  --btn-sec-border: rgba(255, 255, 255, 0.12);
+
+  /* Studio Workspace & Component Aliases */
+  --surface-base: var(--surface);
+  --surface-elevated: var(--surface-raised);
+  --surface-sunken: var(--surface2);
+  --border-subtle: var(--line);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink2);
+  --text-muted: var(--ink3);
+  --status-danger: var(--fail);
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 14px 36px 0 rgba(0, 0, 0, 0.55);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 14px 36px 0 rgba(0, 0, 0, 0.65);
 }
