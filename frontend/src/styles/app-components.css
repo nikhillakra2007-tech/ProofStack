@@ -652,4 +652,37 @@ html.lenis, html.lenis body {
   }
 }
 
+/* ===== Responsive 12-Column Grid Helpers for 3-Panel Hero Showcase Triad ===== */
+@media (min-width: 1024px) {
+  .lg\:col-span-3 {
+    grid-column: span 3 / span 3 !important;
+  }
+  .lg\:col-span-4 {
+    grid-column: span 4 / span 4 !important;
+  }
+  .lg\:col-span-5 {
+    grid-column: span 5 / span 5 !important;
+  }
+  .lg\:col-span-6 {
+    grid-column: span 6 / span 6 !important;
+  }
+  .lg\:col-span-7 {
+    grid-column: span 7 / span 7 !important;
+  }
+  .lg\:col-span-8 {
+    grid-column: span 8 / span 8 !important;
+  }
+  .lg\:col-span-12 {
+    grid-column: span 12 / span 12 !important;
+  }
+}
 
+.card-interactive-hover {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease;
+}
+
+.card-interactive-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong, var(--brand));
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.08));
+}
