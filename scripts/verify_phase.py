@@ -61,6 +61,10 @@ def main():
             name, cmd = item
             cwd = root_dir
 
+        if "Frontend Production Build" in name:
+            import shutil
+            shutil.rmtree(os.path.join(root_dir, cwd, ".next"), ignore_errors=True)
+
         success = run_step(name, cmd, cwd=cwd)
         if not success:
             failed.append(name)
