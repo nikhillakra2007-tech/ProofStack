@@ -4,8 +4,8 @@
 .ps { --f-display:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; --f-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; --f-mono:'JetBrains Mono','DejaVu Sans Mono',Consolas,monospace;
   --term-bg:#12151F; --term-ink:#D9DDEA; --term-mute:#7C8398; --term-pass:#167A58; --term-fail:#B42318; --term-warn:#9A6700; --term-info:#167A58;
   font-family:var(--f-ui); font-size:13px; line-height:1.45; color:var(--ink); background:var(--bg);
-  width:1440px; height:900px; position:relative; overflow:hidden; display:grid; grid-template-columns:var(--side-w,248px) minmax(0,1fr); font-feature-settings:"tnum" 1,"cv11" 1; }
-.ps.nosidebar{display:block}
+  width:100%; max-width:100vw; min-width:0; min-height:100vh; height:100vh; position:relative; overflow:hidden; display:grid; grid-template-columns:var(--side-w,248px) minmax(0,1fr); font-feature-settings:"tnum" 1,"cv11" 1; }
+.ps.nosidebar{display:block;width:100%;min-height:100vh;height:auto}
 .ps svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .ps .mono{font-family:var(--f-mono)}
 .ps .disp{font-family:var(--f-display)}
@@ -37,7 +37,7 @@
 .usercard .i{margin-left:auto;color:var(--side-mute)}
 
 /* main column */
-.main{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:56px minmax(0,1fr) 34px;min-width:0;min-height:0;height:900px}
+.main{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:56px minmax(0,1fr) 34px;min-width:0;min-height:0;height:100%}
 .top{display:flex;align-items:center;gap:14px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
 .crumb{font-size:12.5px;color:var(--ink2);display:flex;gap:8px;align-items:center;white-space:nowrap;flex:none}
 .crumb b{color:var(--ink);font-weight:600}
@@ -46,7 +46,7 @@
 .iconbtn{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink2);position:relative;cursor:pointer;transition:background 120ms ease,border-color 120ms ease}
 .iconbtn:hover{background:var(--surface2);border-color:var(--line-strong,var(--line))}
 .iconbtn .pip{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);border:1.5px solid var(--surface)}
-.page{padding:18px 28px 14px;overflow:hidden;min-height:0;position:relative}
+.page{padding:18px 28px 14px;overflow-y:auto;overflow-x:hidden;min-height:0;position:relative;-webkit-overflow-scrolling:touch}
 .foot{height:34px;flex:none;display:flex;align-items:center;gap:18px;padding:0 28px;border-top:1px solid var(--line);font:500 11px var(--f-mono);color:var(--ink2);background:var(--bg)}
 .foot .sp{margin-left:auto}
 .foot span{display:flex;align-items:center;gap:6px}

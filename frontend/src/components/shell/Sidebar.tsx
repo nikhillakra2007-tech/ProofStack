@@ -77,7 +77,8 @@ export default function Sidebar({
     switchMember(member.id);
     setIsSwitcherOpen(false);
     if (onCloseMobile) onCloseMobile();
-    router.push("/dashboard");
+    const targetRoute = ROLES[member.role]?.primaryRoute || "/dashboard";
+    router.push(targetRoute);
   };
 
   // Strict link visibility rules:
@@ -216,6 +217,35 @@ export default function Sidebar({
           </svg>
           {!isCollapsed && <span>Dashboard</span>}
         </Link>
+
+        {/* Dedicated Role Portal */}
+        {roleDef.primaryRoute && (
+          <Link
+            href={roleDef.primaryRoute}
+            className={`nav ${isRouteActive(roleDef.primaryRoute) ? "on" : ""}`}
+            title={isCollapsed ? `${roleDef.label} Portal` : undefined}
+            onClick={onCloseMobile}
+            style={{
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              padding: isCollapsed ? "0" : "0 10px",
+            }}
+          >
+            <svg className="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            {!isCollapsed && (
+              <span>
+                {role === "super_admin"
+                  ? "CISO Portal"
+                  : role === "admin"
+                  ? "Admin Portal"
+                  : role === "auditor"
+                  ? "Auditor Portal"
+                  : "Developer Portal"}
+              </span>
+            )}
+          </Link>
+        )}
 
         {/* 2. Studio (Developer ONLY) */}
         {showStudio && (

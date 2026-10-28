@@ -18,29 +18,30 @@ html, body {
 }
 
 :root,
-[data-theme="light"] {
-  --bg-canvas: #F6F3EC;
-  --bg-surface: #FFFFFF;
-  --bg-surface2: #F0EDE6;
-  --bg-card: #FFFFFF;
-  --heading-color: #0F172A;
-  --body-color: #334155;
-  --btn-sec-bg: #EFECE6;
-  --btn-sec-color: #0F172A;
-  --btn-sec-border: #D8D3C8;
+[data-theme="light"],
+.light {
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-surface2: var(--surface2);
+  --bg-card: var(--surface);
+  --heading-color: var(--heading-primary);
+  --body-color: var(--ink2);
+  --btn-sec-bg: var(--surface2);
+  --btn-sec-color: var(--ink);
+  --btn-sec-border: var(--line);
 }
 
 [data-theme="dark"],
 .dark {
-  --bg-canvas: #0B111E;
-  --bg-surface: #0F172A;
-  --bg-surface2: #1E293B;
-  --bg-card: #1E293B;
-  --heading-color: #F8FAFC;
-  --body-color: #94A3B8;
-  --btn-sec-bg: #1E293B;
-  --btn-sec-color: #F8FAFC;
-  --btn-sec-border: #334155;
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-surface2: var(--surface2);
+  --bg-card: var(--surface);
+  --heading-color: var(--heading-primary);
+  --body-color: var(--ink2);
+  --btn-sec-bg: var(--surface2);
+  --btn-sec-color: var(--ink);
+  --btn-sec-border: var(--line-strong);
 }
 
 html, body {
@@ -48,8 +49,8 @@ html, body {
   padding: 0;
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-canvas);
-  color: var(--body-color);
+  background-color: var(--bg);
+  color: var(--ink);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 13.5px;
   line-height: 1.5;
@@ -58,29 +59,21 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Strict Dark Mode Overrides */
-html[data-theme="dark"],
-body[data-theme="dark"],
-[data-theme="dark"] body,
-.dark body {
-  background-color: #0B111E !important;
-  color: #F8FAFC !important;
-}
-
+/* Consistent Theme Surface Styling */
 [data-theme="dark"] .ps,
 [data-theme="dark"] .app-frame,
 [data-theme="dark"] .main,
 [data-theme="dark"] .page,
 [data-theme="dark"] .page-container,
 [data-theme="dark"] .workspace-bg {
-  background-color: #0B111E !important;
-  color: #F8FAFC !important;
+  background-color: var(--bg);
+  color: var(--ink);
 }
 
 [data-theme="dark"] .top,
 [data-theme="dark"] header.top {
-  background-color: #0F172A !important;
-  border-bottom: 1px solid #1E293B !important;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
 /* Headings Contrast Rules */
@@ -116,34 +109,34 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
 [data-theme="dark"] .btn.sec,
 [data-theme="dark"] .btn.sm.sec,
 [data-theme="dark"] .btn-secondary {
-  background-color: #1E293B !important;
-  color: #F8FAFC !important;
-  border: 1px solid #334155 !important;
+  background-color: var(--surface2) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line-strong) !important;
 }
 
 [data-theme="dark"] .btn.sec:hover,
 [data-theme="dark"] .btn.sm.sec:hover,
 [data-theme="dark"] .top .btn:hover {
-  background-color: #334155 !important;
-  border-color: #475569 !important;
+  background-color: var(--surface3, #1F3255) !important;
+  border-color: var(--brand) !important;
 }
 
 [data-theme="dark"] .card {
-  background-color: #0F172A !important;
-  border-color: #1E293B !important;
+  background-color: var(--surface) !important;
+  border-color: var(--line) !important;
 }
 
 [data-theme="dark"] .card b,
 [data-theme="dark"] .card strong,
 [data-theme="dark"] b,
 [data-theme="dark"] strong {
-  color: #F8FAFC;
+  color: var(--ink);
 }
 
 [data-theme="dark"] .sub,
 [data-theme="dark"] .eyebrow,
 [data-theme="dark"] p {
-  color: #94A3B8;
+  color: var(--ink2);
 }
 
 /* Universal Typography & Form Controls */
@@ -584,22 +577,18 @@ a:focus-visible {
   .dashboard-metrics-grid,
   .studio-split-grid,
   .control-plane-grid,
-  .cockpit-viewports-grid {
+  .cockpit-viewports-grid,
+  .grid-mobile-1col {
     grid-template-columns: 1fr !important;
   }
 
-  /* Force 3-column and 2-column layouts to single-column on mobile phones */
-  .grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Table horizontal scroll wrapper for data tables */
-  .table-responsive,
-  table {
+  /* Table horizontal scroll wrapper for data tables without breaking table semantics */
+  .table-responsive {
     display: block !important;
     width: 100% !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
   }
 
   .page {
@@ -609,7 +598,19 @@ a:focus-visible {
 
   /* Hide pill search bar on small mobile screens to keep Topbar uncluttered */
   .top .search,
-  .top div[ref="searchContainerRef"] {
+  .top-search-container {
     display: none !important;
+  }
+}
+
+/* Accessibility: Respect user reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

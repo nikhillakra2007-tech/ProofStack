@@ -1,120 +1,195 @@
-/* ProofStack Design Tokens — Semgrep-Inspired Cyber Light & Deliberate Dark System
-   Supporting Light, Dark, and OS System Preferences
+/* ProofStack Design Tokens — Calm Professional Security Design System
+   WCAG 2.2 AA Compliant Contrast in Light, Dark, and High-Contrast Modes
 */
 
 :root,
 [data-theme="light"],
 .light {
-  --bg: #FAFAFA;
+  /* Canvas & Elevated Surfaces */
+  --bg: #F8FAFC;
+  --bg-canvas: #F8FAFC;
   --surface: #FFFFFF;
   --surface2: #F1F4F0;
-  --surface-green: #E8F1EE;
-  --surface-warm: #F4E8DC;
-  --surface-cool: #EAEBF5;
-  --line: #DCE3E0;
-  --line-strong: #C4D0CC;
-  --line-subtle: #EDF2F0;
-  --heading-primary: #344E48;
-  --heading-secondary: #5E7D73;
-  --ink: #263A35;
-  --ink2: #42534E;
-  --ink3: #71807A;
-  --brand: #20C9A6;
-  --brand-hover: #17AF91;
-  --brand-dark: #172E27;
-  --brand-surface: #E8F1EE;
-  --brand-ink: #172E27;
-  --accent: #20C9A6;
-  --accent-hover: #17AF91;
-  --accent-ink: #172E27;
-  --support: #263A35;
-  --side: #FAFAFA;
-  --side-ink: #263A35;
-  --side-mute: #5E7D73;
-  --side-line: #DCE3E0;
-  --pass: #167A58;
-  --pass-bright: #20C9A6;
-  --fail: #B42318;
-  --warn: #9A6700;
-  --term-bg: #111A18;
-  --term-ink: #D7E5E0;
-  --term-mute: #728A83;
-  --term-pass: #20C9A6;
-  --term-fail: #E5534B;
-  --term-warn: #DFA030;
-  --term-info: #20C9A6;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.03);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.04);
-  --shadow-lg: 0 16px 40px rgba(0,0,0,0.06);
-  --f-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --f-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --f-mono: 'JetBrains Mono', 'DejaVu Sans Mono', Consolas, monospace;
-  --radius-pill: 9999px;
-  --radius-card: 14px;
-  --radius-inner: 8px;
-}
+  --surface3: #E2E8F0;
+  --surface-raised: #FFFFFF;
+  --surface-green: #E6F4F1;
+  --surface-warm: #FDF6EE;
+  --surface-cool: #F0F4F8;
+  --card-bg: #FFFFFF;
 
-/* Deliberate Dark Theme */
-[data-theme="dark"],
-.dark {
-  --bg: #0C1210;
-  --surface: #141E1B;
-  --surface2: #1B2924;
-  --surface-green: #172D25;
-  --surface-warm: #26211A;
-  --surface-cool: #181E29;
-  --line: #243831;
-  --line-strong: #334E45;
-  --line-subtle: #192722;
-  --heading-primary: #F0F7F4;
-  --heading-secondary: #98B3AA;
-  --ink: #E2ECE8;
-  --ink2: #A5BCB4;
-  --ink3: #728A82;
-  --brand: #20C9A6;
-  --brand-hover: #2AE4BD;
-  --brand-dark: #0A1310;
-  --brand-surface: #172D25;
-  --brand-ink: #0C1210;
-  --accent: #20C9A6;
-  --accent-hover: #2AE4BD;
-  --accent-ink: #0C1210;
-  --support: #E2ECE8;
-  --side: #0F1714;
-  --side-ink: #E2ECE8;
-  --side-mute: #98B3AA;
-  --side-line: #243831;
-  --pass: #20C9A6;
-  --pass-bright: #34E8C2;
-  --fail: #F87171;
-  --warn: #FBBF24;
-  --term-bg: #080D0B;
-  --term-ink: #E1EBE7;
-  --term-mute: #6C827A;
-  --term-pass: #20C9A6;
+  /* Line & Separation Borders */
+  --line: #E2E8F0;
+  --line-strong: #CBD5E1;
+  --line-subtle: #F1F5F9;
+
+  /* Typography & Contrast Hierarchy */
+  --heading-primary: #0F172A;
+  --heading-secondary: #334155;
+  --heading-color: #0F172A;
+  --ink: #0F172A;
+  --ink2: #334155;
+  --ink3: #64748B;
+  --ink-secondary: #334155;
+  --ink-body: #334155;
+  --ink-muted: #64748B;
+  --body-color: #334155;
+
+  /* Primary Brand & Actions (Teal / Turquoise) */
+  --brand: #0D9488;
+  --brand-hover: #0F766E;
+  --brand-dark: #115E59;
+  --brand-surface: #E6F4F1;
+  --brand-ink: #FFFFFF;
+  --primary: #0D9488;
+  --primary-hover: #0F766E;
+  --primary-glow: rgba(13, 148, 136, 0.15);
+  --accent: #0D9488;
+  --accent-hover: #0F766E;
+  --accent-ink: #FFFFFF;
+  --support: #0F172A;
+
+  /* Sidebar Tokens */
+  --side: #F8FAFC;
+  --side-ink: #0F172A;
+  --side-mute: #64748B;
+  --side-line: #E2E8F0;
+
+  /* Semantic State Indicators (Color + Icon/Label) */
+  --pass: #059669;
+  --pass-bright: #10B981;
+  --fail: #DC2626;
+  --warn: #B45309;
+  --info: #0284C7;
+
+  /* Color Palette Accents */
+  --azure: #0369A1;
+  --cyan: #0284C7;
+  --emerald: #059669;
+  --lime: #16A34A;
+  --gold: #D97706;
+  --amber: #B45309;
+  --violet: #6366F1;
+  --rose: #DC2626;
+  --crimson: #DC2626;
+  --fawn: #0D9488;
+
+  /* Terminal Colors */
+  --term-bg: #0F172A;
+  --term-ink: #F8FAFC;
+  --term-mute: #94A3B8;
+  --term-pass: #10B981;
   --term-fail: #F87171;
   --term-warn: #FBBF24;
   --term-info: #38BDF8;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
-  --shadow-lg: 0 16px 40px rgba(0,0,0,0.5);
+
+  /* Secondary Button Tokens */
+  --btn-sec-bg: #F1F5F9;
+  --btn-sec-color: #0F172A;
+  --btn-sec-border: #CBD5E1;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+
+  /* Typography Scales */
+  --f-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --f-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --f-mono: 'JetBrains Mono', 'DejaVu Sans Mono', Consolas, monospace;
+
+  /* Radii */
+  --radius-pill: 9999px;
+  --radius-card: 12px;
+  --radius-inner: 8px;
 }
 
-/* Palette Variations for Light Mode */
-[data-theme="light"][data-palette="cobalt-ledger"] {
-  --bg: #F6F1E6;
-  --surface: #FFFFFF;
-  --line: #E2DAC8;
-  --ink: #1B1F2A;
-  --brand: #1F3FBF;
-  --accent: #F26B1D;
-}
+/* Deliberate Deep Slate / Navy Dark Theme */
+[data-theme="dark"],
+.dark {
+  /* Canvas & Elevated Surfaces */
+  --bg: #0A0F1D;
+  --bg-canvas: #0A0F1D;
+  --surface: #111C32;
+  --surface2: #182642;
+  --surface3: #1F3255;
+  --surface-raised: #182642;
+  --surface-green: #0E2922;
+  --surface-warm: #261F17;
+  --surface-cool: #132238;
+  --card-bg: #111C32;
 
-[data-theme="light"][data-palette="sage-walnut"] {
-  --bg: #EDEFE3;
-  --surface: #F8F9F3;
-  --line: #D8DEC9;
-  --ink: #2A2620;
-  --brand: #4A6A4F;
-  --accent: #E8A33D;
+  /* Line & Separation Borders */
+  --line: #1E2D4A;
+  --line-strong: #2D4268;
+  --line-subtle: #162238;
+
+  /* Typography & Contrast Hierarchy */
+  --heading-primary: #F8FAFC;
+  --heading-secondary: #CBD5E1;
+  --heading-color: #F8FAFC;
+  --ink: #F1F5F9;
+  --ink2: #94A3B8;
+  --ink3: #64748B;
+  --ink-secondary: #CBD5E1;
+  --ink-body: #94A3B8;
+  --ink-muted: #64748B;
+  --body-color: #94A3B8;
+
+  /* Primary Brand & Actions (Soft Teal / Turquoise) */
+  --brand: #14B8A6;
+  --brand-hover: #2DD4BF;
+  --brand-dark: #0F172A;
+  --brand-surface: #0E2922;
+  --brand-ink: #042F2E;
+  --primary: #14B8A6;
+  --primary-hover: #2DD4BF;
+  --primary-glow: rgba(20, 184, 166, 0.25);
+  --accent: #14B8A6;
+  --accent-hover: #2DD4BF;
+  --accent-ink: #042F2E;
+  --support: #F1F5F9;
+
+  /* Sidebar Tokens */
+  --side: #0C1324;
+  --side-ink: #F1F5F9;
+  --side-mute: #94A3B8;
+  --side-line: #1E2D4A;
+
+  /* Semantic State Indicators */
+  --pass: #10B981;
+  --pass-bright: #34D399;
+  --fail: #EF4444;
+  --warn: #F59E0B;
+  --info: #38BDF8;
+
+  /* Color Palette Accents */
+  --azure: #38BDF8;
+  --cyan: #38BDF8;
+  --emerald: #10B981;
+  --lime: #34D399;
+  --gold: #F59E0B;
+  --amber: #F59E0B;
+  --violet: #818CF8;
+  --rose: #F87171;
+  --crimson: #EF4444;
+  --fawn: #14B8A6;
+
+  /* Terminal Colors */
+  --term-bg: #070B14;
+  --term-ink: #E2E8F0;
+  --term-mute: #64748B;
+  --term-pass: #10B981;
+  --term-fail: #EF4444;
+  --term-warn: #F59E0B;
+  --term-info: #38BDF8;
+
+  /* Secondary Button Tokens */
+  --btn-sec-bg: #182642;
+  --btn-sec-color: #F1F5F9;
+  --btn-sec-border: #2D4268;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 14px 36px 0 rgba(0, 0, 0, 0.55);
 }

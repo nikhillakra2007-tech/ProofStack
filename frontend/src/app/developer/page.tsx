@@ -1,29 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import { MainLayout } from "@/components/layout/MainLayout";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useCurtain } from "@/components/layout/CurtainTransition";
 import { 
   Code2, Terminal, Play, CheckCircle2, ShieldCheck, 
-  ArrowRight, FileCode, Cpu, Layers, Bug, RefreshCw 
+  ArrowRight, FileCode, Cpu, Layers, Bug, RefreshCw,
+  ExternalLink, Sparkles, Check, AlertCircle, Clock
 } from "lucide-react";
 
 export default function DeveloperRolePage() {
-  const { session, role } = useAuth();
-  const { navigateWithCurtain } = useCurtain();
+  const { session, role, activeMember } = useAuth();
+  const router = useRouter();
   const [selectedLanguage, setSelectedLanguage] = useState<"typescript" | "python" | "rust">("typescript");
   const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [synthSuccess, setSynthSuccess] = useState(false);
 
-  const sampleDiff = {
-    vulnerable: `// VULNERABLE: Direct string interpolation in SQL query
+  const sampleDiffs = {
+    typescript: {
+      target: "src/api/users/controller.ts:42",
+      cwe: "CWE-89: SQL Injection via Unbound Parameter",
+      vulnerable: `// VULNERABLE: Direct string interpolation in SQL query
 async function getUserRecord(req: Request, res: Response) {
   const { userId } = req.query;
   const query = \`SELECT * FROM users WHERE id = '\${userId}'\`;
   const result = await db.raw(query); // <-- CWE-89 SQL Injection
   return res.json(result);
 }`,
-    hardened: `// HARDENED: Tree-Sitter AST parameterized binding invariant
+      hardened: `// HARDENED: Tree-Sitter AST parameterized binding invariant
 async function getUserRecord(req: Request, res: Response) {
   const { userId } = req.query;
   // Invariant verified: Parameterized binding prevents taint propagation
@@ -31,247 +36,308 @@ async function getUserRecord(req: Request, res: Response) {
     .where({ id: String(userId) })
     .first();
   return res.json(result);
+}`
+    },
+    python: {
+      target: "backend/api/workspaces.py:86",
+      cwe: "CWE-639: Broken Object-Level Authorization (IDOR)",
+      vulnerable: `# VULNERABLE: Direct billing lookup without tenant authorization check
+@router.get("/workspaces/{workspace_id}/billing")
+def get_billing(workspace_id: str, db: Session = Depends(get_db)):
+    workspace = db.query(Workspace).filter_by(id=workspace_id).first()
+    return serialize_billing(workspace.billing_profile)`,
+      hardened: `# HARDENED: Scoped tenant boundary with deterministic gate assertion
+@router.get("/workspaces/{workspace_id}/billing")
+def get_billing(workspace_id: str, session: SessionAuth = Depends(get_auth), db: Session = Depends(get_db)):
+    workspace = db.query(Workspace).filter_by(id=workspace_id).first()
+    if workspace.tenant_id != session.tenant_id and not session.is_super_admin:
+        raise HTTPException(status_code=403, detail="Tenant boundary violation")
+    return serialize_billing(workspace.billing_profile)`
+    },
+    rust: {
+      target: "crates/engine/src/parser.rs:114",
+      cwe: "CWE-400: Unbounded Memory Allocation in Buffer Slice",
+      vulnerable: `// VULNERABLE: Unbounded allocation on user-supplied buffer dimension
+pub fn allocate_frame(size: usize) -> Vec<u8> {
+    let mut buffer = Vec::with_capacity(size);
+    buffer.resize(size, 0);
+    buffer
 }`,
+      hardened: `// HARDENED: Enforced maximum frame allocation threshold
+pub const MAX_SAFE_FRAME_SIZE: usize = 16 * 1024 * 1024; // 16 MB boundary
+pub fn allocate_frame(size: usize) -> Result<Vec<u8>, EngineError> {
+    if size > MAX_SAFE_FRAME_SIZE {
+        return Err(EngineError::ExceededAllocationCeiling(size));
+    }
+    Ok(vec![0u8; size])
+}`
+    }
   };
 
   const handleSynthesize = () => {
     setIsSynthesizing(true);
+    setSynthSuccess(false);
     setTimeout(() => {
       setIsSynthesizing(false);
-    }, 1200);
+      setSynthSuccess(true);
+      setTimeout(() => setSynthSuccess(false), 4000);
+    }, 1100);
   };
 
-  return (
-    <MainLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Role Header Banner */}
-        <div
-          className="rounded-2xl border p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden"
-          style={{
-            background: "var(--surface)",
-            borderColor: "var(--line-strong)",
-          }}
-        >
-          <div
-            className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-            style={{ background: "rgba(56, 189, 248, 0.12)" }}
-          />
+  const activeDiff = sampleDiffs[selectedLanguage];
 
-          <div className="space-y-3 relative z-10">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase"
-              style={{
-                background: "rgba(56, 189, 248, 0.12)",
-                color: "var(--azure)",
-                border: "1px solid rgba(56, 189, 248, 0.3)",
-              }}
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              <span>ROLE PORTAL • LEAD DEVELOPER WORKSPACE</span>
+  const assignedTasks = [
+    {
+      id: "TASK9142",
+      title: "Broken Object-Level Auth (IDOR) in Workspace Billing",
+      file: "backend/api/workspaces.py:84-89",
+      cwe: "CWE-639",
+      severity: "Critical",
+      speedup: "+74.2% p95",
+      status: "In Remediation",
+    },
+    {
+      id: "TASK8201",
+      title: "SQL Injection in Audit Log Filter Parameter",
+      file: "backend/db/queries.py:112-115",
+      cwe: "CWE-89",
+      severity: "High",
+      speedup: "+82.1% p95",
+      status: "Gates Verified",
+    },
+    {
+      id: "TASK6102",
+      title: "Catastrophic Regex Backtracking (ReDoS) in Slug Parser",
+      file: "backend/utils/slug.py:14-17",
+      cwe: "CWE-400",
+      severity: "High",
+      speedup: "+98.4% p95",
+      status: "Sealed",
+    },
+  ];
+
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* 1. Role Identification & Scope Banner */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", background: "radial-gradient(circle, rgba(20, 184, 166, 0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span className="chip brand" style={{ fontSize: "11px", padding: "4px 10px" }}>
+                <Code2 className="w-3.5 h-3.5" />
+                <span>ROLE PORTAL • LEAD DEVELOPER</span>
+              </span>
+              <span className="chip pass" style={{ fontSize: "10.5px" }}>
+                Active Session: {activeMember?.name || "Nitin Pandey"}
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--ink)" }}>
-              Compiler AST Invariant & Patch Synthesis Workspace
+
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
+              <Link href="/studio" className="btn sm acc" style={{ textDecoration: "none" }}>
+                <Cpu className="w-3.5 h-3.5" />
+                <span>Open AST Studio</span>
+              </Link>
+              <Link href="/cockpit/TASK9142" className="btn sm sec" style={{ textDecoration: "none" }}>
+                <span>Inspect Cockpit</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--heading-primary)", letterSpacing: "-0.02em" }}>
+              Compiler AST Invariant &amp; Neural Patch Synthesis
             </h1>
-            <p className="text-sm max-w-2xl leading-relaxed" style={{ color: "var(--ink-body)" }}>
-              Assigned to <strong>Alex Chen (Staff Dev)</strong>. Autonomous AST grammar parsing, token-masked neural patch generation, and isolated unit test verification.
+            <p style={{ margin: 0, color: "var(--ink2)", fontSize: "13.5px", maxWidth: "800px", lineHeight: 1.55 }}>
+              Authorized for autonomous Tree-Sitter grammar parsing, token-masked NVIDIA Nemotron patch generation, and deterministic 8-gate unit regression verification.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
-            <button
-              onClick={() => navigateWithCurtain("/studio", "AST Studio")}
-              className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-sm"
-              style={{
-                background: "var(--primary)",
-                color: "#030712",
-              }}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Open AST Studio</span>
-            </button>
-            <button
-              onClick={() => navigateWithCurtain("/cockpit", "Remediation Cockpit")}
-              className="px-4 py-2.5 rounded-xl border text-xs font-mono transition-all flex items-center gap-2"
-              style={{
-                background: "var(--line)",
-                borderColor: "var(--line-strong)",
-                color: "var(--ink)",
-              }}
-            >
-              <span>Cockpit Diff</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Developer Workstation Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Compiler Tree & Invariants */}
-          <div className="lg:col-span-4 space-y-6">
-            <div
-              className="rounded-2xl border p-5 space-y-4"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--line)" }}>
-                <span className="text-xs font-mono font-bold uppercase tracking-wider" style={{ color: "var(--azure)" }}>
-                  Target AST Grammar
-                </span>
-                <span className="text-[11px] font-mono" style={{ color: "var(--ink-muted)" }}>
-                  Tree-Sitter v0.22
-                </span>
-              </div>
-
-              {/* Language Selector */}
-              <div className="grid grid-cols-3 gap-2">
-                {(["typescript", "python", "rust"] as const).map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setSelectedLanguage(lang)}
-                    className="py-2 text-xs font-mono rounded-lg border transition-all capitalize"
-                    style={{
-                      background: selectedLanguage === lang ? "var(--azure)" : "var(--line)",
-                      color: selectedLanguage === lang ? "#030712" : "var(--ink-body)",
-                      borderColor: selectedLanguage === lang ? "var(--azure)" : "var(--line)",
-                      fontWeight: selectedLanguage === lang ? 700 : 500,
-                    }}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-2.5 pt-2 font-mono text-xs">
-                <div className="p-3 rounded-xl border space-y-1" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>AST Invariant Rule #1</div>
-                  <div className="font-semibold" style={{ color: "var(--azure)" }}>NO_UNPARAMETRIZED_SINK</div>
-                  <div className="text-[11px]" style={{ color: "var(--ink-body)" }}>Guarantees query strings are compiled to static prepared templates.</div>
-                </div>
-
-                <div className="p-3 rounded-xl border space-y-1" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>AST Invariant Rule #2</div>
-                  <div className="font-semibold" style={{ color: "var(--azure)" }}>TENANCY_FILTER_PRESERVED</div>
-                  <div className="text-[11px]" style={{ color: "var(--ink-body)" }}>Ensures tenant isolation predicates cannot be stripped by LLM.</div>
-                </div>
-
-                <div className="p-3 rounded-xl border space-y-1" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>AST Invariant Rule #3</div>
-                  <div className="font-semibold" style={{ color: "var(--azure)" }}>SAFE_BUFFER_ALLOCATION</div>
-                  <div className="text-[11px]" style={{ color: "var(--ink-body)" }}>Enforces heap boundaries and limits maximum slice dimensions.</div>
-                </div>
-              </div>
+          {/* Quick Metrics Bar */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px", paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Active Ephemeral Runner</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>gVisor Pod #08 (Ready)</div>
             </div>
-
-            {/* Quick Developer Telemetry */}
-            <div
-              className="rounded-2xl border p-5 space-y-3 font-mono text-xs"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <div className="text-xs font-bold" style={{ color: "var(--ink)" }}>Dev Environment Health</div>
-              <div className="flex justify-between py-1.5 border-b" style={{ borderColor: "var(--line)" }}>
-                <span style={{ color: "var(--ink-muted)" }}>Active Runner:</span>
-                <span style={{ color: "var(--emerald)" }}>gVisor MicroVM #08 (Idle)</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b" style={{ borderColor: "var(--line)" }}>
-                <span style={{ color: "var(--ink-muted)" }}>Model Endpoint:</span>
-                <span style={{ color: "var(--azure)" }}>Nemotron 70B (840ms latency)</span>
-              </div>
-              <div className="flex justify-between py-1.5">
-                <span style={{ color: "var(--ink-muted)" }}>Unit Test Coverage:</span>
-                <span style={{ color: "var(--ink)" }}>98.4% (0 regressions)</span>
-              </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Inference Target</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>Nemotron 70B (840ms)</div>
             </div>
-          </div>
-
-          {/* Right Column: Interactive Code Remediation Studio */}
-          <div className="lg:col-span-8 space-y-6">
-            <div
-              className="rounded-2xl border p-6 space-y-6"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold" style={{ color: "var(--ink)" }}>
-                    Active Defect Remediation: CVE-2024-8921 (SQLi)
-                  </h2>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>
-                    Target File: <code>src/api/users/controller.ts:42</code>
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleSynthesize}
-                  disabled={isSynthesizing}
-                  className="px-4 py-2 rounded-xl font-mono font-bold text-xs flex items-center gap-2 transition-all disabled:opacity-50"
-                  style={{
-                    background: "var(--primary)",
-                    color: "#030712",
-                  }}
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isSynthesizing ? "animate-spin" : ""}`} />
-                  <span>{isSynthesizing ? "Re-Synthesizing AST..." : "Re-Synthesize Invariant"}</span>
-                </button>
-              </div>
-
-              {/* Side-by-side Diff */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-mono font-bold text-red-400 border-b border-red-500/20 pb-2">
-                    <span className="flex items-center gap-1.5">
-                      <Bug className="w-3.5 h-3.5" />
-                      Vulnerable Implementation
-                    </span>
-                    <span className="text-[10px] uppercase">AST Taint</span>
-                  </div>
-                  <pre className="font-mono text-xs text-red-400 leading-relaxed overflow-x-auto p-3 rounded-lg" style={{ background: "var(--bg)" }}>
-                    <code>{sampleDiff.vulnerable}</code>
-                  </pre>
-                </div>
-
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-mono font-bold text-emerald-400 border-b border-emerald-500/20 pb-2">
-                    <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      Nemotron AST Invariant
-                    </span>
-                    <span className="text-[10px] uppercase">Zero-Day Safe</span>
-                  </div>
-                  <pre className="font-mono text-xs text-emerald-400 leading-relaxed overflow-x-auto p-3 rounded-lg" style={{ background: "var(--bg)" }}>
-                    <code>{sampleDiff.hardened}</code>
-                  </pre>
-                </div>
-              </div>
-
-              {/* Invariant Verification Bar */}
-              <div
-                className="p-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono"
-                style={{
-                  background: "var(--bg)",
-                  borderColor: "var(--line)",
-                }}
-              >
-                <div className="flex items-center gap-2" style={{ color: "var(--emerald)" }}>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-bold">AST Grammar Constraints Verified</span>
-                </div>
-                <div className="flex items-center gap-4 text-[11px]" style={{ color: "var(--ink-muted)" }}>
-                  <span>AST Nodes: 184</span>
-                  <span>Taint Depth: 0</span>
-                  <span>Tokens Masked: 38</span>
-                </div>
-              </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Gate Pass Rate</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>8 / 8 Gates Pass (100%)</div>
+            </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Sandbox Quota</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink)", marginTop: "2px" }}>42,000 / 100,000 Tokens</div>
             </div>
           </div>
         </div>
       </div>
-    </MainLayout>
+
+      {/* 2. Interactive AST Code Studio */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--line)" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--heading-primary)" }}>
+                Active Defect Remediation: {activeDiff.cwe}
+              </h2>
+              <span className="chip fail" style={{ fontSize: "10px" }}>Active Invariant</span>
+            </div>
+            <p className="mono" style={{ fontSize: "11.5px", color: "var(--ink3)", margin: "4px 0 0 0" }}>
+              Target File: <b>{activeDiff.target}</b>
+            </p>
+          </div>
+
+          {/* Controls: Language Selector & Synthesize Button */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", background: "var(--surface2)", padding: "2px", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              {(["typescript", "python", "rust"] as const).map((lang) => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setSelectedLanguage(lang)}
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: "11.5px",
+                    fontWeight: selectedLanguage === lang ? 700 : 500,
+                    borderRadius: "6px",
+                    border: "none",
+                    background: selectedLanguage === lang ? "var(--brand)" : "transparent",
+                    color: selectedLanguage === lang ? "var(--brand-ink)" : "var(--ink2)",
+                    cursor: "pointer",
+                    textTransform: "capitalize",
+                    transition: "all 120ms ease"
+                  }}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="btn sm acc"
+              onClick={handleSynthesize}
+              disabled={isSynthesizing}
+              style={{ minWidth: "160px", justifyContent: "center" }}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSynthesizing ? "animate-spin" : ""}`} />
+              <span>{isSynthesizing ? "Synthesizing AST..." : synthSuccess ? "✓ Patch Verified" : "Synthesize Invariant"}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Side-by-side AST Diff Viewer */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "14px" }}>
+          {/* Vulnerable Panel */}
+          <div style={{ borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)", padding: "12px", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid var(--line)" }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--fail)", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Bug className="w-3.5 h-3.5" />
+                Vulnerable Implementation
+              </span>
+              <span className="chip fail" style={{ fontSize: "9.5px" }}>AST Taint Sink</span>
+            </div>
+            <pre className="mono" style={{ margin: 0, padding: "10px", background: "var(--term-bg)", color: "var(--term-fail)", borderRadius: "6px", fontSize: "11.5px", lineHeight: 1.5, overflowX: "auto", flex: 1 }}>
+              <code>{activeDiff.vulnerable}</code>
+            </pre>
+          </div>
+
+          {/* Hardened Invariant Panel */}
+          <div style={{ borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)", padding: "12px", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid var(--line)" }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pass)", display: "flex", alignItems: "center", gap: "6px" }}>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                Nemotron Hardened Invariant
+              </span>
+              <span className="chip pass" style={{ fontSize: "9.5px" }}>Zero-Day Safe</span>
+            </div>
+            <pre className="mono" style={{ margin: 0, padding: "10px", background: "var(--term-bg)", color: "var(--term-pass)", borderRadius: "6px", fontSize: "11.5px", lineHeight: 1.5, overflowX: "auto", flex: 1 }}>
+              <code>{activeDiff.hardened}</code>
+            </pre>
+          </div>
+        </div>
+
+        {/* Verification Proof Summary */}
+        <div style={{ marginTop: "14px", padding: "10px 14px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "10px", fontSize: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--pass)", fontWeight: 600 }}>
+            <CheckCircle2 className="w-4 h-4" />
+            <span>AST Syntax Pass · Taint Propagation Neutralized</span>
+          </div>
+          <div className="mono" style={{ display: "flex", gap: "16px", color: "var(--ink3)", fontSize: "11px" }}>
+            <span>Taint Depth: <b>0</b></span>
+            <span>Masked Tokens: <b>38</b></span>
+            <span>Compiler Verdict: <b>ACCEPTED</b></span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Assigned Remediation Tasks Table */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+          <div>
+            <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--heading-primary)" }}>
+              Assigned Developer Tasks ({assignedTasks.length})
+            </h2>
+            <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "var(--ink3)" }}>
+              Triaged vulnerabilities queued for AST synthesis and container probe testing
+            </p>
+          </div>
+          <Link href="/cockpit/TASK9142" className="btn sm sec" style={{ textDecoration: "none" }}>
+            <span>View All in Cockpit</span>
+          </Link>
+        </div>
+
+        <div className="table-responsive">
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--line)", background: "var(--surface2)" }}>
+                <th style={{ padding: "8px 12px", textAlign: "left", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>Task ID</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>Defect Title</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>Affected Target</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>CWE ID</th>
+                <th style={{ padding: "8px 12px", textAlign: "left", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>Status</th>
+                <th style={{ padding: "8px 12px", textAlign: "right", color: "var(--ink3)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {assignedTasks.map((t) => (
+                <tr key={t.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                  <td className="mono" style={{ padding: "10px 12px", fontWeight: 700, color: "var(--brand)" }}>
+                    {t.id}
+                  </td>
+                  <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--heading-primary)" }}>
+                    {t.title}
+                  </td>
+                  <td className="mono" style={{ padding: "10px 12px", color: "var(--ink2)", fontSize: "11.5px" }}>
+                    {t.file}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span className={`chip ${t.severity === "Critical" ? "fail" : "warn"}`} style={{ fontSize: "10px" }}>
+                      {t.cwe}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span className="chip pass" style={{ fontSize: "10px" }}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 12px", textAlign: "right" }}>
+                    <Link href={`/cockpit/${t.id}`} className="btn sm sec" style={{ textDecoration: "none" }}>
+                      <span>Repair</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
