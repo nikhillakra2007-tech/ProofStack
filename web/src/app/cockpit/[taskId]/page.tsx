@@ -314,15 +314,17 @@ function CockpitContent() {
             </svg>
             GAUNTLET VERDICT: ACCEPT
           </span>
-          <button
-            type="button"
-            className="btn sm sec"
-            onClick={() => router.push(`/studio?problem=${selectedProblem.id}`)}
-            style={{ cursor: "pointer" }}
-            title="Open in Studio"
-          >
-            STUDIO →
-          </button>
+          {roleDef.canAccessStudio && (
+            <button
+              type="button"
+              className="btn sm sec"
+              onClick={() => router.push(`/studio?problem=${selectedProblem.id}`)}
+              style={{ cursor: "pointer" }}
+              title="Open in Studio"
+            >
+              STUDIO →
+            </button>
+          )}
           {roleDef.canIngestTask && (
             <button
               type="button"
@@ -1561,16 +1563,18 @@ function CockpitContent() {
               >
                 Copy Code Fix
               </button>
-              <button
-                type="button"
-                className="btn"
-                onClick={() => {
-                  setRemediationModal(null);
-                  router.push(`/studio?problem=${selectedProblem.id}`);
-                }}
-              >
-                Open in Studio →
-              </button>
+              {roleDef.canAccessStudio && (
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setRemediationModal(null);
+                    router.push(`/studio?problem=${selectedProblem.id}`);
+                  }}
+                >
+                  Open in Studio →
+                </button>
+              )}
             </div>
           </div>
         </div>

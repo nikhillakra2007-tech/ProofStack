@@ -88,15 +88,15 @@ function LoginContent() {
     setNotice(`Signed in as ${ROLES[role].label}. Launching workspace…`);
 
     const dest =
-      redirectParam !== "/dashboard"
+      redirectParam && redirectParam !== "/dashboard" && redirectParam !== "/login"
         ? redirectParam
         : role === "developer"
-        ? "/studio"
+        ? "/developer"
         : role === "auditor"
-        ? "/findings"
+        ? "/auditor"
         : role === "admin"
-        ? "/catalog"
-        : "/dashboard";
+        ? "/admin"
+        : "/ciso";
 
     setTimeout(() => {
       router.push(dest);
@@ -122,7 +122,7 @@ function LoginContent() {
       loginAs("super_admin");
 
       setTimeout(() => {
-        router.push(redirectParam !== "/dashboard" ? redirectParam : "/dashboard");
+        router.push(redirectParam !== "/dashboard" ? redirectParam : "/ciso");
       }, 500);
     }, 600);
   };
@@ -146,7 +146,7 @@ function LoginContent() {
       loginAs("developer");
 
       setTimeout(() => {
-        router.push(redirectParam !== "/dashboard" ? redirectParam : "/studio");
+        router.push(redirectParam !== "/dashboard" ? redirectParam : "/developer");
       }, 500);
     }, 600);
   };
@@ -955,11 +955,11 @@ function LoginContent() {
                       <span style={{ fontSize: "16px" }}>🚀</span>
                       <b style={{ fontSize: "13.5px" }}>Developer Persona</b>
                       <span className="chip brand" style={{ fontSize: "10px", padding: "2px 6px" }}>
-                        Studio &amp; Retest
+                        Developer Dashboard
                       </span>
                     </div>
                     <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
-                      Enter Studio →
+                      Enter Dashboard →
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
@@ -992,11 +992,11 @@ function LoginContent() {
                       <span style={{ fontSize: "16px" }}>🛡️</span>
                       <b style={{ fontSize: "13.5px" }}>Security Auditor</b>
                       <span className="chip pass" style={{ fontSize: "10px", padding: "2px 6px" }}>
-                        Findings &amp; Ledger
+                        Auditor Dashboard
                       </span>
                     </div>
                     <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
-                      Enter Findings →
+                      Enter Dashboard →
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
@@ -1029,11 +1029,11 @@ function LoginContent() {
                       <span style={{ fontSize: "16px" }}>⚙️</span>
                       <b style={{ fontSize: "13.5px" }}>Workspace Admin</b>
                       <span className="chip" style={{ fontSize: "10px", padding: "2px 6px" }}>
-                        Catalog &amp; Quotas
+                        Admin Dashboard
                       </span>
                     </div>
                     <span className="mono" style={{ fontSize: "11px", color: "var(--brand)", fontWeight: 600 }}>
-                      Enter Catalog →
+                      Enter Dashboard →
                     </span>
                   </div>
                   <div style={{ fontSize: "11.5px", color: "var(--ink2)", marginTop: "4px" }}>
