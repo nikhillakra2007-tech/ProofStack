@@ -6,7 +6,7 @@ import { useTheme, PALETTES } from "@/lib/theme";
 import { ROLES, TENANT_UUID } from "@/lib/roles";
 
 export default function SettingsPage() {
-  const { session, role } = useAuth();
+  const { session, role, activeMember, switchMember } = useAuth();
   const {
     theme,
     resolvedTheme,
@@ -843,6 +843,50 @@ export default function SettingsPage() {
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
                     {TENANT_UUID}
+                  </div>
+                </div>
+
+                {/* Developer / Account Identity Switcher */}
+                <div className="field" style={{ gridColumn: "span 2", marginTop: "4px" }}>
+                  <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span>Active Workspace Identity (Developer Account Selection)</span>
+                    <span className="chip brand" style={{ fontSize: "10px" }}>Configured Identities</span>
+                  </label>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center", marginTop: "4px" }}>
+                    <select
+                      value={activeMember.id}
+                      onChange={(e) => switchMember(e.target.value)}
+                      style={{
+                        height: "38px",
+                        background: "var(--surface2)",
+                        border: "1px solid var(--line)",
+                        borderRadius: "7px",
+                        padding: "0 12px",
+                        color: "var(--ink)",
+                        fontSize: "12.5px",
+                        fontFamily: "var(--f-mono)",
+                        flex: 1,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {role === "developer" ? (
+                        <>
+                          <option value="nitin-pandey">Nitin Pandey — Staff Systems Optimization Engineer</option>
+                          <option value="nikhil-lakra">Nikhil Lakra — Senior Autonomous Security Systems Engineer</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value={activeMember.id}>{activeMember.name} — {activeMember.title || roleDef.label}</option>
+                          {role === "admin" && <option value="priya-nair">Priya Nair — DevSecOps Governance Manager</option>}
+                          {role === "auditor" && <option value="rohan-verma">Rohan Verma — Lead DAST & Gauntlet Specialist</option>}
+                        </>
+                      )}
+                    </select>
+                  </div>
+                  <div className="hint" style={{ marginTop: "4px" }}>
+                    {role === "developer"
+                      ? "Select between configured developer identities: Nitin Pandey (Lead Optimization) or Nikhil Lakra (Autonomous Systems)."
+                      : "Select active operator profile within this tenant boundary."}
                   </div>
                 </div>
               </div>

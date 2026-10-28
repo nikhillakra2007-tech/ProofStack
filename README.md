@@ -45,6 +45,46 @@ Modern software engineering teams are inundated with static code analysis (SAST)
 | **🛡️ Findings Registry** | **[sentinel-gate-seven.vercel.app/findings](https://sentinel-gate-seven.vercel.app/findings)** | Triaged CWE vulnerability catalog, root cause analysis, CVSS scores, and remediation status |
 | **📚 Knowledge Library** | **[sentinel-gate-seven.vercel.app/library](https://sentinel-gate-seven.vercel.app/library)** | Zero-Compromise policy guides, truth hierarchy (Rank 1 to 6), and formal verification specifications |
 | **🔐 Role Gateway (RBAC)** | **[sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)** | Interactive 5-stage Verification Pipeline simulation & 1-click evaluation access for Developer, Auditor, Admin, Super Admin |
+| **👨‍💻 Developer Dashboard** | **[sentinel-gate-seven.vercel.app/developer](https://sentinel-gate-seven.vercel.app/developer)** | Developer workspace with task queue, diff review, and AST remediation |
+| **🛡️ Auditor Portal** | **[sentinel-gate-seven.vercel.app/auditor](https://sentinel-gate-seven.vercel.app/auditor)** | Security Auditor portal with Merkle block verification and tamper simulation |
+| **⚙️ Admin Dashboard** | **[sentinel-gate-seven.vercel.app/admin](https://sentinel-gate-seven.vercel.app/admin)** | Workspace Admin dashboard for token quotas and runner pool governance |
+| **👑 CISO Executive Plane** | **[sentinel-gate-seven.vercel.app/ciso](https://sentinel-gate-seven.vercel.app/ciso)** | Enterprise Zero-Trust Posture, hardware roots (HSM/Nitro), and gate governance |
+
+---
+
+## 👥 Four-Role System & Deterministic Routing
+
+Every authenticated role maps to a dedicated default dashboard on initial login or Instant Access:
+
+| Role | Configured Identities | Default Landing Route | Key Capabilities |
+| :--- | :--- | :--- | :--- |
+| **Lead Developer** | `Nitin Pandey`, `Nikhil Lakra` | **`/developer`** | Split-diff code review, AST patch synthesis, MicroVM tests, task queue |
+| **Security Auditor** | `Elena Rostova`, `Rohan Verma` | **`/auditor`** | Gate approvals, SHA-256 Merkle chain verification, tamper audit |
+| **Workspace Admin** | `Marcus Vance`, `Priya Nair` | **`/admin`** | Worker quotas, runner pool scaling, task assignment, benchmark catalog |
+| **Super Admin / CISO**| `Dr. Sarah Lin` | **`/ciso`** | Root hardware signing authority, emergency policy override, audit chain |
+
+### Role-Based Routing & Session State Flow:
+
+```mermaid
+graph TD
+    Entry["User Arrival (/login or /)"] --> Auth{"Auth Mode"}
+    Auth -->|Judge Instant Access| RoleSel["Select Role Persona"]
+    Auth -->|SSO / SAML 2.0| Okta["Okta Identity Assertion"]
+    Auth -->|FIDO2 Passkey| Enclave["Hardware Enclave Biometric"]
+    
+    RoleSel & Okta & Enclave --> SessionInit["Session Initialized (Token + Tenant UUID)"]
+    
+    SessionInit --> RoleRouter{"Resolve Role Default"}
+    RoleRouter -->|Developer| DevLanding["/developer (Developer Workspace)"]
+    RoleRouter -->|Security Auditor| AudLanding["/auditor (Auditor Portal)"]
+    RoleRouter -->|Workspace Admin| AdminLanding["/admin (Admin Operations)"]
+    RoleRouter -->|Super Admin| CisoLanding["/ciso (CISO Executive Plane)"]
+    
+    DevLanding --> StudioAccess["Studio Access Granted (/studio)"]
+    AudLanding --> CockpitAccess["Cockpit & Ledger Access (/cockpit, /ledger)"]
+    AdminLanding --> ControlAccess["Control Plane & Catalog (/control-plane, /catalog)"]
+    CisoLanding --> RootAccess["Root Hardware Authority & Policy Override"]
+```
 
 ---
 

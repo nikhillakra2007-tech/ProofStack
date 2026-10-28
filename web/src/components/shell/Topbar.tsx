@@ -84,7 +84,7 @@ export default function Topbar({
 }: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role, activeMember, logout } = useAuth();
+  const { role, activeMember, switchMember, logout } = useAuth();
   const roleDef = ROLES[role] || ROLES.developer;
 
   // Notification state
@@ -845,6 +845,66 @@ export default function Topbar({
               </button>
             </div>
 
+            {/* Developer Identity Switcher */}
+            {role === "developer" && (
+              <div style={{ paddingTop: "6px", borderTop: "1px solid var(--line)", marginBottom: "6px" }}>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", textTransform: "uppercase", padding: "2px 8px 4px", fontWeight: 600 }}>
+                  Switch Developer Identity
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchMember("nitin-pandey");
+                    setIsMemberSwitcherOpen(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    width: "100%",
+                    padding: "5px 8px",
+                    borderRadius: "6px",
+                    fontSize: "11.5px",
+                    color: activeMember.id === "nitin-pandey" ? "var(--brand)" : "var(--ink)",
+                    fontWeight: activeMember.id === "nitin-pandey" ? 700 : 500,
+                    background: activeMember.id === "nitin-pandey" ? "var(--surface2)" : "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span>👨‍💻</span>
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Nitin Pandey</span>
+                  {activeMember.id === "nitin-pandey" && <span style={{ color: "var(--brand)" }}>✓</span>}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchMember("nikhil-lakra");
+                    setIsMemberSwitcherOpen(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    width: "100%",
+                    padding: "5px 8px",
+                    borderRadius: "6px",
+                    fontSize: "11.5px",
+                    color: activeMember.id === "nikhil-lakra" ? "var(--brand)" : "var(--ink)",
+                    fontWeight: activeMember.id === "nikhil-lakra" ? 700 : 500,
+                    background: activeMember.id === "nikhil-lakra" ? "var(--surface2)" : "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span>👨‍💻</span>
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Nikhil Lakra</span>
+                  {activeMember.id === "nikhil-lakra" && <span style={{ color: "var(--brand)" }}>✓</span>}
+                </button>
+              </div>
+            )}
             {/* Sign Out Button */}
             <div style={{ paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
               <button
