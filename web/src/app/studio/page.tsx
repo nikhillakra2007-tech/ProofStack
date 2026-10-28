@@ -35,6 +35,13 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
+  Copy,
+  Check,
+  CheckCheck,
+  Zap,
+  ExternalLink,
+  SlidersHorizontal,
+  Code2,
 } from "lucide-react";
 
 const CUSTOM_PROBLEM_FIXTURE: CatalogProblem = {
@@ -42,7 +49,7 @@ const CUSTOM_PROBLEM_FIXTURE: CatalogProblem = {
   tier: "Real-World",
   domain: "Arbitrary Ingestion",
   title: "Arbitrary Production Code Ingestion",
-  summary: "User-ingested production code evaluated live via rootless microVM sandboxes & AST security scans.",
+  summary: "User-ingested production function evaluated live via rootless Linux 6.6 microVM sandboxes & AST security scans.",
   realWorldImpact: "Evaluates arbitrary enterprise functions for security exploits, query explosion, and latency bottlenecks.",
   bugSnippet: `# INGESTED PRODUCTION FUNCTION
 def process_user_records(db_session, user_ids: list[str]):
@@ -66,7 +73,7 @@ def process_user_records(db_session, user_ids: list[str]):
     stmt = select(User).where(User.id.in_(bindparam("uids", expanding=True)))
     return db_session.scalars(stmt, {"uids": user_ids}).all()`,
   safeVerdict: "ACCEPT",
-  safeReason: "G0-G7 Gates Passed: Zero injection vectors, bound parameters verified, O(1) query complexity.",
+  safeReason: "G0-G7 Invariants Passed: Bound parameters verified, O(1) query complexity, zero injection vectors.",
   probeMethod: "Live AST Security Visitor + Rootless Linux 6.6 MicroVM Probe",
   truthRank: 1,
   filename: "custom_worker.py",
@@ -76,6 +83,30 @@ def process_user_records(db_session, user_ids: list[str]):
     safe: { keyMetric: "1 bound query", latency: "14 ms", invariant: "100% Invariant Met", delta: "+82.5%" },
   },
 };
+
+function highlightLine(line: string) {
+  const trimmed = line.trim();
+  if (trimmed.startsWith("#")) {
+    return <span className="text-emerald-600/80 dark:text-emerald-400/80 italic">{line}</span>;
+  }
+  
+  // Highlight common Python tokens
+  const parts = line.split(/(\b(?:def|from|import|return|for|in|select|where|if|else|while|class|try|except)\b|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g);
+  
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (/^(def|from|import|return|for|in|select|where|if|else|while|class|try|except)$/.test(part)) {
+          return <span key={i} className="text-teal-600 dark:text-teal-400 font-bold">{part}</span>;
+        }
+        if (part.startsWith('"') || part.startsWith("'")) {
+          return <span key={i} className="text-amber-600 dark:text-amber-300">{part}</span>;
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
 
 function StudioContent() {
   const router = useRouter();
@@ -105,7 +136,7 @@ function StudioContent() {
   // Evidence panel active tab: 'gates' | 'logs' | 'ledger'
   const [panelTab, setPanelTab] = useState<"gates" | "logs" | "ledger">("gates");
 
-  // Mobile code diff view mode: 'split' | 'baseline' | 'candidate'
+  // Mobile code diff view mode: 'baseline' | 'candidate'
   const [mobileCodeTab, setMobileCodeTab] = useState<"baseline" | "candidate">("candidate");
 
   // Expandable details toggle
@@ -115,6 +146,7 @@ function StudioContent() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastLink, setToastLink] = useState<{ text: string; href: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
 
   // Repair Cycle state
   const [isRepairing, setIsRepairing] = useState<boolean>(false);
@@ -179,25 +211,33 @@ function StudioContent() {
     if (id === "CUSTOM-1") {
       setSnippetMode("custom");
       setCustomCode(CUSTOM_PROBLEM_FIXTURE.bugSnippet);
-      setToastMessage("Loaded Arbitrary Ingestion Fixture. Edit code below and run.");
+      setToastMessage("Loaded custom ingestion fixture. Edit below and test.");
     } else {
       setSnippetMode("safe");
       const target = catalogWithCustom.find((p) => p.id === id);
       if (target) {
         setCustomCode(target.safeFixSnippet);
       }
-      setToastMessage(`Loaded benchmark ${id}: ${target?.title}`);
+      setToastMessage(`Loaded benchmark scenario [${id}]: ${target?.title}`);
     }
     setIteration(1);
     setHardenedCandidateCode(null);
     setToastLink(null);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
 
     const url = new URL(window.location.href);
     url.searchParams.set("problem", id);
     if (id === "CUSTOM-1") url.searchParams.set("mode", "custom");
     else url.searchParams.delete("mode");
     window.history.pushState({}, "", url.toString());
+  };
+
+  const handleCopyCode = (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleRunCode = async () => {
@@ -220,15 +260,15 @@ function StudioContent() {
           setCustomLogs(data.logs);
         }
         if (data.success) {
-          setToastMessage(`MicroVM execution passed (${data.executionTimeMs}ms, memory delta: ${data.memoryDeltaMb}MB).`);
+          setToastMessage(`MicroVM execution succeeded (${data.executionTimeMs}ms, memory delta: ${data.memoryDeltaMb}MB).`);
         } else {
           setToastMessage(`MicroVM probe exited with code ${data.exitCode} (${data.executionTimeMs}ms).`);
         }
         setToastLink(null);
         setTimeout(() => setToastMessage(null), 4000);
       } catch (err: any) {
-        setToastMessage(`Execution error: ${err?.message || "Sandbox run failed"}`);
-        setTimeout(() => setToastMessage(null), 3000);
+        setToastMessage(`Sandbox error: ${err?.message || "MicroVM execution failed"}`);
+        setTimeout(() => setToastMessage(null), 3500);
       } finally {
         setIsProcessing(false);
       }
@@ -238,7 +278,7 @@ function StudioContent() {
     setTimeout(() => {
       setIsProcessing(false);
       setCustomLogs(getProblemLogs(selectedProblem, snippetMode));
-      setToastMessage(`MicroVM executed ${selectedProblem.filename || "benchmark"}. Exit code 0.`);
+      setToastMessage(`MicroVM executed ${selectedProblem.filename || "benchmark"} with exit code 0.`);
       setToastLink(null);
       setTimeout(() => setToastMessage(null), 3000);
     }, 450);
@@ -256,7 +296,7 @@ function StudioContent() {
       if (current >= 8) {
         clearInterval(interval);
         setGateEvaluationActive(false);
-        setToastMessage(`Gauntlet audit complete for ${selectedProblem.id}: Invariants evaluated.`);
+        setToastMessage(`Gauntlet evaluation completed for ${selectedProblem.id}: all 8 invariants tested.`);
         setToastLink(null);
         setTimeout(() => setToastMessage(null), 3000);
       }
@@ -271,7 +311,7 @@ function StudioContent() {
       setIsProcessing(false);
       setToastMessage(`NVIDIA Nemotron synthesized defensive patch for ${selectedProblem.id}.`);
       setToastLink(null);
-      setTimeout(() => setToastMessage(null), 3000);
+      setTimeout(() => setToastMessage(null), 3500);
     }, 500);
   };
 
@@ -341,7 +381,7 @@ function StudioContent() {
 
   const handleRejectPatch = () => {
     setIsRepairing(true);
-    setToastMessage(`Triggering Nemotron Repair Cycle (Iteration 2/3) for ${selectedProblem.id}...`);
+    setToastMessage(`Triggering Nemotron Hardening Cycle (Iteration 2/3) for ${selectedProblem.id}...`);
 
     setTimeout(() => {
       setIsRepairing(false);
@@ -384,563 +424,648 @@ def process_user_records(db_session, user_ids: list[str]):
       : selectedProblem.metrics?.baseline || { keyMetric: "Baseline", latency: "380ms", delta: "0.0%" };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* 1. STUDIO HEADER: Focused Task & Primary Action */}
-      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5 lg:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[var(--accent-teal)]/10 text-[var(--accent-teal)] border border-[var(--accent-teal)]/20">
-              Studio Workspace
-            </span>
-            <span className="text-xs text-[var(--text-muted)] font-mono">
-              Task: {selectedProblem.id}
-            </span>
+    <div className="space-y-5 max-w-[1440px] mx-auto pb-14 px-1 sm:px-2">
+      {/* =========================================================================
+          SUBSECTION 1: WORKSPACE OVERVIEW
+          Breadcrumbs, Scenario Identity, Execution State, and Primary Actions
+          ========================================================================= */}
+      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6 shadow-sm transition-all">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="space-y-1.5 min-w-0">
+            {/* Breadcrumb & Task Status Badges */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-mono text-[var(--ink3)]">Workspace</span>
+              <span className="text-[var(--ink3)]">/</span>
+              <span className="font-mono text-[var(--ink3)]">Studio</span>
+              <span className="text-[var(--ink3)]">/</span>
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-[var(--brand)]/15 text-[var(--brand)] border border-[var(--brand)]/25">
+                {selectedProblem.id}
+              </span>
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono text-[var(--ink2)] bg-[var(--surface2)] border border-[var(--line)]">
+                Tier: {selectedProblem.tier || "Enterprise"}
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Hermetic Sandbox Ready
+              </span>
+            </div>
+
+            {/* Task Title & Summary */}
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--ink)] leading-snug">
+              {selectedProblem.title}
+            </h1>
+            <p className="text-xs sm:text-sm text-[var(--ink2)] max-w-3xl leading-relaxed">
+              {selectedProblem.summary}
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            {selectedProblem.title}
-          </h1>
-          <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
-            {selectedProblem.summary}
-          </p>
-        </div>
 
-        {/* Compact Benchmark Selector & Primary Action */}
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <select
-            value={selectedProblem.id}
-            onChange={(e) => handleSelectProblem(e.target.value)}
-            className="h-9 px-3 text-xs font-mono rounded-xl bg-[var(--surface-base)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-teal)]"
-          >
-            {catalogWithCustom.map((p) => (
-              <option key={p.id} value={p.id}>
-                [{p.id}] {p.title}
-              </option>
-            ))}
-          </select>
-
-          {/* Primary Action Button */}
-          {isSafeMode ? (
-            <button
-              type="button"
-              onClick={handleAcceptPatch}
-              disabled={isRepairing || isProcessing}
-              className="h-9 px-4 rounded-xl bg-[var(--accent-teal)] hover:opacity-90 text-[var(--surface-base)] text-xs font-mono font-bold transition-all flex items-center gap-1.5 shadow-sm"
-            >
-              {role === "developer" ? (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Submit for Audit</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Approve &amp; Seal</span>
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleRunCode}
-              disabled={isProcessing}
-              className="h-9 px-4 rounded-xl bg-[var(--surface-base)] hover:bg-[var(--surface-sunken)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--text-primary)] transition-all flex items-center gap-1.5"
-            >
-              <Play className="w-3.5 h-3.5 text-[var(--accent-teal)]" />
-              <span>Run Code ↵</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Interactive Toast Notification */}
-      {toastMessage && (
-        <div className="p-3 rounded-xl border border-[var(--accent-teal)]/30 bg-[var(--accent-teal)]/10 text-xs text-[var(--text-primary)] flex items-center justify-between gap-3 font-mono transition-all">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[var(--accent-teal)] shrink-0" />
-            <span>{toastMessage}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {toastLink && (
-              <Link
-                href={toastLink.href}
-                className="text-[var(--accent-teal)] underline hover:opacity-80"
+          {/* Scenario Selector & Quick Execution Action */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Styled Scenario Select Control */}
+            <div className="relative min-w-[240px]">
+              <select
+                value={selectedProblem.id}
+                onChange={(e) => handleSelectProblem(e.target.value)}
+                aria-label="Select benchmark scenario"
+                className="w-full h-10 pl-3 pr-9 text-xs font-mono rounded-xl bg-[var(--surface2)] border border-[var(--line)] text-[var(--ink)] hover:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30 transition-all cursor-pointer appearance-none shadow-sm font-medium"
               >
-                {toastLink.text}
-              </Link>
+                {catalogWithCustom.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-[var(--surface)] text-[var(--ink)]">
+                    [{p.id}] {p.title}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-[var(--ink3)] absolute right-3 top-3 pointer-events-none" />
+            </div>
+
+            {/* Primary Action Button */}
+            {isSafeMode ? (
+              <button
+                type="button"
+                onClick={handleAcceptPatch}
+                disabled={isRepairing || isProcessing}
+                className="h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-sm"
+              >
+                {role === "developer" ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Submit for Audit</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Approve &amp; Seal</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleRunCode}
+                disabled={isProcessing}
+                className="h-10 px-4 rounded-xl bg-[var(--surface2)] hover:bg-[var(--surface3)] active:scale-95 border border-[var(--line)] text-xs font-mono font-bold text-[var(--ink)] transition-all flex items-center gap-2"
+              >
+                <Play className="w-3.5 h-3.5 text-[var(--brand)] fill-current" />
+                <span>Run MicroVM</span>
+              </button>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                setToastMessage(null);
-                setToastLink(null);
-              }}
-              className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-            >
-              ✕
-            </button>
           </div>
         </div>
-      )}
 
-      {/* 2. TASK CONFIGURATION & EXECUTION CONTROLS BAR */}
-      <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-        {/* Code Mode Segmented Control */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--surface-base)] border border-[var(--border-subtle)]">
-          <button
-            type="button"
-            onClick={() => {
-              setSnippetMode("bug");
-              setHardenedCandidateCode(null);
-            }}
-            className={`px-3 py-1.5 rounded-md font-semibold transition-all ${
-              isBugMode
-                ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-sm"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            Baseline (Bug)
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSnippetMode("naive");
-              setHardenedCandidateCode(null);
-            }}
-            className={`px-3 py-1.5 rounded-md font-semibold transition-all ${
-              isNaiveMode
-                ? "bg-[var(--surface-elevated)] text-[var(--status-danger)] shadow-sm"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            Naive Fix
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSnippetMode("safe");
-              setHardenedCandidateCode(null);
-            }}
-            className={`px-3 py-1.5 rounded-md font-semibold transition-all ${
-              isSafeMode
-                ? "bg-[var(--accent-teal)]/15 text-[var(--accent-teal)] shadow-sm"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            Defensive (Nemotron)
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSnippetMode("custom");
-              setHardenedCandidateCode(null);
-            }}
-            className={`px-3 py-1.5 rounded-md font-semibold transition-all ${
-              isCustomMode
-                ? "bg-[var(--surface-elevated)] text-[var(--accent-teal)] shadow-sm"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            Custom Code
-          </button>
-        </div>
-
-        {/* Execution Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleRunCode}
-            disabled={isProcessing}
-            className="px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-base)] hover:bg-[var(--surface-sunken)] text-[var(--text-primary)] flex items-center gap-1.5 transition-colors"
-          >
-            <Play className="w-3 h-3 text-[var(--accent-teal)]" />
-            <span>Run MicroVM</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleAuditGauntlet}
-            disabled={isProcessing || isRepairing}
-            className="px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-base)] hover:bg-[var(--surface-sunken)] text-[var(--text-primary)] flex items-center gap-1.5 transition-colors"
-          >
-            <Shield className="w-3 h-3 text-amber-500" />
-            <span>Audit Gauntlet</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSelfHeal}
-            disabled={isProcessing || isRepairing}
-            className="px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-base)] hover:bg-[var(--surface-sunken)] text-[var(--text-primary)] flex items-center gap-1.5 transition-colors"
-          >
-            <Sparkles className="w-3 h-3 text-[var(--accent-teal)]" />
-            <span>Self-Heal</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 3. FINDING & PROPOSED FIX CARD */}
-      <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] space-y-3 font-mono text-xs">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span
-              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                isSafeMode
-                  ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                  : isNaiveMode
-                  ? "bg-red-500/15 text-red-500 border border-red-500/30"
-                  : "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-              }`}
-            >
-              {isSafeMode
-                ? "100% Invariant Met (Safe)"
-                : isNaiveMode
-                ? "Vetoed (Security Regress)"
-                : "Baseline Flaw"}
-            </span>
-            <span className="text-[var(--text-secondary)] font-mono">
-              File: <strong className="text-[var(--text-primary)]">{targetFilename}</strong>
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowFindingDetails(!showFindingDetails)}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 text-[11px]"
-          >
-            <span>{showFindingDetails ? "Hide details" : "Show vulnerability details"}</span>
-            {showFindingDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-
-        <div className="text-[var(--text-secondary)] leading-relaxed">
-          {isRepairing
-            ? "Synthesizing hardened defensive patch via NVIDIA Nemotron..."
-            : iteration === 2
-            ? "Iteration 2: Enforced parameter bounds, query timeout, and tenant isolation."
-            : isSafeMode
-            ? selectedProblem.safeReason
-            : isNaiveMode
-            ? selectedProblem.naiveReason
-            : selectedProblem.realWorldImpact || selectedProblem.summary}
-        </div>
-
-        {/* Expandable Technical Evidence */}
-        {showFindingDetails && (
-          <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-[11px] text-[var(--text-secondary)]">
-            <div>
-              <span className="text-[var(--text-muted)] uppercase">Exploit Probe:</span>{" "}
-              <code>{selectedProblem.probeMethod || "AST Visitor & MicroVM Probe"}</code>
+        {/* Real-Time Interactive Toast Notification */}
+        {toastMessage && (
+          <div className="mt-4 p-3 rounded-xl border border-[var(--brand)]/30 bg-[var(--brand)]/10 text-xs text-[var(--ink)] flex items-center justify-between gap-3 font-mono transition-all animate-fadeIn">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[var(--brand)] shrink-0" />
+              <span className="font-medium">{toastMessage}</span>
             </div>
-            <div>
-              <span className="text-[var(--text-muted)] uppercase">Severity Impact:</span>{" "}
-              <span className="text-[var(--text-primary)]">{selectedProblem.realWorldImpact}</span>
-            </div>
-            <div>
-              <span className="text-[var(--text-muted)] uppercase">Domain:</span>{" "}
-              <span className="text-[var(--text-primary)]">{selectedProblem.domain} ({selectedProblem.tier})</span>
+            <div className="flex items-center gap-3">
+              {toastLink && (
+                <Link
+                  href={toastLink.href}
+                  className="text-[var(--brand)] font-semibold underline hover:opacity-80 flex items-center gap-1"
+                >
+                  <span>{toastLink.text}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setToastMessage(null);
+                  setToastLink(null);
+                }}
+                className="text-[var(--ink3)] hover:text-[var(--ink)] px-1"
+                aria-label="Dismiss notification"
+              >
+                ✕
+              </button>
             </div>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* 4. CONSOLIDATED VERIFICATION METRICS STRIP */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-        <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] space-y-1">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Gate Status</div>
-          <div className={`text-base font-bold ${isSafeMode ? "text-emerald-500" : isNaiveMode ? "text-red-500" : "text-amber-500"}`}>
-            {isSafeMode ? "8/8 PASSED" : isNaiveMode ? "G2 VETOED" : "BASELINE"}
-          </div>
-          <div className="text-[10px] text-[var(--text-secondary)]">Zero-Compromise Interlock</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] space-y-1">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Speedup Delta</div>
-          <div className="text-base font-bold text-[var(--accent-teal)]">
-            {activeMetrics.delta}
-          </div>
-          <div className="text-[10px] text-[var(--text-secondary)]">
-            Latency: {activeMetrics.latency}
-          </div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] space-y-1">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Security Invariant</div>
-          <div className={`text-base font-bold ${isSafeMode ? "text-emerald-500" : isNaiveMode ? "text-red-500" : "text-[var(--text-primary)]"}`}>
-            {isSafeMode ? "100% PRESERVED" : isNaiveMode ? "VIOLATION" : "UNSAFE"}
-          </div>
-          <div className="text-[10px] text-[var(--text-secondary)]">AST Parameter Bound</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] space-y-1">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">MicroVM Isolation</div>
-          <div className="text-base font-bold text-emerald-500">
-            HERMETIC
-          </div>
-          <div className="text-[10px] text-[var(--text-secondary)]">Zero Network Egress</div>
-        </div>
-      </div>
-
-      {/* 5. CODE COMPARISON: MONACO SPLIT DIFF (Wide) / TABS (Mobile) */}
-      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] overflow-hidden shadow-sm">
-        {/* Mobile Tab Switcher */}
-        <div className="sm:hidden flex border-b border-[var(--border-subtle)] font-mono text-xs">
-          <button
-            type="button"
-            onClick={() => setMobileCodeTab("baseline")}
-            className={`flex-1 py-2.5 text-center font-bold ${
-              mobileCodeTab === "baseline"
-                ? "border-b-2 border-red-500 text-red-500 bg-[var(--surface-base)]"
-                : "text-[var(--text-secondary)]"
-            }`}
-          >
-            - Baseline Code
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileCodeTab("candidate")}
-            className={`flex-1 py-2.5 text-center font-bold ${
-              mobileCodeTab === "candidate"
-                ? "border-b-2 border-emerald-500 text-emerald-500 bg-[var(--surface-base)]"
-                : "text-[var(--text-secondary)]"
-            }`}
-          >
-            + Candidate Patch
-          </button>
-        </div>
-
-        {/* Desktop Split View / Mobile Tab Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[var(--border-subtle)]">
-          {/* Baseline Column */}
-          <div
-            className={`flex flex-col min-w-0 ${
-              mobileCodeTab === "candidate" ? "hidden sm:flex" : "flex"
-            }`}
-          >
-            <div className="px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-base)] flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-red-500 flex items-center gap-1.5">
-                <span>−</span> Baseline Flaw · {targetFilename}
-              </span>
-              <span className="text-[10px] text-[var(--text-muted)]">Read-Only</span>
+      {/* =========================================================================
+          MAIN WORKSPACE GRID: 8 COLUMNS (EDITOR & EVIDENCE) + 4 COLUMNS (DIAGNOSTICS)
+          Eliminates unused whitespace and structures information logically
+          ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* =======================================================================
+            LEFT COLUMN (8 COLS): Configuration, Execution Lab, Code & Verification
+            ======================================================================= */}
+        <div className="lg:col-span-8 space-y-5">
+          {/* SUBSECTION 2 & 3: SCENARIO CONFIGURATION & EXECUTION LAB */}
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3 font-mono text-xs shadow-sm">
+            {/* Mode Switcher Segmented Control */}
+            <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-[var(--surface2)] border border-[var(--line)]">
+              <button
+                type="button"
+                onClick={() => {
+                  setSnippetMode("bug");
+                  setHardenedCandidateCode(null);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                  isBugMode
+                    ? "bg-[var(--surface)] text-[var(--fail)] shadow-sm border border-[var(--line)]"
+                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                Baseline (Flaw)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSnippetMode("naive");
+                  setHardenedCandidateCode(null);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                  isNaiveMode
+                    ? "bg-[var(--surface)] text-amber-600 dark:text-amber-400 shadow-sm border border-[var(--line)]"
+                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                Naive Fix
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSnippetMode("safe");
+                  setHardenedCandidateCode(null);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                  isSafeMode
+                    ? "bg-[var(--brand)] text-[var(--brand-ink)] shadow-sm"
+                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                Defensive (Nemotron)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSnippetMode("custom");
+                  setHardenedCandidateCode(null);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                  isCustomMode
+                    ? "bg-[var(--surface)] text-teal-600 dark:text-teal-400 shadow-sm border border-[var(--line)]"
+                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                Custom Ingestion
+              </button>
             </div>
-            <div className="p-3 font-mono text-xs overflow-x-auto min-h-[320px] max-h-[460px] bg-[var(--surface-base)]">
-              {baselineDisplayCode.split("\n").map((line, idx) => (
-                <div key={idx} className="flex gap-3 py-0.5 text-[var(--text-secondary)]">
-                  <span className="w-6 text-right select-none text-[var(--text-muted)] shrink-0">
-                    {idx + 1}
+
+            {/* Execution Lab Action Deck */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleRunCode}
+                disabled={isProcessing}
+                title="Execute sandbox probe in rootless Linux microVM"
+                className="px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--surface2)] hover:bg-[var(--surface3)] text-[var(--ink)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <Play className="w-3.5 h-3.5 text-[var(--brand)] fill-current" />
+                <span>Run MicroVM</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAuditGauntlet}
+                disabled={isProcessing || isRepairing}
+                title="Evaluate 8 Zero-Compromise Security Invariants"
+                className="px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--surface2)] hover:bg-[var(--surface3)] text-[var(--ink)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <Shield className="w-3.5 h-3.5 text-amber-500" />
+                <span>Audit Gauntlet</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSelfHeal}
+                disabled={isProcessing || isRepairing}
+                title="Synthesize defensive patch with NVIDIA Nemotron"
+                className="px-3 py-1.5 rounded-lg border border-[var(--brand)]/30 bg-[var(--brand)]/10 hover:bg-[var(--brand)]/20 text-[var(--brand)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[var(--brand)]" />
+                <span>Self-Heal</span>
+              </button>
+            </div>
+          </div>
+
+          {/* SUBSECTION 6: CANDIDATE PATCH & CODE REVIEW (MONACO DIFF CONTAINER) */}
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] overflow-hidden shadow-sm">
+            {/* Diff Header Bar */}
+            <div className="px-4 py-3 border-b border-[var(--line)] bg-[var(--surface2)] flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2.5">
+                <FileCode2 className="w-4 h-4 text-[var(--brand)]" />
+                <span className="font-bold text-[var(--ink)]">{targetFilename}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface)] text-[var(--ink2)] border border-[var(--line)]">
+                  Python 3.11 AST
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[var(--ink2)] hidden sm:inline">
+                  {isSafeMode ? "+8 lines added, -6 replaced" : "Inspection view"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleCopyCode(candidateDisplayCode)}
+                  className="px-2 py-1 rounded bg-[var(--surface)] border border-[var(--line)] hover:border-[var(--brand)] text-[var(--ink2)] hover:text-[var(--ink)] flex items-center gap-1 transition-all"
+                  title="Copy candidate patch"
+                >
+                  {copied ? <CheckCheck className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span className="text-[10px]">{copied ? "Copied" : "Copy"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Tab Switcher */}
+            <div className="sm:hidden flex border-b border-[var(--line)] font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setMobileCodeTab("baseline")}
+                className={`flex-1 py-2.5 text-center font-bold transition-all ${
+                  mobileCodeTab === "baseline"
+                    ? "border-b-2 border-[var(--fail)] text-[var(--fail)] bg-[var(--surface)]"
+                    : "text-[var(--ink2)] bg-[var(--surface2)]"
+                }`}
+              >
+                − Baseline Code
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileCodeTab("candidate")}
+                className={`flex-1 py-2.5 text-center font-bold transition-all ${
+                  mobileCodeTab === "candidate"
+                    ? "border-b-2 border-emerald-500 text-emerald-500 bg-[var(--surface)]"
+                    : "text-[var(--ink2)] bg-[var(--surface2)]"
+                }`}
+              >
+                + Candidate Patch
+              </button>
+            </div>
+
+            {/* Side-by-Side Code Diff */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[var(--line)]">
+              {/* Left Column: Baseline Flaw */}
+              <div className={`flex flex-col min-w-0 ${mobileCodeTab === "candidate" ? "hidden sm:flex" : "flex"}`}>
+                <div className="px-3.5 py-2 border-b border-[var(--line)] bg-[var(--surface)]/80 flex items-center justify-between text-[11px] font-mono text-[var(--ink2)]">
+                  <span className="font-semibold text-[var(--fail)] flex items-center gap-1">
+                    <span>−</span> Baseline Vulnerability
                   </span>
-                  <span className="whitespace-pre">{line}</span>
+                  <span className="text-[10px] text-[var(--ink3)]">Read-Only</span>
                 </div>
-              ))}
+                <div className="p-3.5 font-mono text-xs overflow-x-auto min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] selection:bg-rose-900/40">
+                  {baselineDisplayCode.split("\n").map((line, idx) => (
+                    <div key={idx} className="flex gap-3 py-0.5 leading-relaxed hover:bg-white/5 rounded px-1">
+                      <span className="w-6 text-right select-none text-[var(--term-mute)] shrink-0 text-[11px]">
+                        {idx + 1}
+                      </span>
+                      <span className="whitespace-pre font-mono">{highlightLine(line)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Candidate Patch */}
+              <div className={`flex flex-col min-w-0 ${mobileCodeTab === "baseline" ? "hidden sm:flex" : "flex"}`}>
+                <div className="px-3.5 py-2 border-b border-[var(--line)] bg-[var(--surface)]/80 flex items-center justify-between text-[11px] font-mono text-[var(--ink2)]">
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>+</span> Candidate Fix ({snippetMode})
+                  </span>
+                  <span className="text-[10px] text-[var(--ink3)]">
+                    {isCustomMode ? "Interactive Editor" : "Synthesized by Nemotron"}
+                  </span>
+                </div>
+
+                {isCustomMode ? (
+                  <textarea
+                    value={customCode}
+                    onChange={(e) => setCustomCode(e.target.value)}
+                    className="p-3.5 font-mono text-xs w-full min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] resize-none border-0 focus:outline-none focus:ring-1 focus:ring-[var(--brand)] leading-relaxed selection:bg-teal-900/40"
+                    spellCheck={false}
+                    placeholder="# Enter custom production python function here..."
+                  />
+                ) : (
+                  <div className="p-3.5 font-mono text-xs overflow-x-auto min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] selection:bg-emerald-900/40">
+                    {candidateDisplayCode.split("\n").map((line, idx) => (
+                      <div key={idx} className="flex gap-3 py-0.5 leading-relaxed hover:bg-white/5 rounded px-1">
+                        <span className="w-6 text-right select-none text-[var(--term-mute)] shrink-0 text-[11px]">
+                          {idx + 1}
+                        </span>
+                        <span className="whitespace-pre font-mono">{highlightLine(line)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Candidate Column */}
-          <div
-            className={`flex flex-col min-w-0 ${
-              mobileCodeTab === "baseline" ? "hidden sm:flex" : "flex"
-            }`}
-          >
-            <div className="px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-base)] flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-emerald-500 flex items-center gap-1.5">
-                <span>+</span> Candidate Fix ({snippetMode})
-              </span>
-              <span className="text-[10px] text-[var(--text-muted)]">
-                {isCustomMode ? "Editable" : "Synthesized"}
-              </span>
+          {/* SUBSECTION 7: VERIFICATION, GATES & EVIDENCE PANEL */}
+          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5 space-y-4 shadow-sm">
+            {/* Tab Headers */}
+            <div className="flex border-b border-[var(--line)] gap-2">
+              <button
+                type="button"
+                onClick={() => setPanelTab("gates")}
+                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
+                  panelTab === "gates"
+                    ? "border-[var(--brand)] text-[var(--brand)]"
+                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                <span>Verification Gates (8)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPanelTab("logs")}
+                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
+                  panelTab === "logs"
+                    ? "border-[var(--brand)] text-[var(--brand)]"
+                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                <Terminal className="w-4 h-4" />
+                <span>MicroVM Execution Logs</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPanelTab("ledger")}
+                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
+                  panelTab === "ledger"
+                    ? "border-[var(--brand)] text-[var(--brand)]"
+                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                <span>Merkle Ledger Evidence</span>
+              </button>
             </div>
 
-            {isCustomMode ? (
-              <textarea
-                value={customCode}
-                onChange={(e) => setCustomCode(e.target.value)}
-                className="p-3 font-mono text-xs w-full min-h-[320px] max-h-[460px] bg-[var(--surface-base)] text-[var(--text-primary)] resize-none border-0 focus:outline-none"
-                spellCheck={false}
-              />
-            ) : (
-              <div className="p-3 font-mono text-xs overflow-x-auto min-h-[320px] max-h-[460px] bg-[var(--surface-base)]">
-                {candidateDisplayCode.split("\n").map((line, idx) => (
-                  <div key={idx} className="flex gap-3 py-0.5 text-[var(--text-primary)]">
-                    <span className="w-6 text-right select-none text-[var(--text-muted)] shrink-0">
-                      {idx + 1}
-                    </span>
-                    <span className="whitespace-pre">{line}</span>
+            {/* Tab Content: 8 Verification Gates */}
+            {panelTab === "gates" && (
+              <div className="space-y-2.5 font-mono text-xs">
+                {MOCK_GATES.map((g, index) => {
+                  const isEvaluated = index < animatingGateIndex;
+                  const isPassing = isSafeMode && isEvaluated;
+                  const isFailing = isNaiveMode && index === 2; // Gate 2 fails in naive mode
+                  return (
+                    <div
+                      key={g.gateId}
+                      className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] flex items-center justify-between gap-3 hover:border-[var(--brand)]/40 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="font-bold text-[var(--ink)] shrink-0">{g.gateId}:</span>
+                        <span className="text-[var(--ink)] font-semibold truncate">{g.name}</span>
+                        <span className="text-[11px] text-[var(--ink3)] truncate hidden md:inline">
+                          — {g.description}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-[10px] text-[var(--ink3)]">
+                          {isEvaluated ? "12ms" : "Pending"}
+                        </span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            !isEvaluated
+                              ? "bg-[var(--surface)] text-[var(--ink3)] border border-[var(--line)]"
+                              : isFailing
+                              ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30"
+                              : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                          }`}
+                        >
+                          {!isEvaluated ? "QUEUED" : isFailing ? "FAIL (VETO)" : "PASS"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Tab Content: MicroVM Execution Console */}
+            {panelTab === "logs" && (
+              <div className="p-4 rounded-xl bg-[var(--term-bg)] border border-[var(--line)] text-emerald-400 font-mono text-xs overflow-x-auto max-h-[320px] shadow-inner space-y-1">
+                {customLogs.map((log, idx) => (
+                  <div key={idx} className="leading-relaxed whitespace-pre font-mono hover:bg-white/5 px-1 rounded">
+                    {log}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tab Content: Merkle Ledger */}
+            {panelTab === "ledger" && (
+              <div className="space-y-2.5 font-mono text-xs">
+                {ledgerChain.slice(0, 5).map((block) => (
+                  <div
+                    key={block.index}
+                    className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface2)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="font-bold text-[var(--ink)] flex items-center gap-2">
+                        <span>Block #{block.index}:</span>
+                        <span className="text-[var(--brand)]">{block.type}</span>
+                      </div>
+                      <div className="text-[11px] text-[var(--ink3)]">
+                        Hash: {block.entryHash.slice(0, 24)}... · Actor: {block.actor} · {block.time}
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 shrink-0 self-start sm:self-center">
+                      SEALED IN CHAIN
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
         </div>
-      </div>
 
-      {/* 6. AUDIT, GATES & EVIDENCE PANEL */}
-      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5 space-y-4">
-        {/* Tab Headers */}
-        <div className="flex border-b border-[var(--border-subtle)] gap-2">
-          <button
-            type="button"
-            onClick={() => setPanelTab("gates")}
-            className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-1.5 ${
-              panelTab === "gates"
-                ? "border-[var(--accent-teal)] text-[var(--accent-teal)]"
-                : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>Verification Gates (8)</span>
-          </button>
+        {/* =======================================================================
+            RIGHT COLUMN (4 COLS): Security Findings, Performance, Invariants & Signoff
+            ======================================================================= */}
+        <div className="lg:col-span-4 space-y-5">
+          {/* SUBSECTION 4: SECURITY FINDINGS & DEFECT EXPLANATION */}
+          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+                  Security Finding
+                </h3>
+              </div>
+              <span
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                  isSafeMode
+                    ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                    : isNaiveMode
+                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30"
+                    : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                }`}
+              >
+                {isSafeMode
+                  ? "Invariant Met"
+                  : isNaiveMode
+                  ? "Security Regress"
+                  : "Vulnerability"}
+              </span>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => setPanelTab("logs")}
-            className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-1.5 ${
-              panelTab === "logs"
-                ? "border-[var(--accent-teal)] text-[var(--accent-teal)]"
-                : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            <Terminal className="w-3.5 h-3.5" />
-            <span>MicroVM Execution Logs</span>
-          </button>
+            <div className="space-y-1.5">
+              <div className="text-xs font-mono font-bold text-[var(--ink)]">
+                Target: <code>{targetFilename}</code>
+              </div>
+              <p className="text-xs text-[var(--ink2)] leading-relaxed">
+                {isRepairing
+                  ? "Synthesizing hardened defensive patch via NVIDIA Nemotron..."
+                  : iteration === 2
+                  ? "Iteration 2: Enforced parameter bounds, query timeout, and tenant isolation."
+                  : isSafeMode
+                  ? selectedProblem.safeReason
+                  : isNaiveMode
+                  ? selectedProblem.naiveReason
+                  : selectedProblem.realWorldImpact || selectedProblem.summary}
+              </p>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => setPanelTab("ledger")}
-            className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-1.5 ${
-              panelTab === "ledger"
-                ? "border-[var(--accent-teal)] text-[var(--accent-teal)]"
-                : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Merkle Ledger Evidence</span>
-          </button>
-        </div>
+            {/* Collapsible Technical Details */}
+            <div className="pt-2 border-t border-[var(--line)]">
+              <button
+                type="button"
+                onClick={() => setShowFindingDetails(!showFindingDetails)}
+                className="w-full flex items-center justify-between text-xs font-mono text-[var(--ink2)] hover:text-[var(--ink)] py-1"
+              >
+                <span>{showFindingDetails ? "Hide technical evidence" : "Show technical evidence"}</span>
+                {showFindingDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
 
-        {/* Tab Content: Gates */}
-        {panelTab === "gates" && (
-          <div className="space-y-2 font-mono text-xs">
-            {MOCK_GATES.map((g, index) => {
-              const isEvaluated = index < animatingGateIndex;
-              const isPassing = isSafeMode && isEvaluated;
-              const isFailing = isNaiveMode && index === 2; // Gate 2 fails in naive mode
-              return (
-                <div
-                  key={g.gateId}
-                  className="p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-base)] flex items-center justify-between gap-3"
+              {showFindingDetails && (
+                <div className="mt-2.5 p-3 rounded-xl bg-[var(--surface2)] border border-[var(--line)] space-y-2 text-[11px] font-mono text-[var(--ink2)] animate-fadeIn">
+                  <div>
+                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Probe Method:</span>
+                    <span className="text-[var(--ink)]">{selectedProblem.probeMethod || "AST Visitor & MicroVM Probe"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Exploit Vector:</span>
+                    <span className="text-[var(--ink)]">{selectedProblem.realWorldImpact}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Classification:</span>
+                    <span className="text-[var(--ink)]">{selectedProblem.domain} ({selectedProblem.tier})</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* SUBSECTION 5: PERFORMANCE & INVARIANT ANALYSIS */}
+          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-[var(--brand)]" />
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+                Performance &amp; Invariants
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
+                <div className="text-[10px] text-[var(--ink3)] uppercase">Gate Status</div>
+                <div className={`text-base font-bold ${isSafeMode ? "text-emerald-600 dark:text-emerald-400" : isNaiveMode ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"}`}>
+                  {isSafeMode ? "8/8 PASSED" : isNaiveMode ? "G2 VETOED" : "BASELINE"}
+                </div>
+                <div className="text-[10px] text-[var(--ink3)]">Deterministic Check</div>
+              </div>
+
+              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
+                <div className="text-[10px] text-[var(--ink3)] uppercase">Speedup Delta</div>
+                <div className="text-base font-bold text-[var(--brand)]">
+                  {activeMetrics.delta}
+                </div>
+                <div className="text-[10px] text-[var(--ink3)]">
+                  Latency: {activeMetrics.latency}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
+                <div className="text-[10px] text-[var(--ink3)] uppercase">Security Invariant</div>
+                <div className={`text-base font-bold ${isSafeMode ? "text-emerald-600 dark:text-emerald-400" : isNaiveMode ? "text-rose-600 dark:text-rose-400" : "text-[var(--ink)]"}`}>
+                  {isSafeMode ? "100% PRESERVED" : isNaiveMode ? "VIOLATION" : "UNSAFE"}
+                </div>
+                <div className="text-[10px] text-[var(--ink3)]">AST Bound Query</div>
+              </div>
+
+              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
+                <div className="text-[10px] text-[var(--ink3)] uppercase">Sandbox Isolation</div>
+                <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+                  HERMETIC
+                </div>
+                <div className="text-[10px] text-[var(--ink3)]">Rootless MicroVM</div>
+              </div>
+            </div>
+          </section>
+
+          {/* SUBSECTION 8: WORKFLOW DECISION & SIGN-OFF ACTIONS */}
+          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[var(--brand)]" />
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+                Workflow Sign-off
+              </h3>
+            </div>
+
+            <p className="text-xs text-[var(--ink2)] font-mono leading-relaxed">
+              {isSafeMode
+                ? "Candidate satisfies all invariant gates and SLA requirements. Ready for audit submission or cryptographic sealing."
+                : isNaiveMode
+                ? "Candidate rejected by security gate G2. SQL injection regression detected. Trigger repair cycle to harden."
+                : "Baseline scenario loaded. Run microVM or synthesize defensive patch to begin repair."}
+            </p>
+
+            <div className="pt-2 space-y-2.5">
+              {isSafeMode ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleAcceptPatch}
+                    disabled={isProcessing}
+                    className="w-full h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>
+                      {role === "developer"
+                        ? "Submit Patch for Security Audit"
+                        : "Approve & Seal to Ledger"}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRejectPatch}
+                    disabled={isRepairing}
+                    className="w-full h-9 px-3 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-mono text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>Reject &amp; Trigger Hardening Cycle</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSelfHeal}
+                  disabled={isProcessing}
+                  className="w-full h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-bold text-[var(--text-primary)] shrink-0">{g.gateId}:</span>
-                    <span className="text-[var(--text-secondary)] truncate">{g.name}</span>
-                    <span className="text-[10px] text-[var(--text-muted)] truncate hidden sm:inline">({g.description})</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-[10px] text-[var(--text-muted)]">
-                      {isEvaluated ? "12ms" : "Pending"}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        !isEvaluated
-                          ? "bg-[var(--surface-elevated)] text-[var(--text-muted)]"
-                          : isFailing
-                          ? "bg-red-500/15 text-red-500 border border-red-500/30"
-                          : "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                      }`}
-                    >
-                      {!isEvaluated ? "QUEUED" : isFailing ? "FAIL (VETO)" : "PASS"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Tab Content: Logs */}
-        {panelTab === "logs" && (
-          <div className="p-3 rounded-xl bg-slate-950 border border-[var(--border-subtle)] text-emerald-400 font-mono text-xs overflow-x-auto max-h-[300px]">
-            {customLogs.map((log, idx) => (
-              <div key={idx} className="leading-relaxed whitespace-pre">
-                {log}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Tab Content: Ledger */}
-        {panelTab === "ledger" && (
-          <div className="space-y-2 font-mono text-xs">
-            {ledgerChain.slice(0, 5).map((block) => (
-              <div
-                key={block.index}
-                className="p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-base)] flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-              >
-                <div>
-                  <div className="font-bold text-[var(--text-primary)]">
-                    Block #{block.index}: {block.type}
-                  </div>
-                  <div className="text-[10px] text-[var(--text-muted)]">
-                    Hash: {block.entryHash.slice(0, 24)}... · Actor: {block.actor} · {block.time}
-                  </div>
-                </div>
-                <div className="text-[10px] text-emerald-500 font-bold shrink-0">
-                  SEALED IN CHAIN
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 7. PATCH DECISION WORKFLOW ACTIONS */}
-      <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-        <div className="text-[var(--text-secondary)]">
-          Workflow Decision:{" "}
-          <strong className="text-[var(--text-primary)]">
-            {isSafeMode
-              ? "Candidate eligible for submission & ledger commitment."
-              : isNaiveMode
-              ? "Candidate rejected by security gate. Repair cycle required."
-              : "Baseline code under inspection."}
-          </strong>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isSafeMode ? (
-            <>
-              <button
-                type="button"
-                onClick={handleAcceptPatch}
-                disabled={isProcessing}
-                className="px-4 py-2 rounded-xl bg-[var(--accent-teal)] hover:opacity-90 text-[var(--surface-base)] font-bold transition-all flex items-center gap-1.5 shadow-sm"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>
-                  {role === "developer"
-                    ? "Submit Patch for Security Audit"
-                    : "Approve & Commit to Ledger"}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={handleRejectPatch}
-                disabled={isRepairing}
-                className="px-3 py-2 rounded-xl border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors"
-              >
-                Reject &amp; Repair
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSelfHeal}
-              disabled={isProcessing}
-              className="px-4 py-2 rounded-xl bg-[var(--accent-teal)] hover:opacity-90 text-[var(--surface-base)] font-bold transition-all flex items-center gap-1.5 shadow-sm"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Synthesize Defensive Patch (Nemotron)</span>
-            </button>
-          )}
+                  <Sparkles className="w-4 h-4" />
+                  <span>Synthesize Defensive Patch (Nemotron)</span>
+                </button>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -951,8 +1076,9 @@ export default function StudioPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center font-mono text-xs text-[var(--text-secondary)]">
-          Initializing Studio Environment...
+        <div className="p-12 text-center font-mono text-xs text-[var(--ink2)] flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[var(--brand)] animate-ping" />
+          <span>Initializing ProofStack Studio Environment...</span>
         </div>
       }
     >

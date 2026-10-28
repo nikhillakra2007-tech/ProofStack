@@ -1,6 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "../styles/tokens.css";
 @import "../styles/app-components.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap');
 
 /* Reset & Root Setup */
 *, *::before, *::after {
@@ -14,17 +18,369 @@ html {
 html, body {
   margin: 0;
   padding: 0;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root,
+[data-theme="light"],
+.light {
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-surface2: var(--surface2);
+  --bg-card: var(--surface);
+  --heading-color: var(--heading-primary);
+  --body-color: var(--ink2);
+  --btn-sec-bg: var(--surface2);
+  --btn-sec-color: var(--ink);
+  --btn-sec-border: var(--line);
+}
+
+[data-theme="dark"],
+.dark {
+  --bg-canvas: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-surface2: var(--surface2);
+  --bg-card: var(--surface);
+  --heading-color: var(--heading-primary);
+  --body-color: var(--ink2);
+  --btn-sec-bg: var(--surface2);
+  --btn-sec-color: var(--ink);
+  --btn-sec-border: var(--line-strong);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
   width: 100%;
   min-height: 100%;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--ink);
-  font-family: var(--f-ui, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
-  font-size: 13px;
-  line-height: 1.45;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
   font-feature-settings: "tnum" 1, "lnum" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Consistent Theme Surface Styling */
+[data-theme="dark"] .ps,
+[data-theme="dark"] .app-frame,
+[data-theme="dark"] .main,
+[data-theme="dark"] .page,
+[data-theme="dark"] .page-container,
+[data-theme="dark"] .workspace-bg {
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .top,
+[data-theme="dark"] header.top {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Headings Contrast Rules */
+h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
+  color: var(--heading-color);
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] .h1,
+[data-theme="dark"] .h2,
+[data-theme="dark"] .h3,
+[data-theme="dark"] .h4 {
+  color: #F8FAFC !important;
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4 {
+  color: #0F172A !important;
+}
+
+/* Topbar & Control Plane buttons in Dark Mode */
+[data-theme="dark"] .top .btn,
+[data-theme="dark"] .top button,
+[data-theme="dark"] .top a.btn,
+[data-theme="dark"] .top .btn.sec,
+[data-theme="dark"] .top .iconbtn,
+[data-theme="dark"] .control-plane .btn.sec,
+[data-theme="dark"] .btn.sec,
+[data-theme="dark"] .btn.sm.sec,
+[data-theme="dark"] .btn-secondary {
+  background-color: var(--surface2) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line-strong) !important;
+}
+
+[data-theme="dark"] .btn.sec:hover,
+[data-theme="dark"] .btn.sm.sec:hover,
+[data-theme="dark"] .top .btn:hover {
+  background-color: var(--surface3, #1F3255) !important;
+  border-color: var(--brand) !important;
+}
+
+[data-theme="dark"] .card {
+  background-color: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme="dark"] .card b,
+[data-theme="dark"] .card strong,
+[data-theme="dark"] b,
+[data-theme="dark"] strong {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .sub,
+[data-theme="dark"] .eyebrow,
+[data-theme="dark"] p {
+  color: var(--ink2);
+}
+
+/* Universal Typography & Form Controls */
+button, input, select, textarea {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PROOFSTACK SIGNATURE BUTTONS & ACCENTS (NO BROWSER GREY)
+   ========================================================= */
+
+/* Primary Button: Royal Blue #1D4ED8 / #2563EB */
+.btn-primary,
+.btn.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #1D4ED8;
+  color: #FFFFFF !important;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 120ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary:hover,
+.btn.primary:hover {
+  background-color: #1E40AF;
+  transform: translateY(-0.5px);
+  box-shadow: 0 3px 6px rgba(29, 78, 216, 0.2);
+}
+
+.btn-primary:active,
+.btn.primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button: Warm Cream Card #EFECE6 / Border #D8D3C8 */
+.btn-secondary,
+.btn.secondary,
+.btn.sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--btn-sec-bg);
+  border: 1px solid var(--btn-sec-border);
+  color: var(--btn-sec-color) !important;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 120ms ease;
+}
+
+.btn-secondary:hover,
+.btn.secondary:hover,
+.btn.sec:hover {
+  background-color: #E5E0D5;
+  border-color: #C8C2B5;
+}
+
+/* Accent Button: ProofStack Orange #EA580C */
+.btn-accent,
+.btn.acc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #EA580C;
+  color: #FFFFFF !important;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 120ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-accent:hover,
+.btn.acc:hover {
+  background-color: #C2410C;
+}
+
+/* Danger Button */
+.btn.danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FFF1F2;
+  border: 1px solid #FECDD3;
+  color: #E11D48 !important;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn.danger:hover {
+  background-color: #FFE4E6;
+}
+
+/* Base .btn fallback */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 120ms ease;
+  background-color: #1D4ED8;
+  color: #FFFFFF;
+  border: none;
+  padding: 9px 16px;
+}
+
+.btn.sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.btn.lg {
+  height: 44px;
+  padding: 0 22px;
+  font-size: 14.5px;
+  border-radius: 8px;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #141413;
+  border: 1px solid transparent;
+}
+
+.btn.ghost:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ProofStack Orange Accent Badges & Chips */
+.badge-orange,
+.chip.orange,
+.chip.accent {
+  background-color: #FFEDD5;
+  color: #EA580C;
+  border: 1px solid #FDBA74;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+/* Signature Cards */
+.card {
+  background: var(--surface, #FFFFFF);
+  border: 1px solid var(--line, #D8D3C8);
+  border-radius: 10px;
+  color: var(--ink, #141413);
+}
+
+/* Dark Theme & High Contrast Card Text */
+[data-theme="dark"] .card {
+  background: var(--surface, #171B2E);
+  border-color: var(--line, #2C3254);
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .card h1,
+[data-theme="dark"] .card h2,
+[data-theme="dark"] .card h3,
+[data-theme="dark"] .card h4,
+[data-theme="dark"] .card b,
+[data-theme="dark"] .card th,
+[data-theme="dark"] .card td b,
+[data-theme="dark"] .card .mono b {
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .card .sub,
+[data-theme="dark"] .card p,
+[data-theme="dark"] .card td,
+[data-theme="dark"] .card span {
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] table.t th {
+  color: #F8FAFC !important;
+}
+[data-theme="dark"] table.t td {
+  color: #CBD5E1 !important;
+}
+[data-theme="dark"] table.t td b {
+  color: #F8FAFC !important;
+}
+
+/* Force dark navy/slate cards to always have crisp light text regardless of mode */
+.dark-card,
+[style*="background: #0F172A"],
+[style*="background:#0F172A"],
+[style*="background: #1E293B"],
+[style*="background:#1E293B"],
+[style*="background-color: #0F172A"],
+[style*="background-color:#0F172A"],
+[style*="background-color: #1E293B"],
+[style*="background-color:#1E293B"],
+[style*="background: rgb(15, 23, 42)"],
+[style*="background: rgb(30, 41, 59)"] {
+  color: #F8FAFC !important;
+}
+
+[style*="background: #0F172A"] h1, [style*="background: #0F172A"] h2, [style*="background: #0F172A"] h3,
+[style*="background: #0F172A"] b, [style*="background: #0F172A"] th, [style*="background: #0F172A"] td b,
+[style*="background: #1E293B"] h1, [style*="background: #1E293B"] h2, [style*="background: #1E293B"] h3,
+[style*="background: #1E293B"] b, [style*="background: #1E293B"] th, [style*="background: #1E293B"] td b {
+  color: #F8FAFC !important;
+}
+
+[style*="background: #0F172A"] .sub, [style*="background: #0F172A"] p, [style*="background: #0F172A"] td,
+[style*="background: #1E293B"] .sub, [style*="background: #1E293B"] p, [style*="background: #1E293B"] td {
+  color: #CBD5E1 !important;
 }
 
 /* Full Web Application Shell adaptations */
@@ -37,7 +393,7 @@ html, body {
   overflow: hidden;
   display: grid;
   grid-template-columns: var(--side-w, 248px) minmax(0, 1fr);
-  background: var(--bg);
+  background: var(--bg, #F6F3EC);
 }
 
 .ps.app-frame .main {
@@ -47,7 +403,7 @@ html, body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 56px minmax(0, 1fr) 34px;
-  background: var(--bg);
+  background: var(--bg, #F6F3EC);
 }
 
 .ps.app-frame .page {
@@ -56,27 +412,60 @@ html, body {
   height: 100%;
   min-height: 0;
   padding: 18px 28px 14px;
+  background: var(--bg, #F6F3EC);
 }
 
-/* Large display centering (≥ 1920px) */
-@media (min-width: 1920px) {
-  .page-container {
-    max-width: 1536px;
-    margin: 0 auto;
-    width: 100%;
-  }
+/* Dark Mode Comprehensive Overrides */
+[data-theme="dark"],
+html.dark,
+[data-theme="dark"] body {
+  background-color: #0B111E !important;
+  color: #F8FAFC !important;
 }
 
-/* Density overrides */
-[data-density="compact"] table.t td {
-  padding: 8px 12px;
-  font-size: 12px;
+[data-theme="dark"] .ps.app-frame,
+[data-theme="dark"] .ps.app-frame .main,
+[data-theme="dark"] .ps.app-frame .page {
+  background: #0B111E !important;
+  color: #F8FAFC !important;
 }
-[data-density="compact"] .kpi {
-  padding: 10px 14px 10px;
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 {
+  color: #F8FAFC !important;
 }
-[data-density="compact"] .card {
-  padding: 12px 14px;
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4 {
+  color: #0F172A !important;
+}
+
+/* Secondary Button in Dark Mode */
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .btn.secondary,
+[data-theme="dark"] .btn.sec {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .btn.secondary:hover,
+[data-theme="dark"] .btn.sec:hover {
+  background-color: #2D3748 !important;
+  border-color: #4A5568 !important;
+}
+
+/* Google-Developer Style Spotlight Effect */
+.tour-spotlight-active {
+  outline: 3px solid #10B981 !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35) !important;
+  border-radius: 12px !important;
+  transition: outline 200ms ease, box-shadow 200ms ease !important;
 }
 
 /* Scrollbar matching handmade ledger styling */
@@ -85,14 +474,17 @@ html, body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--line);
+  background: #CBD5E1;
   border-radius: 3px;
 }
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ink3);
+  background: #94A3B8;
 }
 
 /* Stamp press single-fire animation */
@@ -105,17 +497,10 @@ html, body {
   animation: stampPress 160ms ease-out 1;
 }
 
-/* Link reset for next/link inside app components */
+/* Link reset for next/link */
 a {
   color: inherit;
   text-decoration: none;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
 }
 
 /* Focus styles matching blueprint */
@@ -124,28 +509,105 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 1px solid var(--brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+  outline: 2px solid #1D4ED8;
+  outline-offset: 1px;
+}
+
+.ps.app-frame {
+  grid-template-columns: var(--side-w, 260px) minmax(0, 1fr);
+  transition: grid-template-columns 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT MEDIA QUERIES (MOBILE, TABLET & LAPTOP)
+   ========================================================= */
+@media (max-width: 1024px) {
+  .ps.app-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .grid[style*="gridTemplateColumns: \"1fr 1fr 1.1fr\""],
+  .grid[style*="grid-template-columns: 1fr 1fr 1.1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
 @media (max-width: 960px) {
+  .login-grid-container {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+  }
+  .login-left-panel {
+    display: none !important;
+  }
+  .login-right-panel {
+    padding: 24px 20px 90px 20px !important;
+    max-height: none !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+  .ps.app-frame {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .ps .main {
+    height: 100vh !important;
+  }
+  .ps aside.side:not(.mobile-sidebar-open) {
+    display: none !important;
+  }
   .mobile-topbar-hamburger {
     display: inline-flex !important;
+  }
+  .top {
+    padding: 0 16px !important;
+    gap: 8px !important;
+  }
+  .top .crumb {
+    font-size: 11px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
 @media (max-width: 768px) {
-  .top-search-container {
-    display: none !important;
+  .hero-2col {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
+  .dashboard-metrics-grid,
+  .studio-split-grid,
+  .control-plane-grid,
+  .cockpit-viewports-grid,
+  .grid-mobile-1col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Table horizontal scroll wrapper for data tables without breaking table semantics */
   .table-responsive {
     display: block !important;
     width: 100% !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+  }
+
+  .page {
+    padding: 14px 14px 90px !important;
+    overflow-y: auto !important;
+  }
+
+  /* Hide pill search bar on small mobile screens to keep Topbar uncluttered */
+  .top .search,
+  .top-search-container {
+    display: none !important;
   }
 }
 
+/* Accessibility: Respect user reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
