@@ -24,6 +24,134 @@ export interface RoleDefinition {
 export const TENANT_UUID = "8f4b238e-89c1-4289-0dba-f423a8e9e19d";
 export const TENANT_BOUNDARY_UUID = TENANT_UUID;
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar: string;
+  title: string;
+  department: string;
+  tokenQuota: number;
+  tokenUsed: number;
+  assignedTasksCount: number;
+  status: "active" | "suspended";
+}
+
+export const TEAM_MEMBERS: TeamMember[] = [
+  // 👑 Super Admin (Single Root)
+  {
+    id: "sarah-lin",
+    name: "Dr. Sarah Lin",
+    email: "superadmin@perfproof.internal",
+    role: "super_admin",
+    avatar: "👑",
+    title: "Chief Systems Architect & Root Authority",
+    department: "Executive & Core Engineering",
+    tokenQuota: 500000,
+    tokenUsed: 142000,
+    assignedTasksCount: 14,
+    status: "active",
+  },
+  // ⚙️ Workspace Admins (Multiple)
+  {
+    id: "marcus-vance",
+    name: "Marcus Vance",
+    email: "admin@perfproof.internal",
+    role: "admin",
+    avatar: "⚙️",
+    title: "Lead Platform & Infrastructure Admin",
+    department: "Cloud Operations",
+    tokenQuota: 250000,
+    tokenUsed: 98000,
+    assignedTasksCount: 8,
+    status: "active",
+  },
+  {
+    id: "priya-nair",
+    name: "Priya Nair",
+    email: "priya.admin@perfproof.internal",
+    role: "admin",
+    avatar: "🧭",
+    title: "DevSecOps Governance Manager",
+    department: "Security Compliance & Triage",
+    tokenQuota: 200000,
+    tokenUsed: 64000,
+    assignedTasksCount: 6,
+    status: "active",
+  },
+  // 👨‍💻 Developers (Multiple)
+  {
+    id: "nitin-pandey",
+    name: "Nitin Pandey",
+    email: "nitin.dev@perfproof.internal",
+    role: "developer",
+    avatar: "👨‍💻",
+    title: "Staff Systems Optimization Engineer",
+    department: "Core Backend Optimization",
+    tokenQuota: 100000,
+    tokenUsed: 42000,
+    assignedTasksCount: 5,
+    status: "active",
+  },
+  {
+    id: "alex-chen",
+    name: "Alex Chen",
+    email: "developer@perfproof.internal",
+    role: "developer",
+    avatar: "🚀",
+    title: "Senior Full-Stack & Sandbox Engineer",
+    department: "Application Performance",
+    tokenQuota: 80000,
+    tokenUsed: 31000,
+    assignedTasksCount: 4,
+    status: "active",
+  },
+  // 🛡️ Security Auditors (Multiple)
+  {
+    id: "elena-rostova",
+    name: "Elena Rostova",
+    email: "auditor@perfproof.internal",
+    role: "auditor",
+    avatar: "🛡️",
+    title: "Principal Security Auditor & Cryptographer",
+    department: "Audit & Formal Verification",
+    tokenQuota: 120000,
+    tokenUsed: 22000,
+    assignedTasksCount: 7,
+    status: "active",
+  },
+  {
+    id: "rohan-verma",
+    name: "Rohan Verma",
+    email: "rohan.audit@perfproof.internal",
+    role: "auditor",
+    avatar: "🔍",
+    title: "Lead DAST & Gauntlet Specialist",
+    department: "Penetration Testing & Gauntlet",
+    tokenQuota: 90000,
+    tokenUsed: 19000,
+    assignedTasksCount: 3,
+    status: "active",
+  },
+];
+
+export const DEFAULT_MEMBER_BY_ROLE: Record<UserRole, string> = {
+  super_admin: "sarah-lin",
+  admin: "marcus-vance",
+  developer: "nitin-pandey",
+  auditor: "elena-rostova",
+};
+
+export function getTeamMemberById(id: string): TeamMember {
+  const found = TEAM_MEMBERS.find((m) => m.id === id);
+  return found || TEAM_MEMBERS[0];
+}
+
+export function getTeamMembersByRole(role: UserRole): TeamMember[] {
+  return TEAM_MEMBERS.filter((m) => m.role === role);
+}
+
 export const ROLES: Record<UserRole, RoleDefinition> = {
   super_admin: {
     role: "super_admin",
@@ -32,10 +160,10 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     email: "superadmin@perfproof.internal",
     tenantUuid: "8f4b238e-89c1-4289-0dba-f423a8e9e19d",
     tenantName: "Global Root Tenant",
-    roleTitle: "Super Admin (Full Control & Policy Override)",
-    description: "Full control plane: token budgets, microVM telemetry, emergency policy override",
-    primaryRoute: "/cockpit/TASK9142",
-    primaryButtonLabel: "Open in Cockpit",
+    roleTitle: "Super Admin (Full Fleet Control & Policy Override)",
+    description: "Full fleet control: global token budgets, microVM telemetry, emergency policy override",
+    primaryRoute: "/ciso",
+    primaryButtonLabel: "Open CISO Control Plane",
     canOverridePolicy: true,
     canIngestTask: true,
     canRemediate: true,
@@ -43,19 +171,19 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     canAccessControlPlane: true,
     canAccessStudio: true,
     canSimulateTamper: true,
-    allowedRoutes: ["/", "/home", "/studio", "/cockpit", "/findings", "/ledger", "/catalog", "/control-plane", "/settings"],
+    allowedRoutes: ["/", "/home", "/dashboard", "/ciso", "/control-plane", "/ledger", "/settings", "/dast"],
   },
   admin: {
     role: "admin",
-    label: "Admin",
+    label: "Workspace Admin",
     badge: "admin",
     email: "admin@perfproof.internal",
     tenantUuid: "4a9c712b-33d8-4e11-9b20-77c1290f44a2",
     tenantName: "Operations & Budget Tenant",
-    roleTitle: "Admin (Token Budgets, User Management & Triage)",
-    description: "Management access: token budget allocation, MicroVM pool telemetry, findings triage. Gates locked.",
-    primaryRoute: "/control-plane",
-    primaryButtonLabel: "Open Control Plane",
+    roleTitle: "Workspace Admin (Token Budgets, Task Allocation & Triage)",
+    description: "Management access: developer/auditor quotas, task assignment corridor, catalog triage",
+    primaryRoute: "/admin",
+    primaryButtonLabel: "Open Workspace Admin",
     canOverridePolicy: false,
     canIngestTask: true,
     canRemediate: true,
@@ -63,19 +191,19 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     canAccessControlPlane: true,
     canAccessStudio: true,
     canSimulateTamper: false,
-    allowedRoutes: ["/", "/home", "/studio", "/cockpit", "/findings", "/catalog", "/control-plane", "/settings"],
+    allowedRoutes: ["/", "/home", "/dashboard", "/admin", "/control-plane", "/catalog", "/findings", "/settings", "/dast"],
   },
   developer: {
     role: "developer",
     label: "Lead Developer",
     badge: "developer",
-    email: "developer@perfproof.internal",
+    email: "nitin.dev@perfproof.internal",
     tenantUuid: "9c2e601f-58a4-41c9-8e73-19b4502d88e5",
     tenantName: "Engineering Sandbox Tenant",
-    roleTitle: "Lead Developer (Studio, DAST & Patch Synthesis)",
-    description: "Task creation, patch verification, DAST scanning, and sandbox execution",
-    primaryRoute: "/studio",
-    primaryButtonLabel: "Open in Studio",
+    roleTitle: "Lead Developer (Studio, Sandboxes & Patch Submission)",
+    description: "Task execution, patch synthesis, DAST testing, and security audit referrals",
+    primaryRoute: "/developer",
+    primaryButtonLabel: "Open Developer Workspace",
     canOverridePolicy: false,
     canIngestTask: true,
     canRemediate: true,
@@ -83,7 +211,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     canAccessControlPlane: false,
     canAccessStudio: true,
     canSimulateTamper: false,
-    allowedRoutes: ["/", "/home", "/studio", "/cockpit", "/findings", "/catalog", "/settings"],
+    allowedRoutes: ["/", "/home", "/dashboard", "/developer", "/studio", "/cockpit", "/dast", "/settings"],
   },
   auditor: {
     role: "auditor",
@@ -92,10 +220,10 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     email: "auditor@perfproof.internal",
     tenantUuid: "2d7b194a-60f2-4c88-a105-55e8913c72b9",
     tenantName: "Compliance Audit Tenant",
-    roleTitle: "Security Auditor (Read-Only Ledger & Tamper Audit)",
-    description: "Read-only ledger verification and tamper audit inspection",
-    primaryRoute: "/ledger",
-    primaryButtonLabel: "Open in Ledger",
+    roleTitle: "Security Auditor (Gate Approvals, Ledger & Tamper Audit)",
+    description: "Patch gate approval, cryptographically sealed ledger commits, and compliance verification",
+    primaryRoute: "/auditor",
+    primaryButtonLabel: "Open Auditor Portal",
     canOverridePolicy: false,
     canIngestTask: false,
     canRemediate: false,
@@ -103,14 +231,14 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
     canAccessControlPlane: false,
     canAccessStudio: false,
     canSimulateTamper: true,
-    allowedRoutes: ["/", "/home", "/cockpit", "/findings", "/ledger", "/catalog"],
+    allowedRoutes: ["/", "/home", "/dashboard", "/auditor", "/findings", "/ledger", "/cockpit", "/dast", "/settings"],
   },
 };
 
 export function canRoleAccessRoute(role: UserRole, pathname: string): boolean {
   const def = ROLES[role];
   if (!def) return false;
-  if (pathname === "/" || pathname === "/login") return true;
+  if (pathname === "/" || pathname === "/login" || pathname === "/home") return true;
 
   return def.allowedRoutes.some((route) => {
     if (route === "/") return pathname === "/";

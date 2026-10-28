@@ -127,3 +127,32 @@ a:focus-visible {
   outline: 1px solid var(--brand);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
 }
+
+@media (max-width: 960px) {
+  .mobile-topbar-hamburger {
+    display: inline-flex !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-search-container {
+    display: none !important;
+  }
+  .table-responsive {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

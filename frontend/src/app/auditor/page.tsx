@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { MainLayout } from "@/components/layout/MainLayout";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useCurtain } from "@/components/layout/CurtainTransition";
 import { 
   Binary, Shield, CheckCircle2, AlertTriangle, 
-  Download, ArrowRight, Lock, Key, FileCheck, RefreshCw 
+  Download, ArrowRight, Lock, Key, FileCheck, RefreshCw,
+  ExternalLink, ShieldAlert, Award
 } from "lucide-react";
 
 interface MerkleBlock {
@@ -20,16 +20,15 @@ interface MerkleBlock {
 }
 
 export default function AuditorRolePage() {
-  const { session } = useAuth();
-  const { navigateWithCurtain } = useCurtain();
+  const { session, activeMember } = useAuth();
   const [tamperTriggered, setTamperTriggered] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   const initialBlocks: MerkleBlock[] = [
     {
       blockNumber: 9482,
-      timestamp: "2026-10-20 22:41:04 UTC",
-      remediationTarget: "CVE-2024-8921 (SQLi AST Invariant)",
+      timestamp: "2026-10-28 17:41:04 UTC",
+      remediationTarget: "CWE-639 (IDOR Tenant Isolation Invariant)",
       blockHash: "0x4e8a1d2f9b8c3a7e6d5f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
       prevHash: "0x3f7b0c1e8a9d2f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
       status: "verified",
@@ -37,8 +36,8 @@ export default function AuditorRolePage() {
     },
     {
       blockNumber: 9481,
-      timestamp: "2026-10-20 21:18:12 UTC",
-      remediationTarget: "CWE-79 (DOM XSS Razor Template)",
+      timestamp: "2026-10-28 16:18:12 UTC",
+      remediationTarget: "CWE-89 (SQL Injection Parameterized Binding)",
       blockHash: "0x3f7b0c1e8a9d2f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
       prevHash: "0x2e6a9d0f7b8c1e3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a",
       status: "verified",
@@ -46,8 +45,8 @@ export default function AuditorRolePage() {
     },
     {
       blockNumber: 9480,
-      timestamp: "2026-10-20 19:04:55 UTC",
-      remediationTarget: "CWE-22 (Path Traversal Sandbox Escape)",
+      timestamp: "2026-10-28 14:04:55 UTC",
+      remediationTarget: "CWE-918 (SSRF Egress DNS Rebinding Guard)",
       blockHash: "0x2e6a9d0f7b8c1e3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a",
       prevHash: "0x1d5f8c9e6a7b0c2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a",
       status: "verified",
@@ -68,7 +67,7 @@ export default function AuditorRolePage() {
               ...b,
               status: nextState ? "tampered" : "verified",
               blockHash: nextState
-                ? "0xDEADBEEF_HASH_MISMATCH_TAMPERED_BYTE_DETECTED"
+                ? "0xDEADBEEF_TAMPER_DETECTED_HASH_CHAIN_BROKEN_AT_BLOCK_9481"
                 : "0x3f7b0c1e8a9d2f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
             }
           : b
@@ -82,217 +81,198 @@ export default function AuditorRolePage() {
   };
 
   return (
-    <MainLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Role Header Banner */}
-        <div
-          className="rounded-2xl border p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden"
-          style={{
-            background: "var(--surface)",
-            borderColor: "var(--line-strong)",
-          }}
-        >
-          <div
-            className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-            style={{ background: "rgba(245, 158, 11, 0.12)" }}
-          />
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* 1. Role Identification Banner */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", background: "radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-          <div className="space-y-3 relative z-10">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase"
-              style={{
-                background: "rgba(245, 158, 11, 0.12)",
-                color: "var(--gold)",
-                border: "1px solid rgba(245, 158, 11, 0.3)",
-              }}
-            >
-              <Binary className="w-3.5 h-3.5" />
-              <span>ROLE PORTAL • SECURITY AUDITOR PORTAL</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span className="chip brand" style={{ fontSize: "11px", padding: "4px 10px" }}>
+                <Binary className="w-3.5 h-3.5" />
+                <span>ROLE PORTAL • SECURITY AUDITOR</span>
+              </span>
+              <span className="chip pass" style={{ fontSize: "10.5px" }}>
+                Signer: {activeMember?.name || "Elena Rostova"} (Ed25519-HSM#4019)
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--ink)" }}>
-              Cryptographic Assurance & SHA-256 Merkle Ledger
+
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={handleExportAuditPack}
+                className="btn sm acc"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{downloadSuccess ? "Audit Pack Exported!" : "Export Cryptographic Audit"}</span>
+              </button>
+              <Link href="/ledger" className="btn sm sec" style={{ textDecoration: "none" }}>
+                <span>Ledger Explorer</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--heading-primary)", letterSpacing: "-0.02em" }}>
+              Cryptographic Assurance &amp; SHA-256 Merkle Ledger Audit
             </h1>
-            <p className="text-sm max-w-2xl leading-relaxed" style={{ color: "var(--ink-body)" }}>
-              Assigned to <strong>Elena Rostova (Lead Auditor)</strong>. Mathematical proof of remediation, Ed25519 non-repudiation seals, and automated SOC2 / FedRAMP compliance export.
+            <p style={{ margin: 0, color: "var(--ink2)", fontSize: "13.5px", maxWidth: "800px", lineHeight: 1.55 }}>
+              Authorized for mathematical proof of remediation, hardware Ed25519 non-repudiation seals, and automated SOC 2 / FedRAMP audit trail validation.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
-            <button
-              onClick={handleExportAuditPack}
-              className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-sm"
-              style={{
-                background: "var(--gold)",
-                color: "#030712",
-              }}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>{downloadSuccess ? "Audit Pack Exported!" : "Export Audit Pack"}</span>
-            </button>
-            <button
-              onClick={() => navigateWithCurtain("/ledger", "Merkle Ledger")}
-              className="px-4 py-2.5 rounded-xl border text-xs font-mono transition-all flex items-center gap-2"
-              style={{
-                background: "var(--line)",
-                borderColor: "var(--line-strong)",
-                color: "var(--ink)",
-              }}
-            >
-              <span>Ledger Explorer</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Auditor Portal Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Ledger Attestation Controls */}
-          <div className="lg:col-span-4 space-y-6">
-            <div
-              className="rounded-2xl border p-5 space-y-4 font-mono text-xs"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--line)" }}>
-                <span className="font-bold uppercase tracking-wider" style={{ color: "var(--gold)" }}>
-                  Cryptographic Parameters
-                </span>
-                <span style={{ color: "var(--ink-muted)" }}>SHA-256</span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="p-3 rounded-xl border" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>ROOT MERKLE ROOT</div>
-                  <div className="font-bold text-xs truncate mt-0.5" style={{ color: "var(--gold)" }}>
-                    0x9482f3a8b2c91d4e5f60a1b2c3d4e5f6
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl border" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>ATTESTATION HARDWARE</div>
-                  <div className="font-bold text-xs mt-0.5" style={{ color: "var(--ink)" }}>
-                    YubiHSM2 Root Vault (Slot #04)
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl border" style={{ background: "var(--bg)", borderColor: "var(--line)" }}>
-                  <div className="text-[10px] uppercase font-bold" style={{ color: "var(--ink-muted)" }}>COMPLIANCE TARGETS</div>
-                  <div className="font-bold text-xs mt-0.5" style={{ color: "var(--emerald)" }}>
-                    SOC2 Type II • FedRAMP High • ISO 27001
-                  </div>
-                </div>
-              </div>
-
-              {/* Adversary Tamper Simulation Tool */}
-              <div className="pt-2">
-                <button
-                  onClick={handleSimulateTamper}
-                  className="w-full py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border"
-                  style={{
-                    background: tamperTriggered ? "rgba(239, 68, 68, 0.15)" : "var(--line)",
-                    borderColor: tamperTriggered ? "rgba(239, 68, 68, 0.5)" : "var(--line-strong)",
-                    color: tamperTriggered ? "var(--rose)" : "var(--gold)",
-                  }}
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>
-                    {tamperTriggered ? "Reset Tamper Injection" : "Simulate Adversary Bit-Flip"}
-                  </span>
-                </button>
-                <p className="text-[10px] text-center mt-2 leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-                  Demonstrates instant release gate halt when byte tamper is detected on-chain.
-                </p>
+          {/* Quick Metrics Bar */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px", paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Current Block Height</div>
+              <div className="mono" style={{ fontSize: "14px", fontWeight: 700, color: "var(--heading-primary)", marginTop: "2px" }}>#9482 SEALED</div>
+            </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Chain Health</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: tamperTriggered ? "var(--fail)" : "var(--pass)", marginTop: "2px" }}>
+                {tamperTriggered ? "❌ Chain Broken (Block #9481)" : "✓ 100% Cryptographically Valid"}
               </div>
             </div>
-          </div>
-
-          {/* Right Column: Verified Audit Trail Blocks */}
-          <div className="lg:col-span-8 space-y-6">
-            <div
-              className="rounded-2xl border p-6 space-y-4"
-              style={{
-                background: "var(--surface)",
-                borderColor: "var(--line)",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold" style={{ color: "var(--ink)" }}>
-                    Cryptographic Block Trail
-                  </h2>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>
-                    Every patch outcome is linked via parent hash pointer.
-                  </p>
-                </div>
-                <div className="text-xs font-mono flex items-center gap-1.5" style={{ color: "var(--gold)" }}>
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>CHAIN LENGTH: 9482 BLOCKS</span>
-                </div>
-              </div>
-
-              {/* Block List */}
-              <div className="space-y-3 font-mono text-xs">
-                {blocks.map((b) => (
-                  <div
-                    key={b.blockNumber}
-                    className="p-4 rounded-xl border transition-all"
-                    style={{
-                      background: b.status === "tampered" ? "rgba(239, 68, 68, 0.1)" : "var(--bg)",
-                      borderColor: b.status === "tampered" ? "rgba(239, 68, 68, 0.5)" : "var(--line)",
-                    }}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2 mb-2" style={{ borderColor: "var(--line)" }}>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold" style={{ color: "var(--gold)" }}>
-                          Block #{b.blockNumber}
-                        </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: "var(--line)", color: "var(--ink-muted)" }}>
-                          {b.timestamp}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {b.status === "verified" ? (
-                          <>
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "var(--emerald)" }} />
-                            <span className="font-bold text-[11px]" style={{ color: "var(--emerald)" }}>HASH VERIFIED</span>
-                          </>
-                        ) : (
-                          <>
-                            <AlertTriangle className="w-3.5 h-3.5 animate-pulse" style={{ color: "var(--rose)" }} />
-                            <span className="font-bold text-[11px]" style={{ color: "var(--rose)" }}>INTEGRITY VIOLATION</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5 text-[11px]">
-                      <div>
-                        <span style={{ color: "var(--ink-muted)" }}>Target: </span>
-                        <span className="font-semibold" style={{ color: "var(--ink)" }}>{b.remediationTarget}</span>
-                      </div>
-                      <div className="truncate">
-                        <span style={{ color: "var(--ink-muted)" }}>Block Hash: </span>
-                        <span style={{ color: b.status === "tampered" ? "var(--rose)" : "var(--gold)" }}>
-                          {b.blockHash}
-                        </span>
-                      </div>
-                      <div className="truncate" style={{ color: "var(--ink-muted)" }}>
-                        <span>Prev Hash: </span>
-                        <span>{b.prevHash}</span>
-                      </div>
-                      <div className="text-[10px] pt-1" style={{ color: "var(--azure)" }}>
-                        Signer: {b.signer} • Hardware-attested Merkle inclusion proof valid
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Attestation Hardware</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>YubiHSM2 Root Vault #04</div>
+            </div>
+            <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Compliance Mapping</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink)", marginTop: "2px" }}>SOC 2 · FedRAMP · ISO 27001</div>
             </div>
           </div>
         </div>
       </div>
-    </MainLayout>
+
+      {/* 2. Interactive Merkle Chain Inspector & Adversary Bit-Flip Simulator */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--line)" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--heading-primary)" }}>
+                Cryptographic Block Trail &amp; Tamper Verification
+              </h2>
+              <span className={`chip ${tamperTriggered ? "fail" : "pass"}`} style={{ fontSize: "10px" }}>
+                {tamperTriggered ? "Tamper Detected" : "Append-Only Chain"}
+              </span>
+            </div>
+            <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "var(--ink3)" }}>
+              Every remediation outcome is canonicalized into JSON, hashed with SHA-256, and linked via parent hash pointers
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSimulateTamper}
+            className={`btn sm ${tamperTriggered ? "danger" : "sec"}`}
+            style={{ minWidth: "210px", justifyContent: "center" }}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>{tamperTriggered ? "Reset Tamper Injection" : "Simulate Adversary Bit-Flip"}</span>
+          </button>
+        </div>
+
+        {/* Tamper Alert Callout if triggered */}
+        {tamperTriggered && (
+          <div style={{ marginBottom: "16px", padding: "12px 16px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid var(--fail)", borderRadius: "8px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
+            <ShieldAlert className="w-5 h-5" style={{ color: "var(--fail)", flexShrink: 0, marginTop: "2px" }} />
+            <div>
+              <b style={{ color: "var(--fail)", fontSize: "13px" }}>AUTOMATIC DEPLOYMENT QUARANTINE TRIGGERED</b>
+              <p style={{ margin: "3px 0 0 0", color: "var(--ink)", fontSize: "12px", lineHeight: 1.5 }}>
+                Adversary modified bytecode in Block #9481. Merkle root signature invalidated: calculated hash does not match stored block pointer. Downstream CI/CD merge gates have been halted.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Blocks List */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {blocks.map((b) => (
+            <div
+              key={b.blockNumber}
+              style={{
+                borderRadius: "8px",
+                padding: "12px 16px",
+                background: b.status === "tampered" ? "rgba(239, 68, 68, 0.06)" : "var(--surface2)",
+                border: b.status === "tampered" ? "1px solid var(--fail)" : "1px solid var(--line)",
+                transition: "all 120ms ease"
+              }}
+            >
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "6px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span className="mono" style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand)" }}>
+                    Block #{b.blockNumber}
+                  </span>
+                  <span style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--heading-primary)" }}>
+                    {b.remediationTarget}
+                  </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span className={`chip ${b.status === "tampered" ? "fail" : "pass"}`} style={{ fontSize: "9.5px" }}>
+                    {b.status === "tampered" ? "Tamper Detected" : "Cryptographically Verified"}
+                  </span>
+                  <span className="mono" style={{ fontSize: "10.5px", color: "var(--ink3)" }}>
+                    {b.timestamp}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "6px", fontSize: "11px" }}>
+                <div className="mono" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span style={{ color: "var(--ink3)" }}>Current Hash: </span>
+                  <span style={{ color: b.status === "tampered" ? "var(--fail)" : "var(--ink)", fontWeight: 600 }}>{b.blockHash}</span>
+                </div>
+                <div className="mono" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span style={{ color: "var(--ink3)" }}>Parent Hash: </span>
+                  <span style={{ color: "var(--ink2)" }}>{b.prevHash}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Formal Compliance & Governance Mapping */}
+      <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
+        <h2 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 12px 0", color: "var(--heading-primary)" }}>
+          Enterprise Governance &amp; Compliance Assertions
+        </h2>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
+          <div style={{ padding: "12px", borderRadius: "8px", background: "var(--surface2)", border: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <b style={{ fontSize: "13px", color: "var(--heading-primary)" }}>SOC 2 Type II Compliance</b>
+              <span className="chip pass" style={{ fontSize: "9.5px" }}>Active</span>
+            </div>
+            <p style={{ margin: 0, fontSize: "12px", color: "var(--ink2)", lineHeight: 1.5 }}>
+              Security &amp; Confidentiality: All patch authorizations are mathematically sealed with non-repudiation timestamps.
+            </p>
+          </div>
+
+          <div style={{ padding: "12px", borderRadius: "8px", background: "var(--surface2)", border: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <b style={{ fontSize: "13px", color: "var(--heading-primary)" }}>FedRAMP High Mapping</b>
+              <span className="chip pass" style={{ fontSize: "9.5px" }}>Enforced</span>
+            </div>
+            <p style={{ margin: 0, fontSize: "12px", color: "var(--ink2)", lineHeight: 1.5 }}>
+              Boundary Protection &amp; Incident Response: Ephemeral container sandboxes isolate dynamic exploit probe replays.
+            </p>
+          </div>
+
+          <div style={{ padding: "12px", borderRadius: "8px", background: "var(--surface2)", border: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <b style={{ fontSize: "13px", color: "var(--heading-primary)" }}>ISO/IEC 27001 Cryptographic Controls</b>
+              <span className="chip pass" style={{ fontSize: "9.5px" }}>Verified</span>
+            </div>
+            <p style={{ margin: 0, fontSize: "12px", color: "var(--ink2)", lineHeight: 1.5 }}>
+              Annex A.10 Cryptography: SHA-256 Merkle chain guarantees tamper detection and irreversible provenance tracking.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

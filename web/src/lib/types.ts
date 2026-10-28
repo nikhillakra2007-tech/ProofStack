@@ -2,6 +2,9 @@ export type UserRole = "super_admin" | "admin" | "developer" | "auditor";
 
 export interface UserSession {
   userId: string;
+  memberId?: string;
+  name?: string;
+  avatar?: string;
   tenantId: string;
   email: string;
   role: UserRole;

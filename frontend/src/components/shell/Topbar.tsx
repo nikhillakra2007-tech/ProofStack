@@ -263,6 +263,7 @@ export default function Topbar({
       {/* Google Search-Style Pill Search Bar */}
       <div
         ref={searchContainerRef}
+        className="top-search-container"
         style={{
           position: "relative",
           width: "320px",
@@ -776,7 +777,8 @@ export default function Topbar({
                     onClick={() => {
                       switchMember(member.id);
                       setIsMemberSwitcherOpen(false);
-                      router.push("/dashboard");
+                      const target = ROLES[member.role]?.primaryRoute || "/dashboard";
+                      router.push(target);
                     }}
                     style={{
                       display: "flex",
