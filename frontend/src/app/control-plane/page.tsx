@@ -276,18 +276,18 @@ export default function ControlPlanePage() {
         </div>
       )}
 
-      {/* 3 Panels Grid */}
+      {/* 3 Responsive Governance Panels */}
       <div
-        className="grid"
         style={{
-          gridTemplateColumns: "1fr 1fr 1.1fr",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
           alignItems: "start",
-          gap: "14px",
+          gap: "16px",
           marginBottom: "24px",
         }}
       >
         {/* Panel 1: Policy & token budgets */}
-        <div className="card">
+        <div className="card" style={{ minWidth: 0 }}>
           <div className="row" style={{ marginBottom: "6px" }}>
             <span style={{ color: "var(--brand)" }}>
               <svg className="i" viewBox="0 0 24 24">
@@ -433,7 +433,7 @@ export default function ControlPlanePage() {
         </div>
 
         {/* Panel 2: Sandbox microVM pool */}
-        <div className="card">
+        <div className="card" style={{ minWidth: 0 }}>
           <div className="row" style={{ marginBottom: "12px" }}>
             <span style={{ color: "var(--brand)" }}>
               <svg className="i" viewBox="0 0 24 24">
@@ -523,7 +523,7 @@ export default function ControlPlanePage() {
         </div>
 
         {/* Panel 3: Locked invariant gates */}
-        <div className="card">
+        <div className="card" style={{ minWidth: 0 }}>
           <div className="row" style={{ marginBottom: "6px" }}>
             <span style={{ color: "var(--brand)" }}>
               <svg className="i" viewBox="0 0 24 24">
@@ -605,17 +605,17 @@ export default function ControlPlanePage() {
           )}
         </div>
 
-        <div style={{ overflowX: "auto" }}>
-          <table className="t">
+        <div className="table-responsive" style={{ maxWidth: "100%", overflowX: "auto" }}>
+          <table className="t" style={{ width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>
-                <th>Member Name &amp; Role</th>
-                <th>Email</th>
+                <th style={{ minWidth: "150px" }}>Member Name &amp; Role</th>
+                <th style={{ minWidth: "180px" }}>Email</th>
                 <th>Tasks Executed</th>
                 <th>Active Contribution</th>
-                <th>Tokens Consumed / Quota</th>
-                <th style={{ minWidth: "200px" }}>Quota Allocation Slider</th>
-                <th>Status / Action</th>
+                <th style={{ minWidth: "160px" }}>Tokens Consumed / Quota</th>
+                <th style={{ minWidth: "190px" }}>Quota Allocation Slider</th>
+                <th style={{ minWidth: "120px" }}>Status / Action</th>
               </tr>
             </thead>
             <tbody>
@@ -623,11 +623,17 @@ export default function ControlPlanePage() {
                 const pct = Math.min(100, Math.round((m.tokensConsumed / m.tokenQuota) * 100));
                 return (
                   <tr key={m.id} style={{ opacity: m.status === "Suspended" ? 0.6 : 1, color: "var(--ink)" }}>
-                    <td>
-                      <b style={{ color: "var(--ink)", fontWeight: 600 }}>{m.name}</b>
-                      <div className="sub" style={{ fontSize: "11px", color: "var(--ink2)" }}>{m.roleTitle}</div>
+                    <td style={{ maxWidth: "180px", overflow: "hidden" }}>
+                      <b style={{ color: "var(--ink)", fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={m.name}>
+                        {m.name}
+                      </b>
+                      <div className="sub" style={{ fontSize: "11px", color: "var(--ink2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {m.roleTitle}
+                      </div>
                     </td>
-                    <td className="mono" style={{ fontSize: "12px", color: "var(--ink2)" }}>{m.email}</td>
+                    <td className="mono" style={{ fontSize: "12px", color: "var(--ink2)", maxWidth: "180px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={m.email}>
+                      {m.email}
+                    </td>
                     <td className="mono" style={{ fontSize: "12.5px", color: "var(--ink)" }}>{m.tasksExecuted} tasks</td>
                     <td className="mono" style={{ fontSize: "12.5px", color: "var(--ink)" }}>{m.contributionTime}</td>
                     <td>
@@ -737,6 +743,8 @@ export default function ControlPlanePage() {
             style={{
               width: "100%",
               maxWidth: "520px",
+              maxHeight: "90vh",
+              overflowY: "auto",
               background: "var(--surface)",
               border: "1px solid var(--line)",
               borderRadius: "12px",

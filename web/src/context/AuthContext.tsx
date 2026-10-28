@@ -73,6 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const switchMember = (memberId: string): UserSession => {
+    // Security check: Only authenticated super_admin or admin can execute audited impersonation/switch
+    if (session && session.role !== "super_admin" && session.role !== "admin") {
+      console.warn("[AuthSecurity] Unauthorized privilege escalation attempt blocked for non-admin session.");
+      return session;
+    }
     const member = getTeamMemberById(memberId);
     const def = ROLES[member.role] || ROLES.developer;
     const newSession: UserSession = {

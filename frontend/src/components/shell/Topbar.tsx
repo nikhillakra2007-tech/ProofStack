@@ -9,7 +9,6 @@ import { ROLES } from "@/lib/roles";
 import { MOCK_CATALOG } from "@/lib/mockData";
 import TourGuideModal from "./TourGuideModal";
 import ThemeSelector from "@/components/common/ThemeSelector";
-import { SentinelLogo } from "@/components/copilot/SentinelAssistant";
 
 interface TopbarProps {
   onOpenCommandPalette: () => void;
@@ -85,7 +84,7 @@ export default function Topbar({
 }: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role, activeMember, allMembers, switchMember } = useAuth();
+  const { role, activeMember, logout } = useAuth();
   const roleDef = ROLES[role] || ROLES.developer;
 
   // Notification state
@@ -521,32 +520,6 @@ export default function Topbar({
         </button>
       )}
 
-      {/* Public Site Link */}
-      <Link
-        href="/home"
-        className="btn sm sec"
-        style={{ display: "inline-flex", alignItems: "center", gap: "6px", textDecoration: "none" }}
-      >
-        <svg className="i" style={{ width: "13px", height: "13px" }} viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-        Public Site
-      </Link>
-
-      {/* Sentinel AI Assistant Topbar Trigger */}
-      <button
-        type="button"
-        className="btn sec"
-        onClick={onToggleCopilot}
-        style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "7px" }}
-      >
-        <SentinelLogo size={16} />
-        <span>Sentinel AI</span>
-        <span className="dot" style={{ marginLeft: "2px" }} />
-      </button>
-
       {/* Accessible Theme Selector (Light / Dark / System) */}
       <ThemeSelector compact={true} />
 
@@ -700,7 +673,7 @@ export default function Topbar({
         )}
       </div>
 
-      {/* Quick Team Member / Persona Switcher Pill */}
+      {/* Authenticated User Account Menu */}
       <div style={{ position: "relative" }} ref={memberSwitcherRef}>
         <button
           type="button"
@@ -717,10 +690,11 @@ export default function Topbar({
             cursor: "pointer",
             transition: "all 120ms ease",
           }}
-          title="Switch team member persona (judging mode)"
+          title={`${activeMember.name} (${roleDef.label}) — Account Options`}
+          aria-expanded={isMemberSwitcherOpen}
         >
           <span style={{ fontSize: "15px", lineHeight: 1 }}>{activeMember.avatar}</span>
-          <b style={{ fontSize: "12px", color: "var(--ink)", maxWidth: "110px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <b style={{ fontSize: "12px", color: "var(--ink)", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {activeMember.name}
           </b>
           <span
@@ -732,92 +706,183 @@ export default function Topbar({
           <span style={{ fontSize: "9px", color: "var(--ink3)" }}>▾</span>
         </button>
 
-        {/* Persona Dropdown Menu */}
+        {/* Authenticated User Profile Dropdown */}
         {isMemberSwitcherOpen && (
           <div
             style={{
               position: "absolute",
               top: "calc(100% + 8px)",
               right: 0,
-              width: "290px",
+              width: "280px",
               background: "var(--surface)",
               border: "1px solid var(--line)",
               borderRadius: "12px",
               boxShadow: "0 18px 40px rgba(0, 0, 0, 0.28)",
               zIndex: 1100,
-              padding: "10px",
+              padding: "12px",
               animation: "fadeIn 120ms ease-out",
             }}
           >
+            {/* User Identity Header */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "8px",
-                paddingBottom: "6px",
+                gap: "10px",
+                paddingBottom: "10px",
                 borderBottom: "1px solid var(--line)",
+                marginBottom: "8px",
               }}
             >
-              <div>
-                <b style={{ fontSize: "12px", color: "var(--ink)" }}>Switch Team Persona</b>
-                <div style={{ fontSize: "10px", color: "var(--ink2)" }}>Role-based enterprise access</div>
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "var(--surface2)",
+                  border: "1px solid var(--line)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: "18px",
+                  flexShrink: 0,
+                }}
+              >
+                {activeMember.avatar}
               </div>
-              <span className="chip brand" style={{ fontSize: "9px", padding: "1px 5px" }}>
-                7 Personas
-              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <b style={{ fontSize: "13px", color: "var(--ink)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {activeMember.name}
+                </b>
+                <div style={{ fontSize: "11px", color: "var(--ink2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {activeMember.title || roleDef.label}
+                </div>
+                <div style={{ fontSize: "10.5px", color: "var(--ink3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "var(--f-mono)" }}>
+                  {activeMember.email}
+                </div>
+              </div>
             </div>
 
-            <div style={{ maxHeight: "310px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "4px" }}>
-              {allMembers.map((member) => {
-                const isCurrent = member.id === activeMember.id;
-                return (
-                  <div
-                    key={member.id}
-                    onClick={() => {
-                      switchMember(member.id);
-                      setIsMemberSwitcherOpen(false);
-                      const target = ROLES[member.role]?.primaryRoute || "/dashboard";
-                      router.push(target);
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "9px",
-                      padding: "7px 9px",
-                      borderRadius: "7px",
-                      background: isCurrent ? "color-mix(in srgb, var(--brand) 10%, var(--surface))" : "transparent",
-                      border: isCurrent ? "1px solid color-mix(in srgb, var(--brand) 40%, var(--line))" : "1px solid transparent",
-                      cursor: "pointer",
-                      transition: "all 90ms ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isCurrent) e.currentTarget.style.background = "var(--surface2)";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isCurrent) e.currentTarget.style.background = "transparent";
-                    }}
-                  >
-                    <span style={{ fontSize: "18px", lineHeight: 1 }}>{member.avatar}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <b style={{ fontSize: "12px", color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {member.name}
-                        </b>
-                        <span style={{ fontSize: "9.5px", color: "var(--brand)", textTransform: "capitalize" }}>
-                          {member.role.replace("_", " ")}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: "10.5px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {member.email}
-                      </div>
-                    </div>
-                    {isCurrent && (
-                      <span style={{ color: "var(--brand)", fontSize: "12px", fontWeight: 700 }}>✓</span>
-                    )}
-                  </div>
-                );
-              })}
+            {/* Account Metadata Strip */}
+            <div
+              style={{
+                fontSize: "10.5px",
+                fontFamily: "var(--f-mono)",
+                color: "var(--ink2)",
+                padding: "6px 8px",
+                background: "var(--surface2)",
+                borderRadius: "6px",
+                marginBottom: "8px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>Workspace:</span>
+              <strong style={{ color: "var(--ink)" }}>ProofStack Enterprise</strong>
+            </div>
+
+            {/* Quick Navigation Items */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "8px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMemberSwitcherOpen(false);
+                  router.push(roleDef.primaryRoute || "/dashboard");
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "7px 9px",
+                  borderRadius: "6px",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  color: "var(--ink)",
+                  textAlign: "left",
+                  width: "100%",
+                  transition: "background 100ms ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface2)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px", color: "var(--brand)" }}>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>My Role Portal ({roleDef.label})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMemberSwitcherOpen(false);
+                  router.push("/settings");
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "7px 9px",
+                  borderRadius: "6px",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  color: "var(--ink)",
+                  textAlign: "left",
+                  width: "100%",
+                  transition: "background 100ms ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface2)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <svg className="i" viewBox="0 0 24 24" style={{ width: "14px", height: "14px", color: "var(--ink2)" }}>
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span>Account Settings &amp; Preferences</span>
+              </button>
+            </div>
+
+            {/* Sign Out Button */}
+            <div style={{ paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMemberSwitcherOpen(false);
+                  logout();
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "7px",
+                  width: "100%",
+                  padding: "7px",
+                  borderRadius: "7px",
+                  background: "transparent",
+                  border: "1px solid color-mix(in srgb, var(--fail) 30%, transparent)",
+                  color: "var(--fail)",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  transition: "all 120ms ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "color-mix(in srgb, var(--fail) 10%, transparent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                <svg className="i" viewBox="0 0 24 24" style={{ width: "13px", height: "13px" }}>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         )}
