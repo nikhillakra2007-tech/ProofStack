@@ -228,3 +228,203 @@ export function resetLedgerBlocks(): void {
     window.dispatchEvent(new CustomEvent("proofstack:ledger-updated", { detail: { reset: true } }));
   }
 }
+
+// -------------------------------------------------------------
+// Developer -> Security Auditor Approval Pipeline Store
+// -------------------------------------------------------------
+
+export interface AuditQueueItem {
+  id: string;
+  problemId: string;
+  problemTitle: string;
+  filename: string;
+  developerId: string;
+  developerName: string;
+  developerAvatar: string;
+  submittedAt: string;
+  speedupDelta: string;
+  latencyBefore: string;
+  latencyAfter: string;
+  gatesPassed: string;
+  status: "PENDING_AUDIT" | "SEALED_AND_DEPLOYED" | "REJECTED";
+  patchCode: string;
+  auditNotes?: string;
+  auditorName?: string;
+  sealedBlockIndex?: number;
+}
+
+export const INITIAL_AUDIT_QUEUE: AuditQueueItem[] = [
+  {
+    id: "audit-101",
+    problemId: "T1-2",
+    problemTitle: "N+1 Query Explosion & SQL-Injection Trap in orders.py",
+    filename: "orders.py",
+    developerId: "nitin-pandey",
+    developerName: "Nitin Pandey",
+    developerAvatar: "👨‍💻",
+    submittedAt: "10m ago",
+    speedupDelta: "+74.2%",
+    latencyBefore: "428ms",
+    latencyAfter: "12ms",
+    gatesPassed: "8/8 Gates PASS",
+    status: "PENDING_AUDIT",
+    patchCode: `# SAFE DEFENSIVE FIX: Eager load customer relationship
+from sqlalchemy.orm import joinedload
+from app.models import Order
+
+def get_orders(session, limit: int = 50):
+    return session.query(Order).options(joinedload(Order.customer)).limit(limit).all()`,
+  },
+  {
+    id: "audit-100",
+    problemId: "T1-1",
+    problemTitle: "Catastrophic Regex Backtracking (ReDoS) in auth/validators.py",
+    filename: "validators.py",
+    developerId: "alex-chen",
+    developerName: "Alex Chen",
+    developerAvatar: "🚀",
+    submittedAt: "1h ago",
+    speedupDelta: "+98.4%",
+    latencyBefore: "3200ms",
+    latencyAfter: "2ms",
+    gatesPassed: "8/8 Gates PASS",
+    status: "SEALED_AND_DEPLOYED",
+    auditorName: "Elena Rostova",
+    sealedBlockIndex: 5,
+    patchCode: `import re
+# Precompiled linear deterministic regex with length bounds
+SAFE_EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')`,
+  },
+];
+
+const AUDIT_STORAGE_KEY = "proofstack_audit_queue";
+
+export function getAuditQueue(): AuditQueueItem[] {
+  if (typeof window === "undefined") return INITIAL_AUDIT_QUEUE;
+  try {
+    const raw = localStorage.getItem(AUDIT_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(INITIAL_AUDIT_QUEUE));
+      return INITIAL_AUDIT_QUEUE;
+    }
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+  } catch {
+    // parse fallback
+  }
+  return INITIAL_AUDIT_QUEUE;
+}
+
+export function submitPatchForAudit(data: {
+  problemId: string;
+  problemTitle: string;
+  filename: string;
+  developerId: string;
+  developerName: string;
+  developerAvatar: string;
+  speedupDelta: string;
+  latencyBefore: string;
+  latencyAfter: string;
+  patchCode: string;
+}): AuditQueueItem {
+  const queue = getAuditQueue();
+  const newItem: AuditQueueItem = {
+    id: `audit-${Date.now().toString().slice(-4)}`,
+    problemId: data.problemId,
+    problemTitle: data.problemTitle,
+    filename: data.filename,
+    developerId: data.developerId,
+    developerName: data.developerName,
+    developerAvatar: data.developerAvatar,
+    submittedAt: "Just now",
+    speedupDelta: data.speedupDelta,
+    latencyBefore: data.latencyBefore,
+    latencyAfter: data.latencyAfter,
+    gatesPassed: "8/8 Gates PASS",
+    status: "PENDING_AUDIT",
+    patchCode: data.patchCode,
+  };
+
+  const updated = [newItem, ...queue];
+  if (typeof window !== "undefined") {
+    localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("proofstack:audit-queue-updated", { detail: { item: newItem } }));
+  }
+  return newItem;
+}
+
+export async function approveAndSealPatch(
+  auditId: string,
+  auditorName: string
+): Promise<{ auditItem: AuditQueueItem; block: StoredLedgerBlock }> {
+  const queue = getAuditQueue();
+  const target = queue.find((i) => i.id === auditId);
+  if (!target) {
+    throw new Error(`Audit task ${auditId} not found`);
+  }
+
+  // 1. Commit new verified block to SHA-256 Ledger
+  const block = await commitPatchToLedger({
+    problemId: target.problemId,
+    patchTitle: `${target.problemTitle} (Auditor Approved)`,
+    actor: `auditor/${auditorName.toLowerCase().replace(/\s+/g, ".")}`,
+    speedupDelta: target.speedupDelta,
+  });
+
+  // 2. Mark audit item as sealed & deployed
+  const updatedQueue = queue.map((item) => {
+    if (item.id === auditId) {
+      return {
+        ...item,
+        status: "SEALED_AND_DEPLOYED" as const,
+        auditorName,
+        sealedBlockIndex: block.index,
+      };
+    }
+    return item;
+  });
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(updatedQueue));
+    window.dispatchEvent(
+      new CustomEvent("proofstack:audit-queue-updated", {
+        detail: { auditId, status: "SEALED_AND_DEPLOYED", blockIndex: block.index },
+      })
+    );
+  }
+
+  const updatedTarget = updatedQueue.find((i) => i.id === auditId)!;
+  return { auditItem: updatedTarget, block };
+}
+
+export function rejectAuditPatch(
+  auditId: string,
+  auditorName: string,
+  reason: string = "Gate G3 tenant boundary constraint violation detected"
+): AuditQueueItem {
+  const queue = getAuditQueue();
+  const updatedQueue = queue.map((item) => {
+    if (item.id === auditId) {
+      return {
+        ...item,
+        status: "REJECTED" as const,
+        auditorName,
+        auditNotes: reason,
+      };
+    }
+    return item;
+  });
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(updatedQueue));
+    window.dispatchEvent(
+      new CustomEvent("proofstack:audit-queue-updated", {
+        detail: { auditId, status: "REJECTED", reason },
+      })
+    );
+  }
+
+  return updatedQueue.find((i) => i.id === auditId)!;
+}

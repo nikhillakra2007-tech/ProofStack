@@ -20,7 +20,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { role, activeMember, allMembers, switchMember, logout } = useAuth();
+  const { role, activeMember, logout } = useAuth();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const switcherRef = useRef<HTMLDivElement>(null);
 
@@ -71,14 +71,6 @@ export default function Sidebar({
   const isRouteActive = (route: string) => {
     if (route === "/") return pathname === "/";
     return pathname.startsWith(route);
-  };
-
-  const handleSelectMember = (member: TeamMember) => {
-    switchMember(member.id);
-    setIsSwitcherOpen(false);
-    if (onCloseMobile) onCloseMobile();
-    const targetRoute = ROLES[member.role]?.primaryRoute || "/dashboard";
-    router.push(targetRoute);
   };
 
   // Strict link visibility rules:
@@ -417,8 +409,8 @@ export default function Sidebar({
             onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
             title={
               isCollapsed
-                ? `${activeMember.name} (${roleDef.label}) · Click to switch persona`
-                : "Click to switch team persona or sign out"
+                ? `${activeMember.name} (${roleDef.label})`
+                : `${activeMember.name} — Account Options`
             }
           >
             <div
@@ -441,7 +433,7 @@ export default function Sidebar({
                     {activeMember.name}
                   </b>
                   <span style={{ fontSize: "10px", color: "var(--brand)", letterSpacing: "0.4px" }}>
-                    {roleDef.label.toUpperCase()} ▾
+                    {roleDef.label.toUpperCase()}
                   </span>
                 </div>
                 <button
@@ -463,89 +455,82 @@ export default function Sidebar({
             )}
           </div>
 
-          {/* Persona Switcher Dropdown Popover */}
+          {/* User Account Popover */}
           {isSwitcherOpen && (
             <div
               style={{
                 position: "absolute",
                 bottom: "calc(100% + 8px)",
                 left: isCollapsed ? "76px" : "4px",
-                width: "270px",
+                width: "250px",
                 background: "var(--surface)",
                 border: "1px solid var(--line)",
                 borderRadius: "12px",
                 boxShadow: "0 18px 40px rgba(0, 0, 0, 0.28)",
                 zIndex: 1000,
-                padding: "10px",
+                padding: "12px",
                 animation: "fadeIn 120ms ease-out",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid var(--line)" }}>
-                <div>
-                  <b style={{ fontSize: "12px", color: "var(--ink)" }}>Switch Team Persona</b>
-                  <div style={{ fontSize: "10px", color: "var(--ink2)" }}>Role-based enterprise access</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "8px", borderBottom: "1px solid var(--line)", marginBottom: "8px" }}>
+                <span style={{ fontSize: "20px" }}>{activeMember.avatar}</span>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <b style={{ fontSize: "12.5px", color: "var(--ink)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {activeMember.name}
+                  </b>
+                  <div style={{ fontSize: "10.5px", color: "var(--ink2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {activeMember.title || roleDef.label}
+                  </div>
                 </div>
-                <span className="chip brand" style={{ fontSize: "9px", padding: "1px 5px" }}>
-                  7 Personas
-                </span>
               </div>
 
-              <div style={{ maxHeight: "280px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "4px" }}>
-                {allMembers.map((member) => {
-                  const isCurrent = member.id === activeMember.id;
-                  return (
-                    <div
-                      key={member.id}
-                      onClick={() => handleSelectMember(member)}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "9px",
-                        padding: "6px 8px",
-                        borderRadius: "7px",
-                        background: isCurrent ? "color-mix(in srgb, var(--brand) 10%, var(--surface))" : "transparent",
-                        border: isCurrent ? "1px solid color-mix(in srgb, var(--brand) 40%, var(--line))" : "1px solid transparent",
-                        cursor: "pointer",
-                        transition: "all 90ms ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isCurrent) e.currentTarget.style.background = "var(--surface2)";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isCurrent) e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <span style={{ fontSize: "17px", lineHeight: 1 }}>{member.avatar}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <b style={{ fontSize: "11.5px", color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {member.name}
-                          </b>
-                          <span style={{ fontSize: "9px", color: "var(--ink3)", textTransform: "capitalize" }}>
-                            {member.role.replace("_", " ")}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "10px", color: "var(--ink2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {member.email}
-                        </div>
-                      </div>
-                      {isCurrent && (
-                        <span style={{ color: "var(--brand)", fontSize: "12px", fontWeight: 700 }}>✓</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between" }}>
-                <button
-                  type="button"
-                  className="btn sm ghost"
+              <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "8px" }}>
+                <Link
+                  href="/settings"
                   onClick={() => setIsSwitcherOpen(false)}
-                  style={{ fontSize: "11px", height: "26px", padding: "0 8px" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    color: "var(--ink)",
+                    textDecoration: "none",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface2)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  Close
-                </button>
+                  <svg className="i" viewBox="0 0 24 24" style={{ width: "13px", height: "13px" }}>
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                  </svg>
+                  <span>Account Settings</span>
+                </Link>
+                <Link
+                  href={roleDef.primaryRoute || "/dashboard"}
+                  onClick={() => setIsSwitcherOpen(false)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    color: "var(--ink)",
+                    textDecoration: "none",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface2)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                >
+                  <svg className="i" viewBox="0 0 24 24" style={{ width: "13px", height: "13px", color: "var(--brand)" }}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <span>Role Portal ({roleDef.label})</span>
+                </Link>
+              </div>
+
+              <div style={{ paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
                 <button
                   type="button"
                   className="btn sm danger"
@@ -553,7 +538,7 @@ export default function Sidebar({
                     setIsSwitcherOpen(false);
                     logout();
                   }}
-                  style={{ fontSize: "11px", height: "26px", padding: "0 8px" }}
+                  style={{ width: "100%", justifyContent: "center", fontSize: "11.5px", height: "28px" }}
                 >
                   Sign Out
                 </button>

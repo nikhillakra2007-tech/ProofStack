@@ -88,7 +88,6 @@ export default function DashboardPage() {
     role,
     activeMember,
     allMembers,
-    switchMember,
   } = useAuth();
   const { isTampered, setIsTampered } = useTheme();
 
