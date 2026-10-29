@@ -79,12 +79,26 @@ export default function SettingsPage() {
   };
 
   const handleTestConnection = async () => {
-    setTestStatus({ loading: true, result: "Pinging Nebius Token Factory & NVIDIA NIM..." });
+    const keyToTest = (nebiusKey || nemotronKey || "").trim();
+    if (!keyToTest) {
+      setTestStatus({
+        loading: false,
+        result: "✗ Please enter a Nebius or NVIDIA API key above before testing.",
+        success: false,
+      });
+      return;
+    }
+
+    setTestStatus({ loading: true, result: "Connecting to Nebius Token Factory & NVIDIA NIM..." });
     try {
       const res = await fetch("/api/model/verify-key", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey: nebiusKey }),
+        body: JSON.stringify({
+          apiKey: keyToTest,
+          endpointUrl: endpointUrl.trim(),
+          model: primaryModel,
+        }),
       });
       const data = await res.json();
       if (data.success) {

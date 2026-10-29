@@ -308,11 +308,15 @@ function StudioContent() {
     setPanelTab("gates");
 
     let apiKey = "";
+    let endpointUrl = "";
+    let model = "nvidia/nemotron-3-super-120b";
     try {
       const stored = localStorage.getItem("proofstack_api_keys");
       if (stored) {
         const parsed = JSON.parse(stored);
-        apiKey = parsed.nebiusKey || parsed.nemotronKey || "";
+        apiKey = (parsed.nebiusKey || parsed.nemotronKey || "").trim();
+        endpointUrl = (parsed.endpointUrl || "").trim();
+        model = parsed.primaryModel || "nvidia/nemotron-3-super-120b";
       }
     } catch {
       // Ignore
@@ -329,7 +333,8 @@ function StudioContent() {
           code: snippetMode === "custom" ? customCode : selectedProblem.bugSnippet,
           problemId: selectedProblem.id,
           apiKey: apiKey,
-          model: "nvidia/nemotron-3-super-120b",
+          endpointUrl: endpointUrl,
+          model: model,
         }),
       });
 

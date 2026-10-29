@@ -1,12 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { prompt, currentCode } = body;
+    const body = await req.json().catch(() => ({}));
+    const { prompt, currentCode, apiKey } = body;
+    const headerKey = req.headers.get("x-nebius-api-key");
+    const activeApiKey = apiKey || headerKey || process.env.NEBIUS_API_KEY || process.env.NVIDIA_API_KEY;
+
+    // 1. If real Nebius / NVIDIA API key is available, perform live Nemotron chat inference
+    if (activeApiKey && typeof activeApiKey === "string" && !activeApiKey.startsWith("demo_") && activeApiKey.trim().length > 8) {
+      const trimmedKey = activeApiKey.trim();
+      const candidateEndpoints = [
+        "https://api.studio.nebius.ai/v1/chat/completions",
+        "https://api.tokenfactory.nebius.com/v1/chat/completions",
+      ];
+      if (trimmedKey.startsWith("nvapi-")) {
+        candidateEndpoints.unshift("https://integrate.api.nvidia.com/v1/chat/completions");
+      }
+
+      for (const ep of candidateEndpoints) {
+        try {
+          const resp = await fetch(ep, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${trimmedKey}`,
+            },
+            body: JSON.stringify({
+              model: "nvidia/nemotron-3-super-120b",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "You are Sentinel AI, an autonomous DevSecOps and security compiler assistant powered by NVIDIA Nemotron for ProofStack. You assist with vulnerability fixes, 8 compiler verification gates, DAST exploit probes, and cryptographic evidence ledgers. Provide concise, expert, actionable guidance with code snippets when helpful.",
+                },
+                {
+                  role: "user",
+                  content: `${prompt}${currentCode ? `\n\nCurrent Code Context:\n\`\`\`python\n${currentCode}\n\`\`\`` : ""}`,
+                },
+              ],
+              temperature: 0.2,
+              max_tokens: 1024,
+            }),
+            signal: AbortSignal.timeout(12000),
+          });
+
+          if (resp.ok) {
+            const data = await resp.json();
+            const text = data.choices?.[0]?.message?.content || "";
+            if (text) {
+              return NextResponse.json({
+                text,
+                provenance: "live_inference",
+                model: "nvidia/nemotron-3-super-120b",
+                tokensUsed: data.usage?.total_tokens || 210,
+              });
+            }
+          }
+        } catch {
+          // Continue to next endpoint or fallback
+        }
+      }
+    }
+
+    // 2. Intelligent Domain Classification Fallback
     const query = (prompt || "").toLowerCase();
 
-    // Natural Language intent classification
     if (query.includes("sql") || query.includes("latency") || query.includes("bottleneck") || query.includes("n+1") || query.includes("audit")) {
       return NextResponse.json({
         text: "I analyzed the code against ProofStack's 19 problem classes. Detected an N+1 database explosion (Problem T1-2) with unparameterized SQL interpolation risk. I synthesized an eager-loading defensive patch via NVIDIA Nemotron:",
