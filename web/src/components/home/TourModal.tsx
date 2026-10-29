@@ -11,7 +11,7 @@ interface TourModalProps {
 
 function extractYouTubeId(urlOrId: string): string {
   const trimmed = urlOrId.trim();
-  if (!trimmed) return "7X8II6J-6mU";
+  if (!trimmed) return "";
   const match = trimmed.match(
     /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/
   );
@@ -21,17 +21,19 @@ function extractYouTubeId(urlOrId: string): string {
   if (/^[\w-]{11}$/.test(trimmed)) {
     return trimmed;
   }
-  return trimmed;
+  return "";
 }
 
 export default function TourModal({ isOpen, onClose }: TourModalProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<"video" | "interactive">("video");
+  // Default to Interactive Flow (Step 1 to 5)
+  const [activeTab, setActiveTab] = useState<"video" | "interactive">("interactive");
   
-  // YouTube video state
-  const [youtubeInput, setYoutubeInput] = useState<string>("https://www.youtube.com/watch?v=7X8II6J-6mU");
-  const [activeVideoId, setActiveVideoId] = useState<string>("7X8II6J-6mU");
+  // YouTube video state with NEXT_PUBLIC_DEMO_VIDEO_URL support
+  const defaultDemoUrl = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL || "";
+  const [youtubeInput, setYoutubeInput] = useState<string>(defaultDemoUrl);
+  const [activeVideoId, setActiveVideoId] = useState<string>(extractYouTubeId(defaultDemoUrl));
   const [videoStatusMessage, setVideoStatusMessage] = useState<string | null>(null);
 
   // Interactive step state
@@ -109,11 +111,18 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
 
   const handleLaunch = () => {
     onClose();
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      router.push("/login?redirect=/dashboard");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("proofstack_auth_active");
+        localStorage.removeItem("proofstack_session");
+        localStorage.removeItem("proofstack_role");
+        localStorage.removeItem("proofstack_user");
+        document.cookie = "ps_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "proofstack_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "ps_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      } catch {}
     }
+    router.push("/login");
   };
 
   const step = steps[currentStep];
@@ -211,25 +220,50 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
                   height: 0,
                   borderRadius: "8px",
                   overflow: "hidden",
-                  background: "#000",
+                  background: "#0A0D14",
                   boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
                   border: "1px solid var(--line)",
                 }}
               >
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${activeVideoId}?autoplay=1&rel=0&modestbranding=1`}
-                  title="ProofStack 2-Minute Architecture Tour"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    border: "none",
-                  }}
-                />
+                {activeVideoId ? (
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${activeVideoId}?autoplay=1&rel=0&modestbranding=1`}
+                    title="ProofStack 2-Minute Architecture Tour"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "10px",
+                      color: "var(--ink2)",
+                      padding: "20px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: "36px" }}>🎬</div>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink)" }}>
+                      Hackathon Demo Video Player
+                    </div>
+                    <div style={{ fontSize: "12px", maxWidth: "420px", color: "var(--ink2)", lineHeight: 1.5 }}>
+                      Paste your Nebius x NVIDIA Hackathon YouTube video link below or configure <code>NEXT_PUBLIC_DEMO_VIDEO_URL</code> in your environment.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* URL Customization Bar */}
@@ -247,7 +281,7 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
                     type="text"
                     value={youtubeInput}
                     onChange={(e) => setYoutubeInput(e.target.value)}
-                    placeholder="Paste YouTube Video URL or ID (e.g. https://www.youtube.com/watch?v=...)"
+                    placeholder="Enter Hackathon YouTube Video URL (e.g. https://www.youtube.com/watch?v=...)"
                     style={{
                       width: "100%",
                       height: "36px",
@@ -283,43 +317,6 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
                   ✓ {videoStatusMessage}
                 </div>
               )}
-
-              {/* Preset Video Chips */}
-              <div
-                style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <span style={{ fontSize: "11px", color: "var(--ink2)" }}>Demo presets:</span>
-                <button
-                  type="button"
-                  className="chip brand"
-                  onClick={() => handleSelectPreset("https://www.youtube.com/watch?v=7X8II6J-6mU")}
-                  style={{ cursor: "pointer", fontSize: "10.5px" }}
-                >
-                  ⚡ NVIDIA Nimbus Architecture
-                </button>
-                <button
-                  type="button"
-                  className="chip pass"
-                  onClick={() => handleSelectPreset("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
-                  style={{ cursor: "pointer", fontSize: "10.5px" }}
-                >
-                  🔒 Zero-Compromise Security
-                </button>
-                <button
-                  type="button"
-                  className="chip mono"
-                  onClick={() => handleSelectPreset("https://www.youtube.com/watch?v=3JZ_D3ELwOQ")}
-                  style={{ cursor: "pointer", fontSize: "10.5px" }}
-                >
-                  📊 Hash-Chained Ledger
-                </button>
-              </div>
             </div>
           ) : (
             <div>

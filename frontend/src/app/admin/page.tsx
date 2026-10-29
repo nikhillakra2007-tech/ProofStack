@@ -99,7 +99,7 @@ export default function AdminRolePage() {
                 <span>ROLE PORTAL • WORKSPACE ADMIN</span>
               </span>
               <span className="chip pass" style={{ fontSize: "10.5px" }}>
-                Operator: {activeMember?.name || "Marcus Vance"} (Platform &amp; Infrastructure)
+                Admin: {activeMember?.name || "Marcus Vance"} (Platform &amp; Infrastructure)
               </span>
             </div>
 
@@ -117,10 +117,10 @@ export default function AdminRolePage() {
 
           <div>
             <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--heading-primary)", letterSpacing: "-0.02em" }}>
-              Workspace Administration &amp; Fleet Resource Allocation
+              Workspace Admin &amp; Cloud Runner Fleet Management
             </h1>
             <p style={{ margin: 0, color: "var(--ink2)", fontSize: "13.5px", maxWidth: "800px", lineHeight: 1.55 }}>
-              Authorized for multi-tenant token quota allocation, microVM container runner pool health, task corridor assignment, and broker throughput telemetry.
+              Manage team members, adjust AI token quotas, monitor isolated runner microVMs, and oversee enterprise workloads.
             </p>
           </div>
 

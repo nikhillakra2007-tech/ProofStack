@@ -424,76 +424,117 @@ def process_user_records(db_session, user_ids: list[str]):
       : selectedProblem.metrics?.baseline || { keyMetric: "Baseline", latency: "380ms", delta: "0.0%" };
 
   return (
-    <div className="space-y-5 max-w-[1440px] mx-auto pb-14 px-1 sm:px-2">
+    <div style={{ maxWidth: "1440px", margin: "0 auto", paddingBottom: "56px", display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* =========================================================================
           SUBSECTION 1: WORKSPACE OVERVIEW
-          Breadcrumbs, Scenario Identity, Execution State, and Primary Actions
+          Top Header Card with Task Selector Dropdown and Green Primary Button (#059669)
           ========================================================================= */}
-      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6 shadow-sm transition-all">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-1.5 min-w-0">
+      <section
+        style={{
+          borderRadius: "14px",
+          border: "1px solid var(--line)",
+          background: "var(--surface)",
+          padding: "20px 24px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+      >
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "800px" }}>
             {/* Breadcrumb & Task Status Badges */}
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-mono text-[var(--ink3)]">Workspace</span>
-              <span className="text-[var(--ink3)]">/</span>
-              <span className="font-mono text-[var(--ink3)]">Studio</span>
-              <span className="text-[var(--ink3)]">/</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-[var(--brand)]/15 text-[var(--brand)] border border-[var(--brand)]/25">
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", fontSize: "11.5px", fontFamily: "var(--f-mono)" }}>
+              <span style={{ color: "var(--ink3)" }}>Workspace</span>
+              <span style={{ color: "var(--ink3)" }}>/</span>
+              <span style={{ color: "var(--ink3)" }}>Studio</span>
+              <span style={{ color: "var(--ink3)" }}>/</span>
+              <span style={{ padding: "2px 8px", borderRadius: "5px", fontWeight: 700, background: "rgba(32, 201, 166, 0.15)", color: "var(--brand)", border: "1px solid rgba(32, 201, 166, 0.3)" }}>
                 {selectedProblem.id}
               </span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono text-[var(--ink2)] bg-[var(--surface2)] border border-[var(--line)]">
+              <span style={{ padding: "2px 8px", borderRadius: "5px", color: "var(--ink2)", background: "var(--surface2)", border: "1px solid var(--line)" }}>
                 Tier: {selectedProblem.tier || "Enterprise"}
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "2px 8px", borderRadius: "5px", color: "#059669", background: "rgba(5, 150, 105, 0.1)", border: "1px solid rgba(5, 150, 105, 0.25)" }}>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#059669" }} />
                 Hermetic Sandbox Ready
               </span>
             </div>
 
             {/* Task Title & Summary */}
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--ink)] leading-snug">
+            <h1 style={{ margin: "2px 0 0", fontSize: "22px", fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.01em", lineHeight: 1.25 }}>
               {selectedProblem.title}
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--ink2)] max-w-3xl leading-relaxed">
+            <p style={{ margin: 0, fontSize: "13px", color: "var(--ink2)", lineHeight: 1.5 }}>
               {selectedProblem.summary}
             </p>
           </div>
 
-          {/* Scenario Selector & Quick Execution Action */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            {/* Styled Scenario Select Control */}
-            <div className="relative min-w-[240px]">
+          {/* Scenario Selector & Green Primary Action Button */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px" }}>
+            {/* Task Selector Dropdown */}
+            <div style={{ position: "relative", minWidth: "240px" }}>
               <select
                 value={selectedProblem.id}
                 onChange={(e) => handleSelectProblem(e.target.value)}
                 aria-label="Select benchmark scenario"
-                className="w-full h-10 pl-3 pr-9 text-xs font-mono rounded-xl bg-[var(--surface2)] border border-[var(--line)] text-[var(--ink)] hover:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30 transition-all cursor-pointer appearance-none shadow-sm font-medium"
+                style={{
+                  width: "100%",
+                  height: "38px",
+                  padding: "0 34px 0 12px",
+                  borderRadius: "8px",
+                  background: "var(--surface2)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  fontFamily: "var(--f-mono)",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  outline: "none",
+                  cursor: "pointer",
+                  appearance: "none",
+                }}
               >
                 {catalogWithCustom.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-[var(--surface)] text-[var(--ink)]">
+                  <option key={p.id} value={p.id}>
                     [{p.id}] {p.title}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-[var(--ink3)] absolute right-3 top-3 pointer-events-none" />
+              <ChevronDown style={{ width: "16px", height: "16px", color: "var(--ink3)", position: "absolute", right: "10px", top: "11px", pointerEvents: "none" }} />
             </div>
 
-            {/* Primary Action Button */}
+            {/* Green Primary Action Button (#059669) */}
             {isSafeMode ? (
               <button
                 type="button"
                 onClick={handleAcceptPatch}
                 disabled={isRepairing || isProcessing}
-                className="h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-sm"
+                style={{
+                  height: "38px",
+                  padding: "0 22px",
+                  borderRadius: "8px",
+                  background: "#059669",
+                  color: "#FFFFFF",
+                  border: "none",
+                  fontWeight: 700,
+                  fontSize: "12.5px",
+                  fontFamily: "var(--f-mono)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(5, 150, 105, 0.35)",
+                  transition: "all 120ms ease",
+                }}
               >
                 {role === "developer" ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 style={{ width: "16px", height: "16px" }} />
                     <span>Submit for Audit</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck style={{ width: "16px", height: "16px" }} />
                     <span>Approve &amp; Seal</span>
                   </>
                 )}
@@ -503,9 +544,23 @@ def process_user_records(db_session, user_ids: list[str]):
                 type="button"
                 onClick={handleRunCode}
                 disabled={isProcessing}
-                className="h-10 px-4 rounded-xl bg-[var(--surface2)] hover:bg-[var(--surface3)] active:scale-95 border border-[var(--line)] text-xs font-mono font-bold text-[var(--ink)] transition-all flex items-center gap-2"
+                style={{
+                  height: "38px",
+                  padding: "0 18px",
+                  borderRadius: "8px",
+                  background: "var(--surface2)",
+                  color: "var(--ink)",
+                  border: "1px solid var(--line)",
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                }}
               >
-                <Play className="w-3.5 h-3.5 text-[var(--brand)] fill-current" />
+                <Play style={{ width: "14px", height: "14px", color: "var(--brand)", fill: "currentColor" }} />
                 <span>Run MicroVM</span>
               </button>
             )}
@@ -514,19 +569,33 @@ def process_user_records(db_session, user_ids: list[str]):
 
         {/* Real-Time Interactive Toast Notification */}
         {toastMessage && (
-          <div className="mt-4 p-3 rounded-xl border border-[var(--brand)]/30 bg-[var(--brand)]/10 text-xs text-[var(--ink)] flex items-center justify-between gap-3 font-mono transition-all animate-fadeIn">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[var(--brand)] shrink-0" />
-              <span className="font-medium">{toastMessage}</span>
+          <div
+            style={{
+              padding: "10px 14px",
+              borderRadius: "8px",
+              border: "1px solid rgba(5, 150, 105, 0.3)",
+              background: "rgba(5, 150, 105, 0.08)",
+              color: "var(--ink)",
+              fontSize: "12px",
+              fontFamily: "var(--f-mono)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <CheckCircle2 style={{ width: "16px", height: "16px", color: "#059669", flexShrink: 0 }} />
+              <span style={{ fontWeight: 600 }}>{toastMessage}</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {toastLink && (
                 <Link
                   href={toastLink.href}
-                  className="text-[var(--brand)] font-semibold underline hover:opacity-80 flex items-center gap-1"
+                  style={{ color: "#059669", fontWeight: 700, textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: "4px" }}
                 >
                   <span>{toastLink.text}</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink style={{ width: "12px", height: "12px" }} />
                 </Link>
               )}
               <button
@@ -535,8 +604,7 @@ def process_user_records(db_session, user_ids: list[str]):
                   setToastMessage(null);
                   setToastLink(null);
                 }}
-                className="text-[var(--ink3)] hover:text-[var(--ink)] px-1"
-                aria-label="Dismiss notification"
+                style={{ background: "transparent", border: "none", color: "var(--ink3)", cursor: "pointer", padding: "2px 4px" }}
               >
                 ✕
               </button>
@@ -546,31 +614,178 @@ def process_user_records(db_session, user_ids: list[str]):
       </section>
 
       {/* =========================================================================
-          MAIN WORKSPACE GRID: 8 COLUMNS (EDITOR & EVIDENCE) + 4 COLUMNS (DIAGNOSTICS)
-          Eliminates unused whitespace and structures information logically
+          4 CLEAN METRIC CARDS
+          Gate Status: 8/8 PASSED | Speedup Delta: +74.2% (12ms) | Security Invariant: 100% PRESERVED | MicroVM Isolation: HERMETIC
           ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* =======================================================================
-            LEFT COLUMN (8 COLS): Configuration, Execution Lab, Code & Verification
-            ======================================================================= */}
-        <div className="lg:col-span-8 space-y-5">
-          {/* SUBSECTION 2 & 3: SCENARIO CONFIGURATION & EXECUTION LAB */}
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3 font-mono text-xs shadow-sm">
-            {/* Mode Switcher Segmented Control */}
-            <div className="flex flex-wrap items-center gap-1 p-1 rounded-xl bg-[var(--surface2)] border border-[var(--line)]">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "14px",
+        }}
+      >
+        {/* Metric Card 1 */}
+        <div
+          style={{
+            padding: "16px 18px",
+            borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Gate Status
+            </span>
+            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", padding: "2px 6px", borderRadius: "4px", background: "rgba(5, 150, 105, 0.12)", color: "#059669", fontWeight: 700 }}>
+              VERIFIED
+            </span>
+          </div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--f-mono)", color: isSafeMode ? "#059669" : isNaiveMode ? "#E11D48" : "#D97706" }}>
+            {isSafeMode ? "8/8 PASSED" : isNaiveMode ? "G2 VETOED" : "BASELINE (BUG)"}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--ink2)" }}>Deterministic compiler &amp; exploit gates</div>
+        </div>
+
+        {/* Metric Card 2 */}
+        <div
+          style={{
+            padding: "16px 18px",
+            borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Speedup Delta
+            </span>
+            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", padding: "2px 6px", borderRadius: "4px", background: "rgba(32, 201, 166, 0.12)", color: "var(--brand)", fontWeight: 700 }}>
+              LATENCY
+            </span>
+          </div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--f-mono)", color: "var(--brand)" }}>
+            {isSafeMode ? "+74.2% (12ms)" : activeMetrics.delta}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--ink2)" }}>Execution latency reduced to 12ms</div>
+        </div>
+
+        {/* Metric Card 3 */}
+        <div
+          style={{
+            padding: "16px 18px",
+            borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Security Invariant
+            </span>
+            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", padding: "2px 6px", borderRadius: "4px", background: "rgba(5, 150, 105, 0.12)", color: "#059669", fontWeight: 700 }}>
+              AST PROOF
+            </span>
+          </div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--f-mono)", color: isSafeMode ? "#059669" : isNaiveMode ? "#E11D48" : "var(--ink)" }}>
+            {isSafeMode ? "100% PRESERVED" : isNaiveMode ? "0% VIOLATED" : "UNPROVEN"}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--ink2)" }}>AST bound query parameterized</div>
+        </div>
+
+        {/* Metric Card 4 */}
+        <div
+          style={{
+            padding: "16px 18px",
+            borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              MicroVM Isolation
+            </span>
+            <span style={{ fontSize: "10px", fontFamily: "var(--f-mono)", padding: "2px 6px", borderRadius: "4px", background: "rgba(5, 150, 105, 0.12)", color: "#059669", fontWeight: 700 }}>
+              SANDBOX
+            </span>
+          </div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--f-mono)", color: "#059669" }}>
+            HERMETIC
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--ink2)" }}>Rootless Linux 6.6 ephemeral VMM</div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          MAIN WORKSPACE GRID: 8 COLUMNS (EDITOR & EVIDENCE) + 4 COLUMNS (DIAGNOSTICS)
+          ========================================================================= */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+          {/* Action Toolbar: Segmented Mode Switcher & Execution Buttons */}
+          <div
+            style={{
+              borderRadius: "12px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              padding: "12px 16px",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+            }}
+          >
+            {/* Mode Switcher Buttons */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "4px",
+                padding: "3px",
+                borderRadius: "8px",
+                background: "var(--surface2)",
+                border: "1px solid var(--line)",
+              }}
+            >
               <button
                 type="button"
                 onClick={() => {
                   setSnippetMode("bug");
                   setHardenedCandidateCode(null);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  isBugMode
-                    ? "bg-[var(--surface)] text-[var(--fail)] shadow-sm border border-[var(--line)]"
-                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "11.5px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 600,
+                  border: isBugMode ? "1px solid #E11D48" : "1px solid transparent",
+                  background: isBugMode ? "rgba(225, 29, 72, 0.12)" : "transparent",
+                  color: isBugMode ? "#E11D48" : "var(--ink2)",
+                  transition: "all 120ms ease",
+                }}
               >
-                Baseline (Flaw)
+                Baseline (Bug)
               </button>
               <button
                 type="button"
@@ -578,11 +793,18 @@ def process_user_records(db_session, user_ids: list[str]):
                   setSnippetMode("naive");
                   setHardenedCandidateCode(null);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  isNaiveMode
-                    ? "bg-[var(--surface)] text-amber-600 dark:text-amber-400 shadow-sm border border-[var(--line)]"
-                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "11.5px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 600,
+                  border: isNaiveMode ? "1px solid #D97706" : "1px solid transparent",
+                  background: isNaiveMode ? "rgba(217, 119, 6, 0.12)" : "transparent",
+                  color: isNaiveMode ? "#D97706" : "var(--ink2)",
+                  transition: "all 120ms ease",
+                }}
               >
                 Naive Fix
               </button>
@@ -592,11 +814,18 @@ def process_user_records(db_session, user_ids: list[str]):
                   setSnippetMode("safe");
                   setHardenedCandidateCode(null);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  isSafeMode
-                    ? "bg-[var(--brand)] text-[var(--brand-ink)] shadow-sm"
-                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "11.5px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 700,
+                  border: isSafeMode ? "1px solid #059669" : "1px solid transparent",
+                  background: isSafeMode ? "#059669" : "transparent",
+                  color: isSafeMode ? "#FFFFFF" : "var(--ink2)",
+                  transition: "all 120ms ease",
+                }}
               >
                 Defensive (Nemotron)
               </button>
@@ -606,26 +835,47 @@ def process_user_records(db_session, user_ids: list[str]):
                   setSnippetMode("custom");
                   setHardenedCandidateCode(null);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  isCustomMode
-                    ? "bg-[var(--surface)] text-teal-600 dark:text-teal-400 shadow-sm border border-[var(--line)]"
-                    : "text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "11.5px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 600,
+                  border: isCustomMode ? "1px solid var(--brand)" : "1px solid transparent",
+                  background: isCustomMode ? "rgba(32, 201, 166, 0.15)" : "transparent",
+                  color: isCustomMode ? "var(--brand)" : "var(--ink2)",
+                  transition: "all 120ms ease",
+                }}
               >
-                Custom Ingestion
+                Custom Code
               </button>
             </div>
 
             {/* Execution Lab Action Deck */}
-            <div className="flex items-center gap-2">
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
               <button
                 type="button"
                 onClick={handleRunCode}
                 disabled={isProcessing}
-                title="Execute sandbox probe in rootless Linux microVM"
-                className="px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--surface2)] hover:bg-[var(--surface3)] text-[var(--ink)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+                style={{
+                  height: "34px",
+                  padding: "0 14px",
+                  borderRadius: "7px",
+                  background: "var(--surface2)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Play className="w-3.5 h-3.5 text-[var(--brand)] fill-current" />
+                <Play style={{ width: "13px", height: "13px", color: "var(--brand)", fill: "currentColor" }} />
                 <span>Run MicroVM</span>
               </button>
 
@@ -633,10 +883,24 @@ def process_user_records(db_session, user_ids: list[str]):
                 type="button"
                 onClick={handleAuditGauntlet}
                 disabled={isProcessing || isRepairing}
-                title="Evaluate 8 Zero-Compromise Security Invariants"
-                className="px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--surface2)] hover:bg-[var(--surface3)] text-[var(--ink)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+                style={{
+                  height: "34px",
+                  padding: "0 14px",
+                  borderRadius: "7px",
+                  background: "var(--surface2)",
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Shield className="w-3.5 h-3.5 text-amber-500" />
+                <Shield style={{ width: "14px", height: "14px", color: "#D97706" }} />
                 <span>Audit Gauntlet</span>
               </button>
 
@@ -644,98 +908,164 @@ def process_user_records(db_session, user_ids: list[str]):
                 type="button"
                 onClick={handleSelfHeal}
                 disabled={isProcessing || isRepairing}
-                title="Synthesize defensive patch with NVIDIA Nemotron"
-                className="px-3 py-1.5 rounded-lg border border-[var(--brand)]/30 bg-[var(--brand)]/10 hover:bg-[var(--brand)]/20 text-[var(--brand)] font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+                style={{
+                  height: "34px",
+                  padding: "0 14px",
+                  borderRadius: "7px",
+                  background: "rgba(32, 201, 166, 0.12)",
+                  border: "1px solid var(--brand)",
+                  color: "var(--brand)",
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Sparkles className="w-3.5 h-3.5 text-[var(--brand)]" />
+                <Sparkles style={{ width: "14px", height: "14px", color: "var(--brand)" }} />
                 <span>Self-Heal</span>
               </button>
             </div>
           </div>
 
-          {/* SUBSECTION 6: CANDIDATE PATCH & CODE REVIEW (MONACO DIFF CONTAINER) */}
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] overflow-hidden shadow-sm">
+          {/* =========================================================================
+              SIDE-BY-SIDE 2-COLUMN DARK CODE DIFF VIEWER (#0F172A Background)
+              Red '- Baseline Code' left panel, Green '+ Candidate Fix (safe)' right panel
+              ========================================================================= */}
+          <div
+            style={{
+              borderRadius: "12px",
+              border: "1px solid #1E293B",
+              background: "#0F172A",
+              overflow: "hidden",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+            }}
+          >
             {/* Diff Header Bar */}
-            <div className="px-4 py-3 border-b border-[var(--line)] bg-[var(--surface2)] flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2.5">
-                <FileCode2 className="w-4 h-4 text-[var(--brand)]" />
-                <span className="font-bold text-[var(--ink)]">{targetFilename}</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface)] text-[var(--ink2)] border border-[var(--line)]">
+            <div
+              style={{
+                padding: "10px 16px",
+                borderBottom: "1px solid #1E293B",
+                background: "#1E293B",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontFamily: "var(--f-mono)",
+                fontSize: "12px",
+                color: "#F8FAFC",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <FileCode2 style={{ width: "16px", height: "16px", color: "var(--brand)" }} />
+                <span style={{ fontWeight: 700 }}>{targetFilename}</span>
+                <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", background: "#0F172A", color: "#94A3B8", border: "1px solid #334155" }}>
                   Python 3.11 AST
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[var(--ink2)] hidden sm:inline">
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "11px", color: "#94A3B8" }}>
                   {isSafeMode ? "+8 lines added, -6 replaced" : "Inspection view"}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleCopyCode(candidateDisplayCode)}
-                  className="px-2 py-1 rounded bg-[var(--surface)] border border-[var(--line)] hover:border-[var(--brand)] text-[var(--ink2)] hover:text-[var(--ink)] flex items-center gap-1 transition-all"
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "5px",
+                    background: "#0F172A",
+                    border: "1px solid #334155",
+                    color: "#94A3B8",
+                    fontSize: "11px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
                   title="Copy candidate patch"
                 >
-                  {copied ? <CheckCheck className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span className="text-[10px]">{copied ? "Copied" : "Copy"}</span>
+                  {copied ? <CheckCheck style={{ width: "13px", height: "13px", color: "#10B981" }} /> : <Copy style={{ width: "13px", height: "13px" }} />}
+                  <span>{copied ? "Copied" : "Copy"}</span>
                 </button>
               </div>
             </div>
 
-            {/* Mobile Tab Switcher */}
-            <div className="sm:hidden flex border-b border-[var(--line)] font-mono text-xs">
-              <button
-                type="button"
-                onClick={() => setMobileCodeTab("baseline")}
-                className={`flex-1 py-2.5 text-center font-bold transition-all ${
-                  mobileCodeTab === "baseline"
-                    ? "border-b-2 border-[var(--fail)] text-[var(--fail)] bg-[var(--surface)]"
-                    : "text-[var(--ink2)] bg-[var(--surface2)]"
-                }`}
-              >
-                − Baseline Code
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileCodeTab("candidate")}
-                className={`flex-1 py-2.5 text-center font-bold transition-all ${
-                  mobileCodeTab === "candidate"
-                    ? "border-b-2 border-emerald-500 text-emerald-500 bg-[var(--surface)]"
-                    : "text-[var(--ink2)] bg-[var(--surface2)]"
-                }`}
-              >
-                + Candidate Patch
-              </button>
-            </div>
-
-            {/* Side-by-Side Code Diff */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[var(--line)]">
-              {/* Left Column: Baseline Flaw */}
-              <div className={`flex flex-col min-w-0 ${mobileCodeTab === "candidate" ? "hidden sm:flex" : "flex"}`}>
-                <div className="px-3.5 py-2 border-b border-[var(--line)] bg-[var(--surface)]/80 flex items-center justify-between text-[11px] font-mono text-[var(--ink2)]">
-                  <span className="font-semibold text-[var(--fail)] flex items-center gap-1">
-                    <span>−</span> Baseline Vulnerability
+            {/* Side-by-Side 2-Column Diff Grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                background: "#0F172A",
+              }}
+            >
+              {/* Left Column: Red '- Baseline Code' */}
+              <div style={{ display: "flex", flexDirection: "column", minWidth: 0, borderRight: "1px solid #1E293B" }}>
+                <div
+                  style={{
+                    padding: "8px 14px",
+                    borderBottom: "1px solid rgba(225, 29, 72, 0.25)",
+                    background: "rgba(225, 29, 72, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    fontSize: "11px",
+                    fontFamily: "var(--f-mono)",
+                    color: "#FB7185",
+                    fontWeight: 700,
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>−</span> Baseline Code (Flaw)
                   </span>
-                  <span className="text-[10px] text-[var(--ink3)]">Read-Only</span>
+                  <span style={{ fontSize: "10px", color: "#94A3B8", fontWeight: 400 }}>Read-Only</span>
                 </div>
-                <div className="p-3.5 font-mono text-xs overflow-x-auto min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] selection:bg-rose-900/40">
+                <div
+                  style={{
+                    padding: "14px 16px",
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "12px",
+                    overflowX: "auto",
+                    minHeight: "360px",
+                    maxHeight: "460px",
+                    background: "#0F172A",
+                    color: "#F1F5F9",
+                    lineHeight: 1.6,
+                  }}
+                >
                   {baselineDisplayCode.split("\n").map((line, idx) => (
-                    <div key={idx} className="flex gap-3 py-0.5 leading-relaxed hover:bg-white/5 rounded px-1">
-                      <span className="w-6 text-right select-none text-[var(--term-mute)] shrink-0 text-[11px]">
+                    <div key={idx} style={{ display: "flex", gap: "12px", padding: "1px 0" }}>
+                      <span style={{ width: "24px", textAlign: "right", color: "#64748B", userSelect: "none", flexShrink: 0, fontSize: "11px" }}>
                         {idx + 1}
                       </span>
-                      <span className="whitespace-pre font-mono">{highlightLine(line)}</span>
+                      <span style={{ whiteSpace: "pre", fontFamily: "var(--f-mono)" }}>{highlightLine(line)}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Right Column: Candidate Patch */}
-              <div className={`flex flex-col min-w-0 ${mobileCodeTab === "baseline" ? "hidden sm:flex" : "flex"}`}>
-                <div className="px-3.5 py-2 border-b border-[var(--line)] bg-[var(--surface)]/80 flex items-center justify-between text-[11px] font-mono text-[var(--ink2)]">
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              {/* Right Column: Green '+ Candidate Fix (safe)' */}
+              <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                <div
+                  style={{
+                    padding: "8px 14px",
+                    borderBottom: "1px solid rgba(5, 150, 105, 0.25)",
+                    background: "rgba(5, 150, 105, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    fontSize: "11px",
+                    fontFamily: "var(--f-mono)",
+                    color: "#34D399",
+                    fontWeight: 700,
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <span>+</span> Candidate Fix ({snippetMode})
                   </span>
-                  <span className="text-[10px] text-[var(--ink3)]">
+                  <span style={{ fontSize: "10px", color: "#94A3B8", fontWeight: 400 }}>
                     {isCustomMode ? "Interactive Editor" : "Synthesized by Nemotron"}
                   </span>
                 </div>
@@ -744,18 +1074,43 @@ def process_user_records(db_session, user_ids: list[str]):
                   <textarea
                     value={customCode}
                     onChange={(e) => setCustomCode(e.target.value)}
-                    className="p-3.5 font-mono text-xs w-full min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] resize-none border-0 focus:outline-none focus:ring-1 focus:ring-[var(--brand)] leading-relaxed selection:bg-teal-900/40"
+                    style={{
+                      padding: "14px 16px",
+                      fontFamily: "var(--f-mono)",
+                      fontSize: "12px",
+                      width: "100%",
+                      minHeight: "360px",
+                      maxHeight: "460px",
+                      background: "#0F172A",
+                      color: "#F1F5F9",
+                      resize: "none",
+                      border: "none",
+                      outline: "none",
+                      lineHeight: 1.6,
+                    }}
                     spellCheck={false}
                     placeholder="# Enter custom production python function here..."
                   />
                 ) : (
-                  <div className="p-3.5 font-mono text-xs overflow-x-auto min-h-[340px] max-h-[460px] bg-[var(--term-bg)] text-[var(--term-ink)] selection:bg-emerald-900/40">
+                  <div
+                    style={{
+                      padding: "14px 16px",
+                      fontFamily: "var(--f-mono)",
+                      fontSize: "12px",
+                      overflowX: "auto",
+                      minHeight: "360px",
+                      maxHeight: "460px",
+                      background: "#0F172A",
+                      color: "#F1F5F9",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {candidateDisplayCode.split("\n").map((line, idx) => (
-                      <div key={idx} className="flex gap-3 py-0.5 leading-relaxed hover:bg-white/5 rounded px-1">
-                        <span className="w-6 text-right select-none text-[var(--term-mute)] shrink-0 text-[11px]">
+                      <div key={idx} style={{ display: "flex", gap: "12px", padding: "1px 0" }}>
+                        <span style={{ width: "24px", textAlign: "right", color: "#64748B", userSelect: "none", flexShrink: 0, fontSize: "11px" }}>
                           {idx + 1}
                         </span>
-                        <span className="whitespace-pre font-mono">{highlightLine(line)}</span>
+                        <span style={{ whiteSpace: "pre", fontFamily: "var(--f-mono)" }}>{highlightLine(line)}</span>
                       </div>
                     ))}
                   </div>
@@ -764,82 +1119,152 @@ def process_user_records(db_session, user_ids: list[str]):
             </div>
           </div>
 
-          {/* SUBSECTION 7: VERIFICATION, GATES & EVIDENCE PANEL */}
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5 space-y-4 shadow-sm">
+          {/* =========================================================================
+              STYLED BOTTOM TABS
+              Verification Gates (8) | MicroVM Execution Logs | Merkle Ledger Evidence
+              ========================================================================= */}
+          <div
+            style={{
+              borderRadius: "14px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              padding: "18px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}
+          >
             {/* Tab Headers */}
-            <div className="flex border-b border-[var(--line)] gap-2">
+            <div style={{ display: "flex", borderBottom: "1px solid var(--line)", gap: "8px", paddingBottom: "10px" }}>
               <button
                 type="button"
                 onClick={() => setPanelTab("gates")}
-                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
-                  panelTab === "gates"
-                    ? "border-[var(--brand)] text-[var(--brand)]"
-                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: panelTab === "gates" ? "1px solid var(--brand)" : "1px solid var(--line)",
+                  background: panelTab === "gates" ? "rgba(32, 201, 166, 0.12)" : "var(--surface2)",
+                  color: panelTab === "gates" ? "var(--brand)" : "var(--ink2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Shield className="w-4 h-4" />
+                <Shield style={{ width: "15px", height: "15px" }} />
                 <span>Verification Gates (8)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setPanelTab("logs")}
-                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
-                  panelTab === "logs"
-                    ? "border-[var(--brand)] text-[var(--brand)]"
-                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: panelTab === "logs" ? "1px solid var(--brand)" : "1px solid var(--line)",
+                  background: panelTab === "logs" ? "rgba(32, 201, 166, 0.12)" : "var(--surface2)",
+                  color: panelTab === "logs" ? "var(--brand)" : "var(--ink2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Terminal className="w-4 h-4" />
+                <Terminal style={{ width: "15px", height: "15px" }} />
                 <span>MicroVM Execution Logs</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setPanelTab("ledger")}
-                className={`pb-2.5 px-3 text-xs font-mono font-bold border-b-2 transition-all flex items-center gap-2 ${
-                  panelTab === "ledger"
-                    ? "border-[var(--brand)] text-[var(--brand)]"
-                    : "border-transparent text-[var(--ink2)] hover:text-[var(--ink)]"
-                }`}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: panelTab === "ledger" ? "1px solid var(--brand)" : "1px solid var(--line)",
+                  background: panelTab === "ledger" ? "rgba(32, 201, 166, 0.12)" : "var(--surface2)",
+                  color: panelTab === "ledger" ? "var(--brand)" : "var(--ink2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all 120ms ease",
+                }}
               >
-                <Layers className="w-4 h-4" />
+                <Layers style={{ width: "15px", height: "15px" }} />
                 <span>Merkle Ledger Evidence</span>
               </button>
             </div>
 
-            {/* Tab Content: 8 Verification Gates */}
+            {/* Tab Content 1: 8 Verification Gates */}
             {panelTab === "gates" && (
-              <div className="space-y-2.5 font-mono text-xs">
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontFamily: "var(--f-mono)", fontSize: "12px" }}>
                 {MOCK_GATES.map((g, index) => {
                   const isEvaluated = index < animatingGateIndex;
                   const isPassing = isSafeMode && isEvaluated;
-                  const isFailing = isNaiveMode && index === 2; // Gate 2 fails in naive mode
+                  const isFailing = isNaiveMode && index === 2;
                   return (
                     <div
                       key={g.gateId}
-                      className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] flex items-center justify-between gap-3 hover:border-[var(--brand)]/40 transition-colors"
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: "8px",
+                        border: "1px solid var(--line)",
+                        background: "var(--surface2)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                      }}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="font-bold text-[var(--ink)] shrink-0">{g.gateId}:</span>
-                        <span className="text-[var(--ink)] font-semibold truncate">{g.name}</span>
-                        <span className="text-[11px] text-[var(--ink3)] truncate hidden md:inline">
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                        <span style={{ fontWeight: 800, color: "var(--ink)", flexShrink: 0 }}>{g.gateId}:</span>
+                        <span style={{ fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {g.name}
+                        </span>
+                        <span style={{ fontSize: "11px", color: "var(--ink3)" }}>
                           — {g.description}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-[10px] text-[var(--ink3)]">
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+                        <span style={{ fontSize: "11px", color: "var(--ink3)" }}>
                           {isEvaluated ? "12ms" : "Pending"}
                         </span>
                         <span
-                          className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                            !isEvaluated
-                              ? "bg-[var(--surface)] text-[var(--ink3)] border border-[var(--line)]"
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: "5px",
+                            fontSize: "10.5px",
+                            fontWeight: 800,
+                            letterSpacing: "0.05em",
+                            background: !isEvaluated
+                              ? "var(--surface)"
                               : isFailing
-                              ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30"
-                              : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                          }`}
+                              ? "rgba(225, 29, 72, 0.15)"
+                              : "rgba(5, 150, 105, 0.15)",
+                            color: !isEvaluated
+                              ? "var(--ink3)"
+                              : isFailing
+                              ? "#E11D48"
+                              : "#059669",
+                            border: !isEvaluated
+                              ? "1px solid var(--line)"
+                              : isFailing
+                              ? "1px solid rgba(225, 29, 72, 0.3)"
+                              : "1px solid rgba(5, 150, 105, 0.3)",
+                          }}
                         >
                           {!isEvaluated ? "QUEUED" : isFailing ? "FAIL (VETO)" : "PASS"}
                         </span>
@@ -850,35 +1275,58 @@ def process_user_records(db_session, user_ids: list[str]):
               </div>
             )}
 
-            {/* Tab Content: MicroVM Execution Console */}
+            {/* Tab Content 2: MicroVM Execution Console */}
             {panelTab === "logs" && (
-              <div className="p-4 rounded-xl bg-[var(--term-bg)] border border-[var(--line)] text-emerald-400 font-mono text-xs overflow-x-auto max-h-[320px] shadow-inner space-y-1">
+              <div
+                style={{
+                  padding: "16px",
+                  borderRadius: "10px",
+                  background: "#0F172A",
+                  border: "1px solid #1E293B",
+                  color: "#10B981",
+                  fontFamily: "var(--f-mono)",
+                  fontSize: "12px",
+                  overflowX: "auto",
+                  maxHeight: "340px",
+                  lineHeight: 1.6,
+                }}
+              >
                 {customLogs.map((log, idx) => (
-                  <div key={idx} className="leading-relaxed whitespace-pre font-mono hover:bg-white/5 px-1 rounded">
+                  <div key={idx} style={{ whiteSpace: "pre" }}>
                     {log}
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Tab Content: Merkle Ledger */}
+            {/* Tab Content 3: Merkle Ledger */}
             {panelTab === "ledger" && (
-              <div className="space-y-2.5 font-mono text-xs">
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontFamily: "var(--f-mono)", fontSize: "12px" }}>
                 {ledgerChain.slice(0, 5).map((block) => (
                   <div
                     key={block.index}
-                    className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface2)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                    style={{
+                      padding: "14px 16px",
+                      borderRadius: "8px",
+                      border: "1px solid var(--line)",
+                      background: "var(--surface2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "10px",
+                      flexWrap: "wrap",
+                    }}
                   >
-                    <div className="space-y-0.5">
-                      <div className="font-bold text-[var(--ink)] flex items-center gap-2">
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <div style={{ fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: "8px" }}>
                         <span>Block #{block.index}:</span>
-                        <span className="text-[var(--brand)]">{block.type}</span>
+                        <span style={{ color: "var(--brand)" }}>{block.type}</span>
                       </div>
-                      <div className="text-[11px] text-[var(--ink3)]">
-                        Hash: {block.entryHash.slice(0, 24)}... · Actor: {block.actor} · {block.time}
+                      <div style={{ fontSize: "11px", color: "var(--ink3)" }}>
+                        Hash: {block.entryHash.slice(0, 28)}... · Actor: {block.actor} · {block.time}
                       </div>
                     </div>
-                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 shrink-0 self-start sm:self-center">
+                    <div style={{ fontSize: "11px", color: "#059669", fontWeight: 700, padding: "3px 8px", borderRadius: "5px", background: "rgba(5, 150, 105, 0.12)", border: "1px solid rgba(5, 150, 105, 0.25)" }}>
                       SEALED IN CHAIN
                     </div>
                   </div>
@@ -891,24 +1339,39 @@ def process_user_records(db_session, user_ids: list[str]):
         {/* =======================================================================
             RIGHT COLUMN (4 COLS): Security Findings, Performance, Invariants & Signoff
             ======================================================================= */}
-        <div className="lg:col-span-4 space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* SUBSECTION 4: SECURITY FINDINGS & DEFECT EXPLANATION */}
-          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+          <section
+            style={{
+              borderRadius: "14px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              padding: "18px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <AlertTriangle style={{ width: "16px", height: "16px", color: "#F59E0B" }} />
+                <h3 style={{ fontFamily: "var(--f-mono)", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink)", margin: 0 }}>
                   Security Finding
                 </h3>
               </div>
               <span
-                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                  isSafeMode
-                    ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                    : isNaiveMode
-                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30"
-                    : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
-                }`}
+                style={{
+                  padding: "3px 8px",
+                  borderRadius: "5px",
+                  fontSize: "10.5px",
+                  fontFamily: "var(--f-mono)",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  background: isSafeMode ? "rgba(5, 150, 105, 0.12)" : isNaiveMode ? "rgba(225, 29, 72, 0.12)" : "rgba(245, 158, 11, 0.12)",
+                  color: isSafeMode ? "#059669" : isNaiveMode ? "#E11D48" : "#D97706",
+                  border: isSafeMode ? "1px solid rgba(5, 150, 105, 0.3)" : isNaiveMode ? "1px solid rgba(225, 29, 72, 0.3)" : "1px solid rgba(245, 158, 11, 0.3)",
+                }}
               >
                 {isSafeMode
                   ? "Invariant Met"
@@ -918,11 +1381,11 @@ def process_user_records(db_session, user_ids: list[str]):
               </span>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="text-xs font-mono font-bold text-[var(--ink)]">
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <div style={{ fontSize: "12px", fontFamily: "var(--f-mono)", fontWeight: 700, color: "var(--ink)" }}>
                 Target: <code>{targetFilename}</code>
               </div>
-              <p className="text-xs text-[var(--ink2)] leading-relaxed">
+              <p style={{ fontSize: "12px", color: "var(--ink2)", lineHeight: 1.5, margin: 0 }}>
                 {isRepairing
                   ? "Synthesizing hardened defensive patch via NVIDIA Nemotron..."
                   : iteration === 2
@@ -936,29 +1399,41 @@ def process_user_records(db_session, user_ids: list[str]):
             </div>
 
             {/* Collapsible Technical Details */}
-            <div className="pt-2 border-t border-[var(--line)]">
+            <div style={{ paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
               <button
                 type="button"
                 onClick={() => setShowFindingDetails(!showFindingDetails)}
-                className="w-full flex items-center justify-between text-xs font-mono text-[var(--ink2)] hover:text-[var(--ink)] py-1"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: "11px",
+                  fontFamily: "var(--f-mono)",
+                  color: "var(--ink2)",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "4px 0",
+                }}
               >
                 <span>{showFindingDetails ? "Hide technical evidence" : "Show technical evidence"}</span>
-                {showFindingDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {showFindingDetails ? <ChevronUp style={{ width: "14px", height: "14px" }} /> : <ChevronDown style={{ width: "14px", height: "14px" }} />}
               </button>
 
               {showFindingDetails && (
-                <div className="mt-2.5 p-3 rounded-xl bg-[var(--surface2)] border border-[var(--line)] space-y-2 text-[11px] font-mono text-[var(--ink2)] animate-fadeIn">
+                <div style={{ marginTop: "10px", padding: "12px", borderRadius: "8px", background: "var(--surface2)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: "8px", fontSize: "11px", fontFamily: "var(--f-mono)", color: "var(--ink2)" }}>
                   <div>
-                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Probe Method:</span>
-                    <span className="text-[var(--ink)]">{selectedProblem.probeMethod || "AST Visitor & MicroVM Probe"}</span>
+                    <span style={{ color: "var(--ink3)", textTransform: "uppercase", display: "block", fontSize: "10px" }}>Probe Method:</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>{selectedProblem.probeMethod || "AST Visitor & MicroVM Probe"}</span>
                   </div>
                   <div>
-                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Exploit Vector:</span>
-                    <span className="text-[var(--ink)]">{selectedProblem.realWorldImpact}</span>
+                    <span style={{ color: "var(--ink3)", textTransform: "uppercase", display: "block", fontSize: "10px" }}>Exploit Vector:</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>{selectedProblem.realWorldImpact}</span>
                   </div>
                   <div>
-                    <span className="text-[var(--ink3)] uppercase block text-[10px]">Classification:</span>
-                    <span className="text-[var(--ink)]">{selectedProblem.domain} ({selectedProblem.tier})</span>
+                    <span style={{ color: "var(--ink3)", textTransform: "uppercase", display: "block", fontSize: "10px" }}>Classification:</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>{selectedProblem.domain} ({selectedProblem.tier})</span>
                   </div>
                 </div>
               )}
@@ -966,61 +1441,83 @@ def process_user_records(db_session, user_ids: list[str]):
           </section>
 
           {/* SUBSECTION 5: PERFORMANCE & INVARIANT ANALYSIS */}
-          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-[var(--brand)]" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+          <section
+            style={{
+              borderRadius: "14px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              padding: "18px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Cpu style={{ width: "16px", height: "16px", color: "var(--brand)" }} />
+              <h3 style={{ fontFamily: "var(--f-mono)", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink)", margin: 0 }}>
                 Performance &amp; Invariants
               </h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
-                <div className="text-[10px] text-[var(--ink3)] uppercase">Gate Status</div>
-                <div className={`text-base font-bold ${isSafeMode ? "text-emerald-600 dark:text-emerald-400" : isNaiveMode ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"}`}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "11.5px", fontFamily: "var(--f-mono)" }}>
+              <div style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)" }}>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", textTransform: "uppercase" }}>Gate Status</div>
+                <div style={{ fontSize: "14px", fontWeight: 800, marginTop: "4px", color: isSafeMode ? "#059669" : isNaiveMode ? "#E11D48" : "#D97706" }}>
                   {isSafeMode ? "8/8 PASSED" : isNaiveMode ? "G2 VETOED" : "BASELINE"}
                 </div>
-                <div className="text-[10px] text-[var(--ink3)]">Deterministic Check</div>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", marginTop: "2px" }}>Deterministic Check</div>
               </div>
 
-              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
-                <div className="text-[10px] text-[var(--ink3)] uppercase">Speedup Delta</div>
-                <div className="text-base font-bold text-[var(--brand)]">
+              <div style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)" }}>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", textTransform: "uppercase" }}>Speedup Delta</div>
+                <div style={{ fontSize: "14px", fontWeight: 800, marginTop: "4px", color: "var(--brand)" }}>
                   {activeMetrics.delta}
                 </div>
-                <div className="text-[10px] text-[var(--ink3)]">
+                <div style={{ fontSize: "10px", color: "var(--ink3)", marginTop: "2px" }}>
                   Latency: {activeMetrics.latency}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
-                <div className="text-[10px] text-[var(--ink3)] uppercase">Security Invariant</div>
-                <div className={`text-base font-bold ${isSafeMode ? "text-emerald-600 dark:text-emerald-400" : isNaiveMode ? "text-rose-600 dark:text-rose-400" : "text-[var(--ink)]"}`}>
+              <div style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)" }}>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", textTransform: "uppercase" }}>Security Invariant</div>
+                <div style={{ fontSize: "14px", fontWeight: 800, marginTop: "4px", color: isSafeMode ? "#059669" : isNaiveMode ? "#E11D48" : "var(--ink)" }}>
                   {isSafeMode ? "100% PRESERVED" : isNaiveMode ? "VIOLATION" : "UNSAFE"}
                 </div>
-                <div className="text-[10px] text-[var(--ink3)]">AST Bound Query</div>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", marginTop: "2px" }}>AST Bound Query</div>
               </div>
 
-              <div className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface2)] space-y-1">
-                <div className="text-[10px] text-[var(--ink3)] uppercase">Sandbox Isolation</div>
-                <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+              <div style={{ padding: "12px", borderRadius: "8px", border: "1px solid var(--line)", background: "var(--surface2)" }}>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", textTransform: "uppercase" }}>Sandbox Isolation</div>
+                <div style={{ fontSize: "14px", fontWeight: 800, marginTop: "4px", color: "#059669" }}>
                   HERMETIC
                 </div>
-                <div className="text-[10px] text-[var(--ink3)]">Rootless MicroVM</div>
+                <div style={{ fontSize: "10px", color: "var(--ink3)", marginTop: "2px" }}>Rootless MicroVM</div>
               </div>
             </div>
           </section>
 
           {/* SUBSECTION 8: WORKFLOW DECISION & SIGN-OFF ACTIONS */}
-          <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[var(--brand)]" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+          <section
+            style={{
+              borderRadius: "14px",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              padding: "18px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Lock style={{ width: "16px", height: "16px", color: "var(--brand)" }} />
+              <h3 style={{ fontFamily: "var(--f-mono)", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink)", margin: 0 }}>
                 Workflow Sign-off
               </h3>
             </div>
 
-            <p className="text-xs text-[var(--ink2)] font-mono leading-relaxed">
+            <p style={{ fontSize: "12px", color: "var(--ink2)", fontFamily: "var(--f-mono)", lineHeight: 1.5, margin: 0 }}>
               {isSafeMode
                 ? "Candidate satisfies all invariant gates and SLA requirements. Ready for audit submission or cryptographic sealing."
                 : isNaiveMode
@@ -1028,16 +1525,33 @@ def process_user_records(db_session, user_ids: list[str]):
                 : "Baseline scenario loaded. Run microVM or synthesize defensive patch to begin repair."}
             </p>
 
-            <div className="pt-2 space-y-2.5">
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
               {isSafeMode ? (
                 <>
                   <button
                     type="button"
                     onClick={handleAcceptPatch}
                     disabled={isProcessing}
-                    className="w-full h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                    style={{
+                      height: "40px",
+                      padding: "0 16px",
+                      borderRadius: "8px",
+                      background: "#059669",
+                      color: "#FFFFFF",
+                      fontFamily: "var(--f-mono)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      boxShadow: "0 2px 6px rgba(5, 150, 105, 0.3)",
+                      transition: "all 120ms ease",
+                    }}
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 style={{ width: "16px", height: "16px" }} />
                     <span>
                       {role === "developer"
                         ? "Submit Patch for Security Audit"
@@ -1048,7 +1562,23 @@ def process_user_records(db_session, user_ids: list[str]):
                     type="button"
                     onClick={handleRejectPatch}
                     disabled={isRepairing}
-                    className="w-full h-9 px-3 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-mono text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    style={{
+                      height: "36px",
+                      padding: "0 14px",
+                      borderRadius: "8px",
+                      background: "transparent",
+                      border: "1px solid rgba(225, 29, 72, 0.3)",
+                      color: "#E11D48",
+                      fontFamily: "var(--f-mono)",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      transition: "all 120ms ease",
+                    }}
                   >
                     <span>Reject &amp; Trigger Hardening Cycle</span>
                   </button>
@@ -1058,9 +1588,26 @@ def process_user_records(db_session, user_ids: list[str]):
                   type="button"
                   onClick={handleSelfHeal}
                   disabled={isProcessing}
-                  className="w-full h-10 px-4 rounded-xl bg-[var(--brand)] hover:brightness-105 active:scale-95 text-[var(--brand-ink)] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                  style={{
+                    height: "40px",
+                    padding: "0 16px",
+                    borderRadius: "8px",
+                    background: "var(--brand)",
+                    color: "var(--brand-ink)",
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    boxShadow: "0 2px 6px rgba(32, 201, 166, 0.2)",
+                    transition: "all 120ms ease",
+                  }}
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles style={{ width: "16px", height: "16px" }} />
                   <span>Synthesize Defensive Patch (Nemotron)</span>
                 </button>
               )}

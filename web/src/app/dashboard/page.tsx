@@ -572,7 +572,7 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
               {[
                 { id: "nitin-pandey", name: "Nitin Pandey", role: "Lead Developer", avatar: "👨‍💻", min: 40000, max: 200000 },
                 { id: "alex-chen", name: "Alex Chen", role: "Full-Stack Dev", avatar: "🚀", min: 40000, max: 200000 },
@@ -584,39 +584,47 @@ export default function DashboardPage() {
                   <div
                     key={m.id}
                     style={{
-                      padding: "12px 14px",
-                      background: "var(--surface2)",
-                      borderRadius: "8px",
-                      border: "1px solid var(--line)",
+                      padding: "16px",
+                      border: "1px solid var(--line, #E2E8F0)",
+                      borderRadius: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                      marginBottom: "12px",
+                      background: "var(--surface)",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                      boxSizing: "border-box",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontSize: "18px" }}>{m.avatar}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "20px" }}>{m.avatar}</span>
                         <div>
-                          <b style={{ fontSize: "12.5px" }}>{m.name}</b>
-                          <div style={{ fontSize: "10.5px", color: "var(--ink2)" }}>{m.role}</div>
+                          <b style={{ fontSize: "13px", color: "var(--ink)", display: "block" }}>{m.name}</b>
+                          <div style={{ fontSize: "11px", color: "var(--ink2)" }}>{m.role}</div>
                         </div>
                       </div>
-                      <span className="mono" style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand)" }}>
+                      <span className="mono" style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand)", background: "var(--surface)", padding: "2px 8px", borderRadius: "4px", border: "1px solid var(--line)" }}>
                         {quota.toLocaleString()} tok
                       </span>
                     </div>
 
-                    <input
-                      type="range"
-                      min={m.min}
-                      max={m.max}
-                      step="5000"
-                      value={quota}
-                      onChange={(e) =>
-                        setMemberQuotas({ ...memberQuotas, [m.id]: parseInt(e.target.value) })
-                      }
-                      style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer" }}
-                    />
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--ink3)", marginTop: "2px" }}>
-                      <span>Min: {m.min.toLocaleString()}</span>
-                      <span>Max: {m.max.toLocaleString()}</span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+                      <input
+                        type="range"
+                        min={m.min}
+                        max={m.max}
+                        step="5000"
+                        value={quota}
+                        onChange={(e) =>
+                          setMemberQuotas({ ...memberQuotas, [m.id]: parseInt(e.target.value) })
+                        }
+                        style={{ width: "100%", accentColor: "var(--brand)", cursor: "pointer", margin: "4px 0" }}
+                      />
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10.5px", color: "var(--ink3)", fontFamily: "var(--f-mono)" }}>
+                        <span>Min: {m.min.toLocaleString()}</span>
+                        <span>Max: {m.max.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
                 );

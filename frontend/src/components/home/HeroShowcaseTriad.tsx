@@ -242,7 +242,7 @@ export default function HeroShowcaseTriad() {
             </span>
 
             <Link
-              href="/cockpit/TASK9142"
+              href="/login"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -854,7 +854,7 @@ export default function HeroShowcaseTriad() {
               }}
             >
               <Link
-                href={`/cockpit/${selectedFinding.taskId.replace("-", "")}`}
+                href="/login"
                 className="btn-pill-primary"
                 style={{
                   width: "100%",

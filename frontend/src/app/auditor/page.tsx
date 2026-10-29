@@ -94,7 +94,7 @@ export default function AuditorRolePage() {
                 <span>ROLE PORTAL • SECURITY AUDITOR</span>
               </span>
               <span className="chip pass" style={{ fontSize: "10.5px" }}>
-                Signer: {activeMember?.name || "Elena Rostova"} (Ed25519-HSM#4019)
+                Auditor: {activeMember?.name || "Elena Rostova"} (Hardware Key #4019)
               </span>
             </div>
 
@@ -116,10 +116,10 @@ export default function AuditorRolePage() {
 
           <div>
             <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--heading-primary)", letterSpacing: "-0.02em" }}>
-              Cryptographic Assurance &amp; SHA-256 Merkle Ledger Audit
+              Tamper-Evident Audit Ledger &amp; Compliance Proofs
             </h1>
             <p style={{ margin: 0, color: "var(--ink2)", fontSize: "13.5px", maxWidth: "800px", lineHeight: 1.55 }}>
-              Authorized for mathematical proof of remediation, hardware Ed25519 non-repudiation seals, and automated SOC 2 / FedRAMP audit trail validation.
+              Immutable audit verification for remediation artifacts, verified with hardware cryptographic signatures and automated SOC 2 / FedRAMP compliance logs.
             </p>
           </div>
 
@@ -127,20 +127,20 @@ export default function AuditorRolePage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px", paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
               <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Current Block Height</div>
-              <div className="mono" style={{ fontSize: "14px", fontWeight: 700, color: "var(--heading-primary)", marginTop: "2px" }}>#9482 SEALED</div>
+              <div className="mono" style={{ fontSize: "14px", fontWeight: 700, color: "var(--heading-primary)", marginTop: "2px" }}>#9482 (Sealed)</div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Chain Health</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Chain Integrity</div>
               <div style={{ fontSize: "13px", fontWeight: 700, color: tamperTriggered ? "var(--fail)" : "var(--pass)", marginTop: "2px" }}>
                 {tamperTriggered ? "❌ Chain Broken (Block #9481)" : "✓ 100% Cryptographically Valid"}
               </div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Attestation Hardware</div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>YubiHSM2 Root Vault #04</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Signing Authority</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>Hardware Vault #04 (Ed25519)</div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Compliance Mapping</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Compliance Standards</div>
               <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink)", marginTop: "2px" }}>SOC 2 · FedRAMP · ISO 27001</div>
             </div>
           </div>

@@ -721,16 +721,19 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* 11 Colour Palettes Swatches Card */}
+              {/* Colour Palette Swatches Card */}
               <div className="card">
-                <h3 style={{ margin: "0 0 3px", fontSize: "14px" }}>Colour palette</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <h3 style={{ margin: 0, fontSize: "14px", fontWeight: 700 }}>Colour palette</h3>
+                  <span className="chip pass" style={{ fontSize: "10px" }}>Semgrep Cyber Neutral (Active)</span>
+                </div>
                 <div className="sub" style={{ marginBottom: "12px" }}>
-                  All eleven palettes keep status colours (pass / fail / warn) identical so verdicts never change meaning.
+                  Production editorial palette calibrated for security audits, deterministic verification gates, and high contrast.
                 </div>
                 <div
                   className="grid"
                   style={{
-                    gridTemplateColumns: "repeat(5, 1fr)",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 320px))",
                     gap: "10px",
                   }}
                 >

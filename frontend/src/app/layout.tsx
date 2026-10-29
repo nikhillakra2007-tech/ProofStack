@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="light" data-palette="proofstack-light" suppressHydrationWarning>
+    <html lang="en" data-theme="light" className="light" data-palette="proofstack-light" suppressHydrationWarning>
       <body>
         <AppShell>{children}</AppShell>
       </body>

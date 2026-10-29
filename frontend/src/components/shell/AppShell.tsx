@@ -149,7 +149,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   // Login page has its own standalone 2-panel layout (assistant hidden on unauthenticated pages)
   if (pathname === "/login") {
     return (
-      <div className="ps nosidebar app-frame" style={{ width: "100%", height: "100vh" }}>
+      <div style={{ width: "100%", minHeight: "100vh", margin: 0, padding: 0 }}>
         {children}
       </div>
     );

@@ -50,25 +50,25 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const ease = "cubic-bezier(.76, 0, .24, 1)";
+      const ease = "cubic-bezier(.16, 1, .3, 1)";
       
-      // Top blade slides down from -100% to 0
+      // Fast instantaneous top blade slide down
       const animTopIn = topBlade.animate(
         [{ transform: "translateY(-100%)" }, { transform: "translateY(0%)" }],
-        { duration: 420, easing: ease, fill: "forwards" }
+        { duration: 110, easing: ease, fill: "forwards" }
       );
 
-      // Bottom blade slides up in reverse from 100% to 0
+      // Fast instantaneous bottom blade slide up
       const animBottomIn = bottomBlade.animate(
         [{ transform: "translateY(100%)" }, { transform: "translateY(0%)" }],
-        { duration: 420, easing: ease, fill: "forwards" }
+        { duration: 110, easing: ease, fill: "forwards" }
       );
 
-      // Center badge fades and scales in
+      // Center badge instant fade
       if (centerBadge) {
         centerBadge.animate(
-          [{ opacity: 0, transform: "scale(0.85)" }, { opacity: 1, transform: "scale(1)" }],
-          { duration: 320, delay: 180, easing: "ease-out", fill: "forwards" }
+          [{ opacity: 0, transform: "scale(0.92)" }, { opacity: 1, transform: "scale(1)" }],
+          { duration: 90, easing: "ease-out", fill: "forwards" }
         );
       }
 
@@ -76,23 +76,22 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
         .then(() => {
           router.push(href);
 
-          // Wait a tick for router to mount new view
+          // Fast reveal: 20ms tick
           setTimeout(() => {
-            // Reverse slide out: top blade slides back up to -100%, bottom blade slides back down to 100%
             const animTopOut = topBlade.animate(
               [{ transform: "translateY(0%)" }, { transform: "translateY(-100%)" }],
-              { duration: 440, easing: ease, fill: "forwards" }
+              { duration: 110, easing: ease, fill: "forwards" }
             );
 
             const animBottomOut = bottomBlade.animate(
               [{ transform: "translateY(0%)" }, { transform: "translateY(100%)" }],
-              { duration: 440, easing: ease, fill: "forwards" }
+              { duration: 110, easing: ease, fill: "forwards" }
             );
 
             if (centerBadge) {
               centerBadge.animate(
-                [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(1.1)" }],
-                { duration: 250, easing: "ease-in", fill: "forwards" }
+                [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(1.05)" }],
+                { duration: 80, easing: "ease-in", fill: "forwards" }
               );
             }
 
@@ -109,7 +108,7 @@ export function CurtainProvider({ children }: { children: React.ReactNode }) {
                 setIsOpen(false);
                 setIsBusy(false);
               });
-          }, 150);
+          }, 20);
         })
         .catch(() => {
           setIsOpen(false);

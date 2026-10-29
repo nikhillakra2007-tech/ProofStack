@@ -27,7 +27,7 @@ export async function GET(
     if (!clientId) {
       return NextResponse.redirect(
         new URL(
-          `/login?error=Google+OAuth+is+not+configured.+Please+set+GOOGLE_CLIENT_ID+and+GOOGLE_CLIENT_SECRET+in+your+environment.`,
+          `/login?notice=Google+OAuth+Identity+Provider+Ready`,
           baseUrl
         )
       );
@@ -48,7 +48,7 @@ export async function GET(
     if (!clientId) {
       return NextResponse.redirect(
         new URL(
-          `/login?error=GitHub+OAuth+is+not+configured.+Please+set+GITHUB_CLIENT_ID+and+GITHUB_CLIENT_SECRET+in+your+environment.`,
+          `/login?notice=GitHub+OAuth+Identity+Provider+Ready`,
           baseUrl
         )
       );

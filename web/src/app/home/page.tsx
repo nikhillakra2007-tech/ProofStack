@@ -14,10 +14,7 @@ export default function PublicHomePage() {
   return (
     <SmoothScrollProvider>
       <ScrollRevealObserver />
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "var(--bg, #FAFAFA)",
+      <div className="home-page-wrapper" style={{ minHeight: "100vh", backgroundColor: "var(--bg, #F8FAF9)",
           color: "var(--ink, #263A35)",
           overflowX: "hidden",
         }}

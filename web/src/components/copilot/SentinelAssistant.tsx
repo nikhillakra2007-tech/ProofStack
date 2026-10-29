@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/lib/theme";
 import {
   X,
@@ -15,6 +17,7 @@ import {
   GripHorizontal,
   Terminal,
   Code2,
+  Lock,
 } from "lucide-react";
 
 export function SentinelLogo({ size = 20 }: { size?: number }) {
@@ -71,65 +74,11 @@ const FRESH_WELCOME_MESSAGE: ChatMessage = {
   sender: "sentinel",
   name: "Sentinel AI",
   time: "Just now",
-  text: "Hi, I'm Sentinel. I can help you inspect vulnerability evidence, replay DAST exploit probes against test containers, review AST diffs, or check gate verification results. What would you like to review?",
+  text: "Hi, I'm Sentinel AI Copilot. I can assist you with vulnerability evidence inspection, microVM execution, AST analysis, and cryptographic audit proofs. What would you like to review?",
 };
 
-const INITIAL_SESSIONS: SavedSession[] = [
-  {
-    id: "session_1",
-    title: "Session #1: TASK9142 N+1 & SQLi Audit",
-    date: "Earlier today",
-    messages: [
-      {
-        id: "s1_m1",
-        sender: "user",
-        name: "You",
-        time: "10:14 AM",
-        text: "Audit orders.py for SQL injection and N+1 query explosion bottlenecks.",
-      },
-      {
-        id: "s1_m2",
-        sender: "sentinel",
-        name: "Sentinel AI",
-        time: "10:15 AM",
-        text: "Audit complete. Detected an N+1 query loop across 5,000 orders and raw string concatenation in orders.py. Here is the synthesized eager-loading patch:",
-        hasCard: true,
-        cardData: {
-          title: "T1-2: N+1 Explosion & SQL Injection Remediated",
-          baseline: "5,001 SQL queries (428 ms)",
-          fix: "1 SQL query (12 ms) · +97.2% Speedup",
-        },
-      },
-    ],
-  },
-  {
-    id: "session_2",
-    title: "Session #2: Staging DAST CSP Remediation",
-    date: "Yesterday",
-    messages: [
-      {
-        id: "s2_m1",
-        sender: "user",
-        name: "You",
-        time: "04:30 PM",
-        text: "Run DAST scan on https://staging.perfproof.internal and fix missing CSP headers.",
-      },
-      {
-        id: "s2_m2",
-        sender: "sentinel",
-        name: "Sentinel AI",
-        time: "04:31 PM",
-        text: "Dispatched automated scanner. Detected missing Content-Security-Policy (D-01) and wildcards in script-src (D-02). Generated strict nonce-based header configuration in next.config.js.",
-        hasCard: true,
-        cardData: {
-          title: "D-01 / D-02: Strict CSP Applied",
-          baseline: "Missing CSP · unsafe-inline allowed",
-          fix: "default-src 'self' · nonce-based script execution",
-        },
-      },
-    ],
-  },
-];
+// Wiped dummy history — starts fresh and clean
+const INITIAL_SESSIONS: SavedSession[] = [];
 
 const SUGGESTED_PROMPTS = [
   "Inspect billing endpoint for cross-tenant IDOR access",
@@ -139,6 +88,13 @@ const SUGGESTED_PROMPTS = [
 
 export default function SentinelAssistant() {
   const { isCopilotOpen, setIsCopilotOpen } = useTheme();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { session } = useAuth();
+
+  // Strict sign-in barrier check
+  const isPublicRoute = pathname === "/home" || pathname === "/login" || pathname === "/" || !pathname;
+  const isLocked = !session || isPublicRoute;
 
   // Position state with localStorage persistence and viewport boundary clamping
   const [position, setPosition] = useState<{ x: number; y: number } | null>(() => {
@@ -168,12 +124,24 @@ export default function SentinelAssistant() {
   const windowRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Sessions list
+  // Sessions list (wiped fresh)
   const [sessions, setSessions] = useState<SavedSession[]>(() => {
     if (typeof window !== "undefined") {
       try {
         const stored = localStorage.getItem("proofstack:copilot_sessions");
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            return parsed.filter((s: SavedSession) =>
+              !s.title?.includes("TASK9142") &&
+              !s.title?.includes("DAST CSP") &&
+              !s.title?.includes("Session #1") &&
+              !s.title?.includes("Session #2") &&
+              !s.id?.startsWith("session_1") &&
+              !s.id?.startsWith("session_2")
+            );
+          }
+        }
       } catch {}
     }
     return INITIAL_SESSIONS;
@@ -185,6 +153,19 @@ export default function SentinelAssistant() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showSessionArchive, setShowSessionArchive] = useState(false);
+
+  // Purge legacy dummy sessions from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("proofstack:copilot_sessions");
+        if (stored && (stored.includes("TASK9142") || stored.includes("session_1") || stored.includes("session_2"))) {
+          localStorage.removeItem("proofstack:copilot_sessions");
+          setSessions([]);
+        }
+      } catch {}
+    }
+  }, []);
 
   // Sync sessions to localStorage
   useEffect(() => {
@@ -328,6 +309,11 @@ export default function SentinelAssistant() {
   };
 
   const handleSend = (textToSend?: string) => {
+    if (isLocked) {
+      router.push("/login");
+      return;
+    }
+
     const text = textToSend || inputText;
     if (!text.trim()) return;
 
@@ -841,106 +827,184 @@ export default function SentinelAssistant() {
               </div>
             )}
 
-            {/* Suggested Prompt Chips */}
-            <div style={{ marginTop: "10px" }}>
+            {/* Strict Sign-In Barrier Lock Card OR Suggested Prompt Chips */}
+            {isLocked ? (
               <div
+                onClick={() => router.push("/login")}
                 style={{
-                  fontFamily: "var(--f-mono)",
-                  fontSize: "9.5px",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "var(--ink3)",
-                  marginBottom: "6px",
+                  marginTop: "12px",
+                  padding: "16px 14px",
+                  borderRadius: "10px",
+                  background: "var(--surface2)",
+                  border: "1px solid var(--line)",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
                 }}
               >
-                Suggested verification tasks
+                <div style={{ fontSize: "22px" }}>🔒</div>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink)" }}>
+                  Sign In Required — Tap to Sign In to Continue
+                </div>
+                <div style={{ fontSize: "11px", color: "var(--ink2)", maxWidth: "280px", lineHeight: 1.4 }}>
+                  Authentication is required to query Sentinel AI, replay DAST exploit probes, and synthesize AST invariants.
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push("/login");
+                  }}
+                  style={{
+                    marginTop: "4px",
+                    height: "30px",
+                    padding: "0 14px",
+                    borderRadius: "6px",
+                    background: "var(--brand)",
+                    color: "var(--brand-ink)",
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "11.5px",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <span>Sign In to Continue</span>
+                  <span>→</span>
+                </button>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                {SUGGESTED_PROMPTS.map((promptText, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleSend(promptText)}
-                    style={{
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      borderRadius: "6px",
-                      background: "var(--surface)",
-                      border: "1px solid var(--line)",
-                      color: "var(--ink2)",
-                      fontSize: "11px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                  >
-                    <Terminal size={12} style={{ color: "var(--brand)", flexShrink: 0 }} />
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {promptText}
-                    </span>
-                  </button>
-                ))}
+            ) : (
+              <div style={{ marginTop: "10px" }}>
+                <div
+                  style={{
+                    fontFamily: "var(--f-mono)",
+                    fontSize: "9.5px",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    color: "var(--ink3)",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Suggested verification tasks
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {SUGGESTED_PROMPTS.map((promptText, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSend(promptText)}
+                      style={{
+                        textAlign: "left",
+                        padding: "6px 8px",
+                        borderRadius: "6px",
+                        background: "var(--surface)",
+                        border: "1px solid var(--line)",
+                        color: "var(--ink2)",
+                        fontSize: "11px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <Terminal size={12} style={{ color: "var(--brand)", flexShrink: 0 }} />
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {promptText}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message Input Form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-            style={{
-              padding: "10px 12px",
-              borderTop: "1px solid var(--line)",
-              background: "var(--surface)",
-              display: "flex",
-              gap: "8px",
-            }}
-          >
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ask Sentinel to review findings, inspect diffs, or replay probes..."
+          {/* Message Input Form / Locked Bottom Barrier */}
+          {isLocked ? (
+            <div
+              onClick={() => router.push("/login")}
               style={{
-                flex: 1,
-                height: "34px",
-                padding: "0 10px",
-                borderRadius: "7px",
-                border: "1px solid var(--line)",
-                background: "var(--bg)",
-                color: "var(--ink)",
-                fontSize: "12px",
-                outline: "none",
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!inputText.trim() || isTyping}
-              style={{
-                height: "34px",
-                padding: "0 12px",
-                borderRadius: "7px",
-                background: "var(--brand)",
-                color: "var(--brand-ink)",
-                border: "none",
-                fontWeight: 600,
-                fontSize: "12px",
-                cursor: !inputText.trim() || isTyping ? "not-allowed" : "pointer",
-                opacity: !inputText.trim() || isTyping ? 0.6 : 1,
-                display: "inline-flex",
+                padding: "10px 14px",
+                borderTop: "1px solid var(--line)",
+                background: "var(--surface)",
+                display: "flex",
                 alignItems: "center",
-                gap: "5px",
+                justifyContent: "space-between",
+                gap: "8px",
+                cursor: "pointer",
               }}
             >
-              <span>Send</span>
-              <Send size={12} />
-            </button>
-          </form>
+              <div style={{ fontSize: "11.5px", color: "var(--ink3)", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Lock size={12} style={{ color: "var(--brand)" }} />
+                <span>🔒 Sign In Required — Tap to Sign In to Continue</span>
+              </div>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand)", fontFamily: "var(--f-mono)" }}>
+                Sign In →
+              </span>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+              style={{
+                padding: "10px 12px",
+                borderTop: "1px solid var(--line)",
+                background: "var(--surface)",
+                display: "flex",
+                gap: "8px",
+              }}
+            >
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Ask Sentinel to review findings, inspect diffs, or replay probes..."
+                style={{
+                  flex: 1,
+                  height: "34px",
+                  padding: "0 10px",
+                  borderRadius: "7px",
+                  border: "1px solid var(--line)",
+                  background: "var(--bg)",
+                  color: "var(--ink)",
+                  fontSize: "12px",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!inputText.trim() || isTyping}
+                style={{
+                  height: "34px",
+                  padding: "0 12px",
+                  borderRadius: "7px",
+                  background: "var(--brand)",
+                  color: "var(--brand-ink)",
+                  border: "none",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  cursor: !inputText.trim() || isTyping ? "not-allowed" : "pointer",
+                  opacity: !inputText.trim() || isTyping ? 0.6 : 1,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                <span>Send</span>
+                <Send size={12} />
+              </button>
+            </form>
+          )}
         </>
       )}
     </div>

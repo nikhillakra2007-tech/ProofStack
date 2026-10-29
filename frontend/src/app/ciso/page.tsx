@@ -42,29 +42,29 @@ export default function CisoRolePage() {
     {
       name: "SOC 2 Type II",
       status: "Certified",
-      auditScope: "Trust Services Criteria CC6.1 - CC7.4 (Logical Access & Cryptographic Boundary)",
-      verification: "Automated Merkle Non-Repudiation Leaf Attestation",
+      auditScope: "Security & Confidentiality: Logical Access, Boundary Protection, and Release Authorization",
+      verification: "Automated Audit Trail & Tamper-Evident Ledger Seals",
       lastAttestation: "2026-10-28 14:32 UTC",
     },
     {
       name: "FedRAMP High Baseline",
       status: "Enforced",
-      auditScope: "SC-12 / SC-13 Cryptographic Key Establishment & MicroVM Boundary Isolation",
-      verification: "AWS Nitro Enclave EIF PCR0/PCR1 Measurement Registers",
+      auditScope: "Hardware-Enforced Enclave & Rootless MicroVM Boundary Isolation",
+      verification: "AWS Nitro Enclave Hardware Attestation & Measured Boot Verification",
       lastAttestation: "2026-10-28 16:05 UTC",
     },
     {
       name: "ISO/IEC 27001:2022",
       status: "Aligned",
-      auditScope: "Annex A.8.24 Use of Cryptography & A.8.28 Secure Coding Invariants",
-      verification: "Deterministic AST Semantic Proof Invariant Ledger",
+      auditScope: "Secure Software Development Lifecycle & Cryptographic Control Invariants",
+      verification: "Deterministic Syntax & Security Invariant Checkpoints",
       lastAttestation: "2026-10-28 17:15 UTC",
     },
     {
       name: "OWASP ASVS Level 3",
       status: "Automated",
-      auditScope: "12 Dynamic Automated Exploit Probes in Ephemeral Firecracker VMM",
-      verification: "Real-time Fuzzing & Memory Safety Verification",
+      auditScope: "Dynamic Automated Exploit Testing in Hermetic MicroVM Sandboxes",
+      verification: "Automated Fuzzing & Runtime Memory Safety Verification",
       lastAttestation: "2026-10-28 18:40 UTC",
     },
   ];
@@ -148,11 +148,11 @@ export default function CisoRolePage() {
         <div className="mt-6 pt-5 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
           <div className="flex items-center gap-2 text-[var(--ink2)]">
             <Fingerprint className="w-4 h-4 text-[var(--brand)]" />
-            <span>Root Authority: <strong className="text-[var(--ink)]">ECDSA P-384 HSM</strong></span>
+            <span>Root Authority: <strong className="text-[var(--ink)]">Hardware Key (HSM)</strong></span>
           </div>
           <div className="flex items-center gap-2 text-[var(--ink2)]">
             <Cpu className="w-4 h-4 text-emerald-500" />
-            <span>Enclave Attestation: <strong className="text-[var(--ink)]">Nitro PCR0 Validated</strong></span>
+            <span>Hardware Enclave: <strong className="text-[var(--ink)]">Secure Enclave (Verified)</strong></span>
           </div>
           <div className="flex items-center gap-2 text-[var(--ink2)]">
             <Lock className="w-4 h-4 text-amber-500" />

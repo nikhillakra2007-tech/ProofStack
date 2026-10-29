@@ -425,7 +425,7 @@ export default function CoreProductSections() {
 
             <div style={{ marginTop: "18px", paddingTop: "12px", borderTop: "1px solid var(--line)" }}>
               <Link
-                href="/cockpit/TASK9142"
+                href="/login"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -816,7 +816,7 @@ export default function CoreProductSections() {
             }}
           >
             <Link
-              href="/cockpit/TASK9142"
+              href="/login"
               className="btn-pill-primary"
               style={{
                 height: "44px",
@@ -899,7 +899,7 @@ export default function CoreProductSections() {
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               <li>
-                <Link href="/cockpit/TASK9142" style={{ fontSize: "12.5px", color: "var(--ink2)", textDecoration: "none" }} className="hover:underline">
+                <Link href="/login" style={{ fontSize: "12.5px", color: "var(--ink2)", textDecoration: "none" }} className="hover:underline">
                   Remediation Cockpit
                 </Link>
               </li>

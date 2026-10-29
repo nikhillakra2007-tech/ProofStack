@@ -137,7 +137,7 @@ pub fn allocate_frame(size: usize) -> Result<Vec<u8>, EngineError> {
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
               <Link href="/studio" className="btn sm acc" style={{ textDecoration: "none" }}>
                 <Cpu className="w-3.5 h-3.5" />
-                <span>Open AST Studio</span>
+                <span>Open Remediation Studio</span>
               </Link>
               <Link href="/cockpit/TASK9142" className="btn sm sec" style={{ textDecoration: "none" }}>
                 <span>Inspect Cockpit</span>
@@ -148,29 +148,29 @@ pub fn allocate_frame(size: usize) -> Result<Vec<u8>, EngineError> {
 
           <div>
             <h1 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 6px 0", color: "var(--heading-primary)", letterSpacing: "-0.02em" }}>
-              Compiler AST Invariant &amp; Neural Patch Synthesis
+              AI Patch Synthesis &amp; Security Verification Studio
             </h1>
             <p style={{ margin: 0, color: "var(--ink2)", fontSize: "13.5px", maxWidth: "800px", lineHeight: 1.55 }}>
-              Authorized for autonomous Tree-Sitter grammar parsing, token-masked NVIDIA Nemotron patch generation, and deterministic 8-gate unit regression verification.
+              Autonomous vulnerability remediation powered by NVIDIA Nemotron, verified against deterministic security invariants and 8 automated gates before release.
             </p>
           </div>
 
           {/* Quick Metrics Bar */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px", paddingTop: "8px", borderTop: "1px solid var(--line)" }}>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Active Ephemeral Runner</div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>gVisor Pod #08 (Ready)</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>MicroVM Sandbox</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>Hermetic Runner (Ready)</div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Inference Target</div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>Nemotron 70B (840ms)</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>AI Remediation Model</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand)", marginTop: "2px" }}>NVIDIA Nemotron 70B</div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
               <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Gate Pass Rate</div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>8 / 8 Gates Pass (100%)</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pass)", marginTop: "2px" }}>8 / 8 Gates Passed (100%)</div>
             </div>
             <div style={{ padding: "8px 12px", background: "var(--surface2)", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Sandbox Quota</div>
+              <div style={{ fontSize: "11px", color: "var(--ink3)" }}>Token Budget</div>
               <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink)", marginTop: "2px" }}>42,000 / 100,000 Tokens</div>
             </div>
           </div>
