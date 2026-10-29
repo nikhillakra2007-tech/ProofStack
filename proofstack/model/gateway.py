@@ -30,7 +30,7 @@ class ModelGateway:
         api_key: Optional[str] = None,
         budget_tracker: Optional[BudgetTracker] = None,
     ):
-        self.base_url = base_url or os.environ.get("TOKEN_FACTORY_BASE_URL", "https://api.tokenfactory.nebius.ai/v1")
+        self.base_url = base_url or os.environ.get("TOKEN_FACTORY_BASE_URL", "https://api.studio.nebius.ai/v1")
         self.api_key = api_key or os.environ.get("NEBIUS_API_KEY", "")
         self.budget_tracker = budget_tracker or BudgetTracker()
         self.supports_response_format = True  # Auto-cached capability flag

@@ -137,7 +137,7 @@ Open `.env` in any text editor and paste your key:
 # NVIDIA NEMOTRON / NEBIUS AI INFERENCE CONFIGURATION
 # ==============================================================================
 NEBIUS_API_KEY=your_actual_nebius_api_key_here
-TOKEN_FACTORY_BASE_URL=https://api.tokenfactory.nebius.ai/v1
+TOKEN_FACTORY_BASE_URL=https://api.studio.nebius.ai/v1
 MODEL_DIAGNOSIS=nvidia/nemotron-3-super-120b
 MODEL_PATCH=nvidia/nemotron-3.5-lightning
 ```
