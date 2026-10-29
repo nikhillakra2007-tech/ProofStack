@@ -178,24 +178,6 @@ If you do **not** configure an API key, ProofStack **never crashes or simulates 
 
 ---
 
-### 🚀 3-Minute Live Cloud Evaluation Walkthrough (No Setup)
-
-1. Go to **[https://sentinel-gate-seven.vercel.app/login](https://sentinel-gate-seven.vercel.app/login)**.
-2. In **Instant Access (Evaluation)**, click any role:
-   - **Lead Developer**: Lands on `/developer` with the remediation queue and microVM telemetry.
-   - **Security Auditor**: Lands on `/auditor` with cryptographic Merkle chain validation.
-   - **Workspace Admin**: Lands on `/admin` with runner pool scaling and token quotas.
-   - **Super Admin / CISO**: Lands on `/ciso` with root hardware enclave authority and zero-compromise policy controls.
-3. Open **[Interactive Studio](https://sentinel-gate-seven.vercel.app/studio)**:
-   - Select any problem (e.g. `T1-2: N+1 DB Explosion & SQL Injection`, `T1-3: IDOR Cache Leak`, `T1-1: ReDoS`).
-   - Click the green **Run Synthesis & Verification** button (`#059669`).
-   - Watch the live Monaco editor perform AST taint analysis, run microVM exploit assertions, and verify all 8 compiler gates.
-4. Open **[Remediation Cockpit](https://sentinel-gate-seven.vercel.app/cockpit/TASK9142)**: Inspect the split-diff viewer, execution telemetry, and 8-gate checklist.
-5. Open **[DAST Exploit Sandbox](https://sentinel-gate-seven.vercel.app/dast)**: Trigger dynamic curl exploit requests across 12 OWASP vectors (D-01 to D-12).
-6. Open **[Cryptographic Ledger](https://sentinel-gate-seven.vercel.app/ledger)**: Click **Simulate Tamper Attack** to watch the cryptographic alarm detect modified block payloads.
-7. Launch **Sentinel AI Copilot**: Click the floating neural-shield badge in the bottom-right corner from any page.
-
----
 
 ## 🏛️ End-to-End Autonomous Remediation Architecture
 
