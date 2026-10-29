@@ -102,6 +102,18 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (data.success) {
+        try {
+          const payload = {
+            nebiusKey: keyToTest,
+            nemotronKey: keyToTest,
+            endpointUrl: endpointUrl.trim(),
+            primaryModel,
+            githubToken,
+            updatedAt: new Date().toISOString(),
+          };
+          localStorage.setItem("proofstack_api_keys", JSON.stringify(payload));
+        } catch {}
+
         setTestStatus({
           loading: false,
           result: data.message || "✓ Connected: Nebius Token Factory · NVIDIA Nemotron Active",
