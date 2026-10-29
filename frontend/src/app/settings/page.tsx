@@ -78,18 +78,35 @@ export default function SettingsPage() {
     }
   };
 
-  const handleTestConnection = () => {
+  const handleTestConnection = async () => {
     setTestStatus({ loading: true, result: "Pinging Nebius Token Factory & NVIDIA NIM..." });
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/model/verify-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: nebiusKey }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTestStatus({
+          loading: false,
+          result: data.message || "✓ Connected: Nebius Token Factory · NVIDIA Nemotron Active",
+          success: true,
+        });
+      } else {
+        setTestStatus({
+          loading: false,
+          result: `✗ Connection Failed: ${data.error || "Unable to authenticate with Nebius Token Factory"}`,
+          success: false,
+        });
+      }
+    } catch (err: any) {
       setTestStatus({
         loading: false,
-        result: "✓ Connected: Nebius Token Factory (142 ms roundtrip) · NVIDIA Nemotron 3 Ready · Quorum Validated",
-        success: true,
+        result: `✗ Network Error: ${err?.message || "Failed to reach verification endpoint"}`,
+        success: false,
       });
-      setTimeout(() => {
-        setTestStatus({ loading: false, result: "" });
-      }, 6000);
-    }, 1100);
+    }
   };
 
   return (

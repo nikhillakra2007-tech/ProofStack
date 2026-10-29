@@ -29,7 +29,7 @@ export default function TopHeader({ onToggleCopilot, copilotOpen }: TopHeaderPro
     let isMounted = true;
     const checkBackend = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/", {
+        const res = await fetch("http://127.0.0.1:8765/api/health", {
           method: "GET",
           signal: AbortSignal.timeout(1500),
         });
@@ -38,7 +38,7 @@ export default function TopHeader({ onToggleCopilot, copilotOpen }: TopHeaderPro
         }
       } catch {
         if (isMounted) {
-          // If port 8000 direct call blocked or offline, verify /api/tasks
+          // If port 8765 direct call blocked or offline, verify /api/tasks
           try {
             const apiRes = await fetch("/api/tasks");
             setIsBackendOnline(apiRes.ok);
@@ -110,7 +110,7 @@ export default function TopHeader({ onToggleCopilot, copilotOpen }: TopHeaderPro
         {/* Real-time Backend Connection Status (No static gimmick badge) */}
         <div className="flex items-center gap-2 px-3 py-1 bg-ink-950 border border-hairline rounded-lg text-[11px] font-mono">
           <Server className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="text-ink-400 hidden sm:inline">Backend (8000):</span>
+          <span className="text-ink-400 hidden sm:inline">Backend (8765):</span>
           <div className="flex items-center gap-1.5">
             <span
               className={`w-2 h-2 rounded-full ${

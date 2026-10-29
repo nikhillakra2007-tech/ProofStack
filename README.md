@@ -45,6 +45,10 @@ Authentic captures from the verified live Vercel production deployment:
 *Interactive 5-stage pipeline simulation & 1-click evaluator personas.*
 ![Role Clearance Gateway](docs/screenshots/login.png)
 
+### 7. Nebius API Key & Inference Gateway Settings (`/settings`)
+*Configure custom Nebius / NVIDIA Nemotron API tokens with live latency roundtrip testing directly in the browser.*
+![Model Settings](docs/screenshots/settings.png)
+
 ---
 
 ## 📌 Executive Summary
@@ -105,7 +109,17 @@ flowchart TD
 
 ### 🔑 Walkthrough for Judges: Adding Your Own Nebius / NVIDIA API Key
 
-Follow these simple steps to connect your own API key for live remote LLM inference:
+Judges can connect their Nebius Token Factory / NVIDIA Nemotron API key using either the **instant web UI** (no code setup) or a **local environment**:
+
+#### ⚡ Method A: Instant Web UI (0 Install — 30 Seconds)
+1. Open the live deployment: **[https://sentinel-gate-seven.vercel.app/settings](https://sentinel-gate-seven.vercel.app/settings)**.
+2. In the **Nebius Token Factory / NVIDIA Nemotron API Key** input box, paste your API key.
+3. Click **Test Connection**: ProofStack calls the live verification gateway (`/v1/models`) and displays round-trip network latency (e.g. `✓ Connected (145ms)`).
+4. Navigate to **[Interactive Studio](https://sentinel-gate-seven.vercel.app/studio)** and click **Run Synthesis & Verification** (or **AI Self-Heal**): ProofStack dispatches prompts directly to `nvidia/nemotron-3.5-lightning` / `nvidia/nemotron-3-super-120b` and streams the AST repair into Monaco with verified compiler provenance.
+
+---
+
+#### 💻 Method B: Local Environment Configuration (.env)
 
 #### Step 1: Obtain Your Nebius API Key
 - Sign in to **[Nebius Token Factory](https://tokenfactory.nebius.ai/)** or **[Nebius AI Studio](https://studio.nebius.ai/)**.

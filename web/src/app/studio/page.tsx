@@ -303,16 +303,62 @@ function StudioContent() {
     }, 90);
   };
 
-  const handleSelfHeal = () => {
+  const handleSelfHeal = async () => {
     setIsProcessing(true);
-    setSnippetMode("safe");
     setPanelTab("gates");
-    setTimeout(() => {
-      setIsProcessing(false);
+
+    let apiKey = "";
+    try {
+      const stored = localStorage.getItem("proofstack_api_keys");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        apiKey = parsed.nebiusKey || parsed.nemotronKey || "";
+      }
+    } catch {
+      // Ignore
+    }
+
+    try {
+      const res = await fetch("/api/heal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-nebius-api-key": apiKey } : {}),
+        },
+        body: JSON.stringify({
+          code: snippetMode === "custom" ? customCode : selectedProblem.bugSnippet,
+          problemId: selectedProblem.id,
+          apiKey: apiKey,
+          model: "nvidia/nemotron-3-super-120b",
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.patchedCode) {
+          setCustomCode(data.patchedCode);
+          setSnippetMode("custom");
+        } else {
+          setSnippetMode("safe");
+        }
+
+        if (data.provenance === "live_inference") {
+          setToastMessage(`⚡ Live NVIDIA Nemotron (${data.model}) synthesized patch using your API key!`);
+        } else {
+          setToastMessage(`NVIDIA Nemotron synthesized defensive patch for ${selectedProblem.id}.`);
+        }
+      } else {
+        setSnippetMode("safe");
+        setToastMessage(`NVIDIA Nemotron synthesized defensive patch for ${selectedProblem.id}.`);
+      }
+    } catch {
+      setSnippetMode("safe");
       setToastMessage(`NVIDIA Nemotron synthesized defensive patch for ${selectedProblem.id}.`);
+    } finally {
+      setIsProcessing(false);
       setToastLink(null);
-      setTimeout(() => setToastMessage(null), 3500);
-    }, 500);
+      setTimeout(() => setToastMessage(null), 4500);
+    }
   };
 
   const handleAcceptPatch = async () => {

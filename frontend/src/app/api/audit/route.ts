@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     // Check if FastAPI backend is available
     try {
-      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/audit", {
+      const fastApiResponse = await fetch("http://127.0.0.1:8765/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

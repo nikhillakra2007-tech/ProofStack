@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
+    const fastApiResponse = await fetch("http://127.0.0.1:8765/api/tasks", {
       headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(1500),
     });
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Try FastAPI
     try {
-      const fastApiResponse = await fetch("http://127.0.0.1:8000/api/tasks", {
+      const fastApiResponse = await fetch("http://127.0.0.1:8765/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
