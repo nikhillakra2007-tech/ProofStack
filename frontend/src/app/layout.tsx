@@ -3,7 +3,7 @@ import AppShell from "@/components/AppShell";
 
 export const metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://sentinel-gate-seven.vercel.app"
+    process.env.NEXT_PUBLIC_APP_URL || "https://proofstack-cockpit.vercel.app"
   ),
   title: {
     default: "ProofStack | Autonomous DevSecOps & Evidence Ledger",

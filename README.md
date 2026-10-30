@@ -1,19 +1,18 @@
 # ProofStack (Autonomous Verification Engine & Cockpit)
 
-[![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
-[![Secondary Cockpit](https://img.shields.io/badge/Cockpit-Secondary_Mirror-38BDF8?style=for-the-badge&logo=vercel&logoColor=white)](https://proofstack-cockpit.vercel.app/)
+[![ProofStack Live](https://img.shields.io/badge/ProofStack-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://proofstack-cockpit.vercel.app/)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://proofstack-cockpit.vercel.app/)
 [![2-Minute Demo Video](https://img.shields.io/badge/YouTube-2--Minute_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/EsdJ2vkg5HA)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_120B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
-[![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://sentinel-gate-seven.vercel.app/ledger)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_120B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://proofstack-cockpit.vercel.app/)
+[![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://proofstack-cockpit.vercel.app/ledger)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
 
 > **Autonomous DevSecOps Engine with Zero-Compromise Compiler Gates, Live Container DAST & Cryptographic Merkle Ledger**  
 > *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*
 >
-> 🚀 **Primary Canonical Production App**: **[https://sentinel-gate-seven.vercel.app/](https://sentinel-gate-seven.vercel.app/)**  
-> 🔗 **Secondary Cockpit Mirror**: **[https://proofstack-cockpit.vercel.app/](https://proofstack-cockpit.vercel.app/)**  
+> 🚀 **ProofStack Live Application**: **[https://proofstack-cockpit.vercel.app/](https://proofstack-cockpit.vercel.app/)**  
+> 🔗 **Alternative Production Mirror**: **[https://sentinel-gate-seven.vercel.app/](https://sentinel-gate-seven.vercel.app/)**  
 > 🎬 **2-Minute Demo Video**: **[https://youtu.be/EsdJ2vkg5HA](https://youtu.be/EsdJ2vkg5HA)**  
 > 📄 **License**: **[Apache License 2.0](LICENSE)**
 >
@@ -79,7 +78,7 @@ flowchart TD
     Start([🏆 Judge Starts Evaluation]) --> Choice{Choose Evaluation Mode}
     
     %% Option A: Instant Live Cloud
-    Choice -->|Option A: Zero-Setup Live Cloud| Cloud["1. Open Live Vercel App<br/><b>sentinel-gate-seven.vercel.app</b>"]
+    Choice -->|Option A: Zero-Setup Live Cloud| Cloud["1. Open Live ProofStack App<br/><b>proofstack-cockpit.vercel.app</b>"]
     Cloud --> RoleLogin["2. Visit /login &rarr; Click 1-Click Instant Access<br/>(Developer, Auditor, Admin, CISO)"]
     RoleLogin --> StudioTest["3. Test Studio (/studio)<br/>Select T1-2 (SQLi/N+1) &rarr; Run Synthesis & 8 Gates"]
     StudioTest --> CockpitTest["4. Review Cockpit (/cockpit/TASK9142)<br/>Side-by-side Monaco Diff + MicroVM tests"]
@@ -115,10 +114,10 @@ flowchart TD
 Judges can connect their Nebius Token Factory / NVIDIA Nemotron API key using either the **instant web UI** (no code setup) or a **local environment**:
 
 #### ⚡ Method A: Instant Web UI (0 Install — 30 Seconds)
-1. Open the live deployment: **[https://sentinel-gate-seven.vercel.app/settings](https://sentinel-gate-seven.vercel.app/settings)**.
+1. Open the live deployment: **[https://proofstack-cockpit.vercel.app/settings](https://proofstack-cockpit.vercel.app/settings)**.
 2. In the **Nebius Token Factory / NVIDIA Nemotron API Key** input box, paste your API key.
 3. Click **Test Connection**: ProofStack calls the live verification gateway (`/v1/models`) and displays round-trip network latency (e.g. `✓ Connected (145ms)`).
-4. Navigate to **[Interactive Studio](https://sentinel-gate-seven.vercel.app/studio)** and click **Run Synthesis & Verification** (or **AI Self-Heal**): ProofStack dispatches prompts directly to `nvidia/nemotron-3.5-lightning` / `nvidia/nemotron-3-super-120b` and streams the AST repair into Monaco with verified compiler provenance.
+4. Navigate to **[Interactive Studio](https://proofstack-cockpit.vercel.app/studio)** and click **Run Synthesis & Verification** (or **AI Self-Heal**): ProofStack dispatches prompts directly to `nvidia/nemotron-3.5-lightning` / `nvidia/nemotron-3-super-120b` and streams the AST repair into Monaco with verified compiler provenance.
 
 ---
 
@@ -171,7 +170,7 @@ npm run dev
 ```
 
 #### Step 4: Verify Live NVIDIA Nemotron Patch Synthesis
-1. Open **`http://localhost:3000/studio`** (or use the deployed **[Studio](https://sentinel-gate-seven.vercel.app/studio)**).
+1. Open **`http://localhost:3000/studio`** (or use the deployed **[Studio](https://proofstack-cockpit.vercel.app/studio)**).
 2. Choose benchmark problem **`T1-2: N+1 Explosion & SQL Injection`** or **`T1-3: IDOR Cache Leak`**.
 3. Click the green **Run Synthesis & Verification** button (`#059669`).
 4. ProofStack dispatches your code directly to `nvidia/nemotron-3-super-120b` via Token Factory and streams the AST patch into Monaco for 8-gate verification.
@@ -292,7 +291,7 @@ Every authenticated role maps to a dedicated default dashboard on initial login 
 ProofStack/
 ├── frontend/             # Canonical Next.js 14 Web Application (Full DevSecOps Suite)
 │   ├── src/app/          # 26 Static & Dynamic Routes (/studio, /dashboard, /dast, etc.)
-│   └── src/components/   # Design Tokens, Monacdiff Viewer, 8-Gate Interlock
+│   └── src/components/   # Design Tokens, Monaco Diff Viewer, 8-Gate Interlock
 ├── web/                  # Secondary Cockpit Application Mirror
 ├── proofstack/           # Deterministic Verification & Remediation Engine
 │   ├── ast/              # Tree-Sitter Parser, Syntax Traversal, Masked Token Boundaries
