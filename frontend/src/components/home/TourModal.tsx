@@ -10,6 +10,7 @@ interface TourModalProps {
 }
 
 function extractYouTubeId(urlOrId: string): string {
+  if (!urlOrId || typeof urlOrId !== "string") return "";
   const trimmed = urlOrId.trim();
   if (!trimmed) return "";
   const match = trimmed.match(
@@ -24,14 +25,16 @@ function extractYouTubeId(urlOrId: string): string {
   return "";
 }
 
+const FALLBACK_DEMO_VIDEO_URL = "https://youtu.be/EsdJ2vkg5HA";
+
 export default function TourModal({ isOpen, onClose }: TourModalProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  // Default to Interactive Flow (Step 1 to 5)
-  const [activeTab, setActiveTab] = useState<"video" | "interactive">("interactive");
+  // Default to 2-Min Demo Video tab
+  const [activeTab, setActiveTab] = useState<"video" | "interactive">("video");
   
-  // YouTube video state with NEXT_PUBLIC_DEMO_VIDEO_URL support
-  const defaultDemoUrl = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL || "";
+  // YouTube video state with NEXT_PUBLIC_DEMO_VIDEO_URL support (single source of truth with safe fallback)
+  const defaultDemoUrl = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL || FALLBACK_DEMO_VIDEO_URL;
   const [youtubeInput, setYoutubeInput] = useState<string>(defaultDemoUrl);
   const [activeVideoId, setActiveVideoId] = useState<string>(extractYouTubeId(defaultDemoUrl));
   const [videoStatusMessage, setVideoStatusMessage] = useState<string | null>(null);
@@ -182,7 +185,7 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
               onClick={() => setActiveTab("video")}
               style={{ cursor: "pointer", fontSize: "11.5px", padding: "4px 10px" }}
             >
-              ▶ YouTube Player
+              ▶ 2-Min Demo Video
             </span>
             <span
               className={activeTab === "interactive" ? "on" : ""}
@@ -227,7 +230,7 @@ export default function TourModal({ isOpen, onClose }: TourModalProps) {
               >
                 {activeVideoId ? (
                   <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${activeVideoId}?autoplay=1&rel=0&modestbranding=1`}
+                    src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1&rel=0&modestbranding=1`}
                     title="ProofStack 2-Minute Architecture Tour"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
