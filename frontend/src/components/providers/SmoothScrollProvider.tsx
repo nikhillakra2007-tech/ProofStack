@@ -17,22 +17,49 @@ export default function SmoothScrollProvider({ children }: SmoothScrollProviderP
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    if (!prefersReducedMotion) {
+    // Fast-path: On mobile or small screens, use native browser scrolling without RAF loop
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth <= 960 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        ));
+
+    if (!prefersReducedMotion && !isMobile) {
       import("lenis")
         .then(({ default: Lenis }) => {
           const lenis = new Lenis({
-            duration: 1.0,
+            duration: 0.8,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             orientation: "vertical",
             gestureOrientation: "vertical",
             smoothWheel: true,
-            wheelMultiplier: 0.95,
-            touchMultiplier: 1.2,
+            wheelMultiplier: 1.0,
+            touchMultiplier: 1.0,
             infinite: false,
+            syncTouch: false,
           });
 
           lenisRef.current = lenis;
           lenisInstance = lenis;
+
+          // Throttle is-scrolling class to pause heavy background animations during active scroll
+          let isScrolling = false;
+          let scrollTimeout: NodeJS.Timeout;
+
+          const onScroll = () => {
+            if (!isScrolling) {
+              isScrolling = true;
+              document.body.classList.add("is-scrolling");
+            }
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+              isScrolling = false;
+              document.body.classList.remove("is-scrolling");
+            }, 120);
+          };
+
+          lenis.on("scroll", onScroll);
 
           function raf(time: number) {
             lenis.raf(time);
@@ -57,12 +84,12 @@ export default function SmoothScrollProvider({ children }: SmoothScrollProviderP
           e.preventDefault();
           const targetTop = element.getBoundingClientRect().top + window.pageYOffset - 72;
 
-          if (prefersReducedMotion) {
+          if (prefersReducedMotion || isMobile) {
             window.scrollTo({ top: targetTop, behavior: "auto" });
           } else if (lenisRef.current) {
             lenisRef.current.scrollTo(element as HTMLElement, {
               offset: -72,
-              duration: 0.9,
+              duration: 0.7,
             });
           } else {
             window.scrollTo({ top: targetTop, behavior: "smooth" });
@@ -72,7 +99,7 @@ export default function SmoothScrollProvider({ children }: SmoothScrollProviderP
       }
     };
 
-    document.addEventListener("click", handleAnchorClick);
+    document.addEventListener("click", handleAnchorClick, { passive: false });
 
     return () => {
       document.removeEventListener("click", handleAnchorClick);

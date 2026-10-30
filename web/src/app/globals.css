@@ -532,22 +532,50 @@ a:focus-visible {
   }
 }
 
-@media (max-width: 960px) {
-  .login-grid-container {
+/* 4 Evaluation Personas Grid: 2x2 on mobile, clean cards */
+.login-persona-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (min-width: 769px) {
+  .login-persona-grid {
     grid-template-columns: 1fr !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: auto !important;
+    gap: 10px !important;
   }
-  .login-left-panel {
-    display: none !important;
+}
+
+.persona-card-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 120ms ease;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  justifyContent: space-between;
+  box-sizing: border-box;
+}
+
+.persona-card-item:hover,
+.persona-card-item:active {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 6%, var(--surface));
+}
+
+@media (max-width: 768px) {
+  .persona-card-item {
+    padding: 10px;
+    min-height: 72px;
   }
-  .login-right-panel {
-    padding: 24px 20px 90px 20px !important;
-    max-height: none !important;
-    height: auto !important;
-    width: 100% !important;
-  }
+}
+
+@media (max-width: 960px) {
   .ps.app-frame {
     grid-template-columns: 1fr !important;
     width: 100% !important;
@@ -607,6 +635,19 @@ a:focus-visible {
   }
 }
 
+/* Fast, Instantaneous Transitions & Smoothness (max 200ms) */
+.scrim,
+.modal-backdrop,
+.drawer-backdrop {
+  transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.modal-content,
+.dialog-content,
+.card-drawer {
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), opacity 160ms ease !important;
+}
+
 /* Accessibility: Respect user reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -617,12 +658,6 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* Full Width No-Sidebar App Frame */
-.ps.nosidebar {
-  width: 100%;
-  min-height: 100vh;
 }
 
 /* ==========================================================================
@@ -725,6 +760,97 @@ a:focus-visible {
     box-sizing: border-box !important;
   }
 }
+/* 2x2 Persona Grid on Mobile */
+.login-persona-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .login-persona-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.persona-card-item {
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 120ms ease;
+  display: flex;
+  flex-direction: column;
+  justifyContent: center;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.persona-card-item:hover,
+.persona-card-item:active {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 6%, var(--surface));
+}
+
+@media (max-width: 639px) {
+  .persona-desc {
+    display: none !important;
+  }
+}
+
+/* Mobile pipeline compact view */
+.mobile-pipeline-pill-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--side-line);
+  margin-top: 14px;
+}
+
+@media (min-width: 1024px) {
+  .mobile-pipeline-pill-strip {
+    display: none !important;
+  }
+}
+
+.login-pipeline-flowchart {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--side-ink) 4%, transparent);
+  border: 1px solid var(--side-line);
+}
+
+@media (max-width: 1023px) {
+  .login-pipeline-flowchart {
+    margin-top: 12px;
+    padding: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .login-pipeline-flowchart.mobile-collapsed {
+    display: none !important;
+  }
+}
+
+
+/* Full Width No-Sidebar App Frame */
+.ps.nosidebar {
+  width: 100%;
+  min-height: 100vh;
+}
 
 
 /* =========================================================
@@ -808,4 +934,154 @@ a:focus-visible {
   color: #34D399 !important;
   background: rgba(52, 211, 153, 0.12) !important;
   border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+
+
+/* =========================================================
+   AUTH CARD & LOGIN RIGHT PANEL STRICT HIGH CONTRAST RULES
+   ========================================================= */
+
+.auth-card,
+.login-right-panel,
+.login-right-content,
+[data-theme='dark'] .login-right-panel,
+.dark .login-right-panel {
+  color: #0F172A !important;
+}
+
+.auth-card h1,
+.auth-card h2,
+.auth-card h3,
+.auth-card h4,
+.auth-card .card-title,
+.login-right-panel h1,
+.login-right-panel h2,
+.login-right-panel h3,
+.login-right-panel h4,
+.login-right-panel .card-title,
+[data-theme='dark'] .login-right-panel h1,
+[data-theme='dark'] .login-right-panel h2,
+[data-theme='dark'] .login-right-panel h3,
+[data-theme='dark'] .login-right-panel h4,
+[data-theme='dark'] .login-right-panel .card-title,
+[data-theme='dark'] .auth-card h1,
+[data-theme='dark'] .auth-card h2,
+[data-theme='dark'] .auth-card h3,
+[data-theme='dark'] .auth-card h4,
+[data-theme='dark'] .auth-card .card-title,
+.dark .login-right-panel h1,
+.dark .login-right-panel h2,
+.dark .login-right-panel h3,
+.dark .login-right-panel h4,
+.dark .login-right-panel .card-title,
+.dark .auth-card h1,
+.dark .auth-card h2,
+.dark .auth-card h3,
+.dark .auth-card h4,
+.dark .auth-card .card-title {
+  color: #0F172A !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.auth-card p,
+.auth-card .card-subtitle,
+.login-right-panel p,
+.login-right-panel .card-subtitle,
+[data-theme='dark'] .login-right-panel p,
+[data-theme='dark'] .login-right-panel .card-subtitle,
+[data-theme='dark'] .auth-card p,
+[data-theme='dark'] .auth-card .card-subtitle,
+.dark .login-right-panel p,
+.dark .login-right-panel .card-subtitle,
+.dark .auth-card p,
+.dark .auth-card .card-subtitle {
+  color: #475569 !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+.auth-card .section-label,
+.login-right-panel .section-label,
+[data-theme='dark'] .login-right-panel .section-label,
+[data-theme='dark'] .auth-card .section-label,
+.dark .login-right-panel .section-label,
+.dark .auth-card .section-label {
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+.auth-card b,
+.auth-card strong,
+.auth-card .persona-title,
+.login-right-panel b,
+.login-right-panel strong,
+.login-right-panel .persona-title,
+[data-theme='dark'] .login-right-panel b,
+[data-theme='dark'] .login-right-panel strong,
+[data-theme='dark'] .login-right-panel .persona-title,
+[data-theme='dark'] .auth-card b,
+[data-theme='dark'] .auth-card strong,
+[data-theme='dark'] .auth-card .persona-title,
+.dark .login-right-panel b,
+.dark .login-right-panel strong,
+.dark .login-right-panel .persona-title,
+.dark .auth-card b,
+.dark .auth-card strong,
+.dark .auth-card .persona-title {
+  color: #0F172A !important;
+}
+
+.auth-card .persona-desc,
+.login-right-panel .persona-desc,
+[data-theme='dark'] .login-right-panel .persona-desc,
+[data-theme='dark'] .auth-card .persona-desc,
+.dark .login-right-panel .persona-desc,
+.dark .auth-card .persona-desc {
+  color: #64748B !important;
+}
+
+.auth-card label,
+.login-right-panel label,
+[data-theme='dark'] .login-right-panel label,
+[data-theme='dark'] .auth-card label,
+.dark .login-right-panel label,
+.dark .auth-card label {
+  color: #0F172A !important;
+}
+
+.auth-card input,
+.login-right-panel input,
+[data-theme='dark'] .login-right-panel input,
+[data-theme='dark'] .auth-card input,
+.dark .login-right-panel input,
+.dark .auth-card input {
+  color: #0F172A !important;
+}
+
+/* Pause heavy blob keyframe translation while scrolling to eliminate stutter */
+body.is-scrolling .hero-blob-glow div,
+.is-scrolling .hero-blob-glow div {
+  animation-play-state: paused !important;
+}
+
+@media (max-width: 960px) {
+  .hero-blob-glow div {
+    animation: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob-glow div {
+    animation: none !important;
+  }
+}
+
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 120ms;
 }

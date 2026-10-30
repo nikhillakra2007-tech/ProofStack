@@ -12,6 +12,7 @@ import CommandPalette from "./CommandPalette";
 import IngestModal from "./IngestModal";
 import AICopilotDrawer from "./AICopilotDrawer";
 import { ROLES } from "@/lib/roles";
+import { primeClientCache, prefetchAllRoutes } from "@/lib/clientCache";
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,6 +30,19 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const roleDef = ROLES[role] || ROLES.developer;
+
+  // Instant client-side caching & route prefetching
+  useEffect(() => {
+    primeClientCache(role);
+    prefetchAllRoutes(router);
+    try {
+      router.prefetch("/developer");
+      router.prefetch("/studio");
+      router.prefetch("/cockpit/TASK9142");
+      router.prefetch("/settings");
+      router.prefetch("/auditor");
+    } catch {}
+  }, [role, router]);
 
   // Global hotkeys & keyboard navigation (PDF p. 34)
   useEffect(() => {

@@ -12,6 +12,7 @@ import CommandPalette from "./CommandPalette";
 import IngestModal from "./IngestModal";
 import AICopilotDrawer from "./AICopilotDrawer";
 import { ROLES } from "@/lib/roles";
+import { primeClientCache, prefetchAllRoutes } from "@/lib/clientCache";
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,8 +27,22 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [gKeyPressed, setGKeyPressed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const roleDef = ROLES[role] || ROLES.developer;
+
+  // Instant client-side caching & route prefetching
+  useEffect(() => {
+    primeClientCache(role);
+    prefetchAllRoutes(router);
+    try {
+      router.prefetch("/developer");
+      router.prefetch("/studio");
+      router.prefetch("/cockpit/TASK9142");
+      router.prefetch("/settings");
+      router.prefetch("/auditor");
+    } catch {}
+  }, [role, router]);
 
   // Global hotkeys & keyboard navigation (PDF p. 34)
   useEffect(() => {
@@ -157,7 +172,11 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="ps app-frame">
       {/* 248px Left Sidebar */}
-      <Sidebar onOpenNewTaskModal={() => setIsIngestModalOpen(true)} />
+      <Sidebar
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        onOpenNewTaskModal={() => setIsIngestModalOpen(true)}
+      />
 
       {/* Main Area: Topbar (56px), Page Content (1fr), Footer (34px) */}
       <div className="main">
@@ -165,6 +184,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           onOpenNewTaskModal={() => setIsIngestModalOpen(true)}
           onToggleCopilot={() => setIsCopilotOpen(!isCopilotOpen)}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
 
         <main className="page" id="main-content">

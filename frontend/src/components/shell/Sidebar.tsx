@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES, TeamMember } from "@/lib/roles";
 import BrandLogo from "@/components/common/BrandLogo";
+import { prefetchAllRoutes } from "@/lib/clientCache";
 
 interface SidebarProps {
   onOpenNewTaskModal?: () => void;
@@ -54,6 +55,11 @@ export default function Sidebar({
   };
 
   const roleDef = ROLES[role] || ROLES.developer;
+
+  // Speculatively prefetch all main routes on mount for zero-latency transitions
+  useEffect(() => {
+    prefetchAllRoutes(router);
+  }, [router]);
 
   // Click outside to close switcher popover
   useEffect(() => {
@@ -129,8 +135,7 @@ export default function Sidebar({
           }}
         >
           {!isCollapsed ? (
-            <Link
-              href="/"
+            <Link href="/" prefetch={true}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -143,7 +148,7 @@ export default function Sidebar({
               <BrandLogo size="sm" showTagline={true} />
             </Link>
           ) : (
-            <Link href="/" title="ProofStack Autonomous Engine" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link href="/" prefetch={true} title="ProofStack Autonomous Engine" style={{ textDecoration: "none", color: "inherit" }}>
               <BrandLogo size="icon" />
             </Link>
           )}
@@ -191,8 +196,7 @@ export default function Sidebar({
         )}
 
         {/* 1. Dashboard (Always visible) */}
-        <Link
-          href="/dashboard"
+        <Link href="/dashboard" prefetch={true}
           className={`nav ${pathname === "/dashboard" ? "on" : ""}`}
           title={isCollapsed ? "Dashboard" : undefined}
           onClick={onCloseMobile}
@@ -212,8 +216,7 @@ export default function Sidebar({
 
         {/* Dedicated Role Portal */}
         {roleDef.primaryRoute && (
-          <Link
-            href={roleDef.primaryRoute}
+          <Link href={roleDef.primaryRoute} prefetch={true}
             className={`nav ${isRouteActive(roleDef.primaryRoute) ? "on" : ""}`}
             title={isCollapsed ? `${roleDef.label} Portal` : undefined}
             onClick={onCloseMobile}
@@ -241,8 +244,7 @@ export default function Sidebar({
 
         {/* 2. Studio (Developer ONLY) */}
         {showStudio && (
-          <Link
-            href="/studio"
+          <Link href="/studio" prefetch={true}
             className={`nav ${isRouteActive("/studio") ? "on" : ""}`}
             title={isCollapsed ? "Studio" : undefined}
             onClick={onCloseMobile}
@@ -261,8 +263,7 @@ export default function Sidebar({
 
         {/* 3. Control Plane (Super Admin & Workspace Admin ONLY) */}
         {showControlPlane && (
-          <Link
-            href="/control-plane"
+          <Link href="/control-plane" prefetch={true}
             className={`nav ${isRouteActive("/control-plane") ? "on" : ""}`}
             title={isCollapsed ? "Control Plane" : undefined}
             onClick={onCloseMobile}
@@ -288,8 +289,7 @@ export default function Sidebar({
 
         {/* 4. 19-Catalog (Workspace Admin ONLY) */}
         {showCatalog && (
-          <Link
-            href="/catalog"
+          <Link href="/catalog" prefetch={true}
             className={`nav ${isRouteActive("/catalog") ? "on" : ""}`}
             title={isCollapsed ? "19-Catalog" : undefined}
             onClick={onCloseMobile}
@@ -308,8 +308,7 @@ export default function Sidebar({
 
         {/* 5. Findings (Security Auditor & Workspace Admin) */}
         {showFindings && (
-          <Link
-            href="/findings"
+          <Link href="/findings" prefetch={true}
             className={`nav ${isRouteActive("/findings") ? "on" : ""}`}
             title={isCollapsed ? "Findings" : undefined}
             onClick={onCloseMobile}
@@ -334,8 +333,7 @@ export default function Sidebar({
 
         {/* 6. Ledger (Security Auditor & Super Admin) */}
         {showLedger && (
-          <Link
-            href="/ledger"
+          <Link href="/ledger" prefetch={true}
             className={`nav ${isRouteActive("/ledger") ? "on" : ""}`}
             title={isCollapsed ? "Ledger" : undefined}
             onClick={onCloseMobile}
@@ -355,8 +353,7 @@ export default function Sidebar({
 
         {/* 7. Cockpit (Developer & Security Auditor) */}
         {showCockpit && (
-          <Link
-            href="/cockpit/TASK9142"
+          <Link href="/cockpit/TASK9142" prefetch={true}
             className={`nav ${isRouteActive("/cockpit") ? "on" : ""}`}
             title={isCollapsed ? "Cockpit" : undefined}
             onClick={onCloseMobile}
@@ -378,8 +375,7 @@ export default function Sidebar({
         )}
 
         {/* 8. Settings (Always visible) */}
-        <Link
-          href="/settings"
+        <Link href="/settings" prefetch={true}
           className={`nav ${isRouteActive("/settings") ? "on" : ""}`}
           title={isCollapsed ? "Settings" : undefined}
           onClick={onCloseMobile}
@@ -485,8 +481,7 @@ export default function Sidebar({
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "8px" }}>
-                <Link
-                  href="/settings"
+                <Link href="/settings" prefetch={true}
                   onClick={() => setIsSwitcherOpen(false)}
                   style={{
                     display: "flex",
@@ -507,8 +502,7 @@ export default function Sidebar({
                   </svg>
                   <span>Account Settings</span>
                 </Link>
-                <Link
-                  href={roleDef.primaryRoute || "/dashboard"}
+                <Link href={roleDef.primaryRoute || "/dashboard"} prefetch={true}
                   onClick={() => setIsSwitcherOpen(false)}
                   style={{
                     display: "flex",

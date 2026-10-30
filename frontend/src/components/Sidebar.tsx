@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -20,6 +20,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { prefetchAllRoutes } from "@/lib/clientCache";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   onOpenNewTaskModal: () => void;
@@ -34,6 +36,11 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const { session, role, isAdmin, isSuperAdmin, isAuditor, logout } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    prefetchAllRoutes(router);
+  }, [router]);
 
   const navItems = [
     { label: "Workspace Home", href: "/", icon: Home, hidden: false },
@@ -54,7 +61,7 @@ export default function Sidebar({
       {/* Top Header & Logo */}
       <div className="flex flex-col">
         <div className="h-16 px-4 flex items-center justify-between border-b border-[#1E293B]">
-          <Link href="/" className="flex items-center gap-3 overflow-hidden group">
+          <Link href="/" prefetch={true} className="flex items-center gap-3 overflow-hidden group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 shrink-0 group-hover:scale-105 transition-transform">
               <ShieldCheck className="w-5 h-5 text-emerald-300" />
             </div>
@@ -124,9 +131,7 @@ export default function Sidebar({
                   : pathname.startsWith(item.href);
 
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
+                <Link key={item.href} href={item.href} prefetch={true}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                     isActive
                       ? "bg-indigo-600/20 text-white border border-indigo-500/40 shadow-sm"
@@ -150,8 +155,7 @@ export default function Sidebar({
       <div className="p-3 border-t border-[#1E293B] space-y-2">
         {/* Control Plane Link (Strictly Admin & Super Admin) */}
         {isAdmin && (
-          <Link
-            href="/admin"
+          <Link href="/admin" prefetch={true}
             className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
               pathname.startsWith("/admin")
                 ? "bg-purple-600/20 text-white border border-purple-500/40"

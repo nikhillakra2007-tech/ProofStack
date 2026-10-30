@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { prefetchAllRoutes } from "@/lib/clientCache";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
@@ -19,6 +21,18 @@ export function HorizonNav() {
   const { session, role, activeMember, logout, isAuthenticated } = useAuth();
   const { navigateWithCurtain } = useCurtain();
   const roleDef = ROLES[role] || ROLES.developer;
+
+  // Instant prefetch on mount for zero-latency transitions
+  useEffect(() => {
+    prefetchAllRoutes(router);
+    try {
+      router.prefetch("/developer");
+      router.prefetch("/studio");
+      router.prefetch("/cockpit/TASK9142");
+      router.prefetch("/settings");
+      router.prefetch("/auditor");
+    } catch {}
+  }, [router]);
 
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -78,10 +92,10 @@ export function HorizonNav() {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent, href: string, label: string) => {
+  const handleNavClick = (e: React.MouseEvent, href: string, label?: string) => {
     e.preventDefault();
     if (pathname === href) return;
-    navigateWithCurtain(href, label);
+    router.push(href);
   };
 
   const handleSignOut = () => {
@@ -89,7 +103,7 @@ export function HorizonNav() {
     if (typeof logout === "function") {
       logout();
     }
-    navigateWithCurtain("/", "Sentinel Gate");
+    router.push("/");
   };
 
   const isNavActive = (href: string) => {
@@ -179,9 +193,7 @@ export function HorizonNav() {
         }}
       >
         {/* Brand Identity */}
-        <a
-          href="/"
-          onClick={(e) => handleNavClick(e, "/", "Sentinel Gate")}
+        <Link href="/" prefetch={true} className="cursor-pointer active:scale-98 transition-transform"
           style={{
             display: "flex",
             alignItems: "center",
@@ -190,7 +202,7 @@ export function HorizonNav() {
           }}
         >
           <BrandLogo size="md" showWordmark={true} />
-        </a>
+        </Link>
 
         {/* Desktop Navigation Links (Context-Aware) */}
         <nav
@@ -227,10 +239,11 @@ export function HorizonNav() {
             }
 
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item.href, item.pageName)}
+                prefetch={true}
+                className="cursor-pointer active:scale-98 transition-transform"
                 style={{
                   position: "relative",
                   padding: "7px 12px",
@@ -259,7 +272,7 @@ export function HorizonNav() {
                   />
                 )}
                 <span>{item.label}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -367,7 +380,7 @@ export function HorizonNav() {
                       <button
                         onClick={(e) => {
                           setRoleMenuOpen(false);
-                          handleNavClick(e, roleDef.primaryRoute || "/dashboard", `${roleDef.label} Hub`);
+                          router.push(roleDef.primaryRoute || "/dashboard");
                         }}
                         style={{
                           width: "100%",
@@ -414,9 +427,7 @@ export function HorizonNav() {
             </div>
           ) : (
             /* Explicit Sign In Button for unauthenticated visitors */
-            <a
-              href="/login"
-              onClick={(e) => handleNavClick(e, "/login", "Authentication")}
+            <Link href="/login" prefetch={true}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -436,7 +447,7 @@ export function HorizonNav() {
             >
               <LogIn style={{ width: "14px", height: "14px" }} />
               <span>Sign In</span>
-            </a>
+            </Link>
           )}
         </div>
       </div>
