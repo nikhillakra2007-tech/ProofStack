@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import React, { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -78,10 +79,10 @@ export function HorizonNav() {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent, href: string, label: string) => {
+  const handleNavClick = (e: React.MouseEvent, href: string, label?: string) => {
     e.preventDefault();
     if (pathname === href) return;
-    navigateWithCurtain(href, label);
+    router.push(href);
   };
 
   const handleSignOut = () => {
@@ -89,7 +90,7 @@ export function HorizonNav() {
     if (typeof logout === "function") {
       logout();
     }
-    navigateWithCurtain("/", "Sentinel Gate");
+    router.push("/");
   };
 
   const isNavActive = (href: string) => {
@@ -179,9 +180,10 @@ export function HorizonNav() {
         }}
       >
         {/* Brand Identity */}
-        <a
+        <Link
           href="/"
-          onClick={(e) => handleNavClick(e, "/", "Sentinel Gate")}
+          prefetch={true}
+          className="cursor-pointer active:scale-98 transition-transform"
           style={{
             display: "flex",
             alignItems: "center",
@@ -190,7 +192,7 @@ export function HorizonNav() {
           }}
         >
           <BrandLogo size="md" showWordmark={true} />
-        </a>
+        </Link>
 
         {/* Desktop Navigation Links (Context-Aware) */}
         <nav
@@ -414,9 +416,9 @@ export function HorizonNav() {
             </div>
           ) : (
             /* Explicit Sign In Button for unauthenticated visitors */
-            <a
+            <Link
               href="/login"
-              onClick={(e) => handleNavClick(e, "/login", "Authentication")}
+              prefetch={true}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -432,11 +434,11 @@ export function HorizonNav() {
                 transition: "all 0.15s ease",
                 boxShadow: "0 0 15px rgba(16, 185, 129, 0.25)",
               }}
-              className="hover:scale-105 active:scale-95"
+              className="hover:scale-105 active:scale-95 cursor-pointer"
             >
               <LogIn style={{ width: "14px", height: "14px" }} />
               <span>Sign In</span>
-            </a>
+            </Link>
           )}
         </div>
       </div>

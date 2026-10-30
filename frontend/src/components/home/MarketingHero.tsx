@@ -27,7 +27,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
         scrollMarginTop: "80px",
       }}
     >
-      {/* Floating Radial Shader Blobs */}
+      {/* Floating Radial Shader Blobs with Zero-Blur Native Falloff Gradients */}
       <div
         className="hero-blob-glow"
         style={{
@@ -41,6 +41,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
       >
         {/* Blob 1 (Top-Left): Sage Teal */}
         <div
+          className="hero-blob-1"
           style={{
             position: "absolute",
             top: "-8%",
@@ -48,14 +49,16 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             width: "560px",
             height: "560px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(20, 83, 67, 0.16) 0%, rgba(20, 83, 67, 0.04) 65%, transparent 75%)",
-            filter: "blur(80px)",
+            background:
+              "radial-gradient(circle, rgba(20, 83, 67, 0.18) 0%, rgba(20, 83, 67, 0.08) 35%, rgba(20, 83, 67, 0.02) 60%, transparent 75%)",
+            willChange: "transform",
             animation: "floatBlob1 18s ease-in-out infinite",
           }}
         />
 
         {/* Blob 2 (Center-Right): Soft Terracotta / Burgundy Glow */}
         <div
+          className="hero-blob-2"
           style={{
             position: "absolute",
             top: "20%",
@@ -63,14 +66,16 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             width: "520px",
             height: "520px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(194, 65, 12, 0.12) 0%, rgba(159, 18, 57, 0.06) 60%, transparent 75%)",
-            filter: "blur(80px)",
+            background:
+              "radial-gradient(circle, rgba(194, 65, 12, 0.14) 0%, rgba(159, 18, 57, 0.07) 35%, rgba(159, 18, 57, 0.02) 60%, transparent 75%)",
+            willChange: "transform",
             animation: "floatBlob2 22s ease-in-out infinite",
           }}
         />
 
         {/* Blob 3 (Bottom-Center): Emerald Mint */}
         <div
+          className="hero-blob-3"
           style={{
             position: "absolute",
             bottom: "8%",
@@ -78,8 +83,9 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             width: "600px",
             height: "460px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(16, 185, 129, 0.14) 0%, rgba(32, 201, 166, 0.05) 60%, transparent 75%)",
-            filter: "blur(80px)",
+            background:
+              "radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(32, 201, 166, 0.06) 35%, rgba(32, 201, 166, 0.01) 60%, transparent 75%)",
+            willChange: "transform",
             animation: "floatBlob3 20s ease-in-out infinite",
           }}
         />
@@ -210,7 +216,8 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
         >
           <Link
             href="/login"
-            className="btn-pill-primary hero-primary-cta"
+            prefetch={true}
+            className="btn-pill-primary hero-primary-cta cursor-pointer active:scale-98 transition-transform"
             style={{
               height: "44px",
               padding: "0 24px",
@@ -243,7 +250,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
             <button
               type="button"
               onClick={onOpenTour}
-              className="btn-pill-secondary hero-pill-secondary"
+              className="btn-pill-secondary hero-pill-secondary cursor-pointer active:scale-98 transition-transform"
               style={{
                 height: "44px",
                 padding: "0 22px",
@@ -257,7 +264,7 @@ export default function MarketingHero({ onOpenTour }: MarketingHeroProps) {
           ) : (
             <a
               href="#showcase"
-              className="btn-pill-secondary hero-pill-secondary"
+              className="btn-pill-secondary hero-pill-secondary cursor-pointer active:scale-98 transition-transform"
               style={{
                 height: "44px",
                 padding: "0 22px",
