@@ -12,6 +12,7 @@
 >
 > 🚀 **Live Production Application**: **[https://sentinel-gate-seven.vercel.app/](https://sentinel-gate-seven.vercel.app/)**  
 > 🔗 **Secondary Cockpit Mirror**: **[https://proofstack-cockpit.vercel.app/](https://proofstack-cockpit.vercel.app/)**  
+> 🎬 **2-Minute Demo Video**: **[https://youtu.be/EsdJ2vkg5HA](https://youtu.be/EsdJ2vkg5HA)**  
 > 📄 **License**: **[Apache License 2.0](LICENSE)**
 >
 > *Core Invariant: Deterministic Code Decides; The Generative Model Only Proposes.*
