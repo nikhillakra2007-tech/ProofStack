@@ -1,17 +1,20 @@
 # ProofStack (Autonomous Verification Engine & Cockpit)
 
 [![Live Production](https://img.shields.io/badge/Vercel-Live_Production-10B981?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
+[![Secondary Cockpit](https://img.shields.io/badge/Cockpit-Secondary_Mirror-38BDF8?style=for-the-badge&logo=vercel&logoColor=white)](https://proofstack-cockpit.vercel.app/)
+[![2-Minute Demo Video](https://img.shields.io/badge/YouTube-2--Minute_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/EsdJ2vkg5HA)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14.2.15-0F172A?style=for-the-badge&logo=next.js&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://127.0.0.1:8765/docs)
-[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_70B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
+[![NVIDIA Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron_120B-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://sentinel-gate-seven.vercel.app/)
 [![HMAC-SHA256](https://img.shields.io/badge/Evidence_Ledger-HMAC--SHA256-38BDF8?style=for-the-badge&logo=shield&logoColor=white)](https://sentinel-gate-seven.vercel.app/ledger)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
 
 > **Autonomous DevSecOps Engine with Zero-Compromise Compiler Gates, Live Container DAST & Cryptographic Merkle Ledger**  
 > *Nebius x NVIDIA Global AI Hackathon (Coding and Agentic Engineering track)*
 >
-> 🚀 **Live Production Application**: **[https://sentinel-gate-seven.vercel.app/](https://sentinel-gate-seven.vercel.app/)**  
+> 🚀 **Primary Canonical Production App**: **[https://sentinel-gate-seven.vercel.app/](https://sentinel-gate-seven.vercel.app/)**  
 > 🔗 **Secondary Cockpit Mirror**: **[https://proofstack-cockpit.vercel.app/](https://proofstack-cockpit.vercel.app/)**  
+> 🎬 **2-Minute Demo Video**: **[https://youtu.be/EsdJ2vkg5HA](https://youtu.be/EsdJ2vkg5HA)**  
 > 📄 **License**: **[Apache License 2.0](LICENSE)**
 >
 > *Core Invariant: Deterministic Code Decides; The Generative Model Only Proposes.*
@@ -84,7 +87,7 @@ flowchart TD
     DastTest --> LedgerTest["6. Verify Ledger (/ledger)<br/>Simulate tamper detection & Merkle chain"]
     
     %% Option B: Live NVIDIA Model with API Key
-    Choice -->|Option B: Live Cloud Inference with API Key| ApiKey["1. Configure Nebius API Key<br/>NEBIUS_API_KEY in .env"]
+    Choice -->|Option B: Live Cloud Inference with API Key| ApiKey["1. Configure Nebius API Key<br/>NEBIUS_API_KEY in .env or Web UI"]
     ApiKey --> RunLocal["2. Launch FastAPI backend + Next.js<br/>Port 8765 + Port 3000"]
     RunLocal --> LiveInference["3. Live NVIDIA Nemotron 70B/120B Inference<br/>Synthesizes dynamic AST repairs in real-time"]
     
@@ -177,7 +180,6 @@ npm run dev
 If you do **not** configure an API key, ProofStack **never crashes or simulates fake cloud latency**. It transparently runs in **Deterministic AST Rule Fallback Mode** (`proofstack/model/gateway.py`), ensuring that 100% of the 8 compiler gates, test benchmarks, and UI features continue executing offline.
 
 ---
-
 
 ## 🏛️ End-to-End Autonomous Remediation Architecture
 
@@ -284,12 +286,32 @@ Every authenticated role maps to a dedicated default dashboard on initial login 
 
 ---
 
+## 📂 Repository Architecture
+
+```text
+ProofStack/
+├── frontend/             # Canonical Next.js 14 Web Application (Full DevSecOps Suite)
+│   ├── src/app/          # 26 Static & Dynamic Routes (/studio, /dashboard, /dast, etc.)
+│   └── src/components/   # Design Tokens, Monacdiff Viewer, 8-Gate Interlock
+├── web/                  # Secondary Cockpit Application Mirror
+├── proofstack/           # Deterministic Verification & Remediation Engine
+│   ├── ast/              # Tree-Sitter Parser, Syntax Traversal, Masked Token Boundaries
+│   ├── gates/            # 8 Deterministic Interlock Compilers & Ruff Linter
+│   ├── sandbox/          # MicroVM Runner, Memory Profiler, Concurrency Evaluator
+│   └── ledger/           # SHA-256 Merkle Chain & Ed25519 Attestation
+├── server.py             # FastAPI Production Backend Gateway (Port 8765)
+├── tests/                # 115 Automated Python Security & Gate Regression Tests
+└── scripts/              # E2E Lifecycle Validators, Benchmark Seeders
+```
+
+---
+
 ## ⚡ Quick Start (Local Development)
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/nikhillakra2007-tech/something.git
-cd something
+git clone https://github.com/nikhillakra2007-tech/ProofStack.git
+cd ProofStack
 pip install -r requirements.txt
 cp .env.example .env
 
@@ -319,6 +341,9 @@ python scripts/verify_e2e.py
 
 # Build & Typecheck Canonical Production Frontend (frontend/)
 cd frontend && npm run build
+
+# Build & Typecheck Secondary Cockpit Mirror (web/)
+cd web && npm run build
 ```
 
 ---
