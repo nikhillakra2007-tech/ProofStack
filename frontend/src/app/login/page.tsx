@@ -690,14 +690,14 @@ function LoginContent() {
                     </span>
                   </div>
                   <div className="stage-card-desc" style={{ fontSize: "11px", color: "#94A3B8 !important", marginTop: "2px" }}>
-                    Signed block appended to audit ledger · Pull Request ready
+                    Hash-chained block appended to audit ledger · Verdict, diff and report ready
                   </div>
                 </div>
               </div>
               {activePipelineStage === 5 && (
                 <div style={{ margin: "4px 0 4px 30px", padding: "6px 8px", borderRadius: "5px", background: "rgba(0, 0, 0, 0.45)", border: "1px solid rgba(52, 211, 153, 0.35)", fontSize: "10px", fontFamily: "var(--f-mono, monospace)", color: "#CBD5E1", lineHeight: 1.4 }}>
                   <div style={{ color: "#34D399", fontWeight: 600 }}>Evidence Block #8842 · Sealed</div>
-                  <div>Signature: <code>SHA-256 Hash Chain (Ed25519 Sealed)</code> · Status: <span style={{ color: "#34D399" }}>PR Ready</span></div>
+                  <div>Signature: <code>SHA-256 Hash Chain (Ed25519 Sealed)</code> · Status: <span style={{ color: "#34D399" }}>Report Ready</span></div>
                 </div>
               )}
             </div>

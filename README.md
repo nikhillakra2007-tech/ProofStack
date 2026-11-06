@@ -15,6 +15,7 @@ cp .env.example .env
 docker compose up -d        # postgres + redis
 
 pip install -r requirements.txt
+pip install -r requirements-dev.txt   # to run the test suite
 alembic upgrade head
 python scripts/seed_demo.py
 python server.py                     # API on http://127.0.0.1:8765
@@ -42,7 +43,7 @@ AI writes patches faster than people can review them. The bottleneck in code rep
 
 ## DAST sandbox and evidence ledger
 
-Before a patch is even proposed, ProofStack proves the vulnerability is real by replaying adversarial exploit probes against an ephemeral container sandbox (DAST), so teams stop triaging static-analysis noise. After the gates accept a patch, the decision is sealed in an append-only evidence ledger: a SHA-256 hash chain over canonical JSON where every entry links to the previous one, so tampering with any record is detectable. Accepted patches auto-merge with that attestation attached.
+Before a patch is even proposed, ProofStack proves the vulnerability is real by replaying adversarial exploit probes against an ephemeral container sandbox (DAST), so teams stop triaging static-analysis noise. After the gates accept a patch, the decision is sealed in an append-only evidence ledger: a SHA-256 hash chain over canonical JSON where every entry links to the previous one, so tampering with any record is detectable. Accepted patches are emitted as a verdict, a diff and a report with that attestation attached. ProofStack never pushes, merges or deploys - merging stays a human decision.
 
 [![Tests](https://img.shields.io/badge/tests-115-10B981)](tests/)
 
