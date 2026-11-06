@@ -23,7 +23,7 @@ In this phase, we implemented:
 2. **Evidence-Grounded Prompting**: Delimits all untrusted inputs (source code, logs, user input) inside content-hashed `<untrusted-{hash}>` blocks via `proofstack.llm.render.fence`, preventing prompt injection.
 3. **Strict Structured Schema Validation**: Validates all model hypotheses against `schemas/hypothesis-set.v1.json` rules server-side before persisting or displaying.
 4. **Security Veto & Boundaries on Patch Proposals**: Model-proposed patches undergo path restriction audits (`tests/**`, `alembic/**`, `.env`, and traversal patterns are strictly forbidden), line budgets, and are labeled `AWAITING_VERIFICATION`—they cannot override deterministic gates or falsify acceptance verdicts.
-5. **Cryptographic Ledger Integration**: Model calls and generated proposals are appended to the hash-chained HMAC-SHA256 evidence ledger as `MODEL_CALL`, `HYPOTHESES`, and `PATCH` events.
+5. **Cryptographic Ledger Integration**: Model calls and generated proposals are appended to the hash-chained SHA-256 evidence ledger as `MODEL_CALL`, `HYPOTHESES`, and `PATCH` events.
 6. **Cockpit UI Provenance Transparency**: The UI explicitly distinguishes `Live AI Inference (NVIDIA Nemotron)` from `Deterministic Rule Engine (Local Fallback)` with provenance notes and interactive diagnosis/remediation triggers.
 7. **Comprehensive Test Suite**: Added 13 new tests across `tests/test_model_service.py` and `tests/test_model_api.py`, bringing total regression test coverage to 76 passed, 1 skipped.
 

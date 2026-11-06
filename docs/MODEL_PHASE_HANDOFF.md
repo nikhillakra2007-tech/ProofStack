@@ -89,5 +89,5 @@ curl -X POST -H "X-API-Key: test-secret-key-12345" http://localhost:3000/api/run
    - Proposed patches are marked `AWAITING_VERIFICATION` and cannot modify protected paths (`tests/**`, `alembic/**`, `.env`, configuration files).
    - Patches exceeding file count or line budgets are rejected server-side.
 3. **Cryptographic Tamper-Evidence**:
-   - Every model interaction is recorded in the HMAC-SHA256 evidence ledger.
+   - Every model interaction is recorded in the SHA-256 hash-chained evidence ledger.
    - Modifying any attribute of a persisted model record invalidates the ledger chain.

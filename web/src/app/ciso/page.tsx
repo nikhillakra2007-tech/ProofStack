@@ -22,6 +22,7 @@ import {
   XCircle,
   FileCheck2,
 } from "lucide-react";
+import { GATES } from "@/lib/gates";
 
 interface ComplianceFramework {
   name: string;
@@ -69,16 +70,19 @@ export default function CisoRolePage() {
     },
   ];
 
-  const verificationGates = [
-    { id: 1, name: "Gate 1: AST Semantic Lexer", status: "PASSED", latency: "14ms", desc: "Tree-sitter AST validation & syntax normalization" },
-    { id: 2, name: "Gate 2: Invariant Synthesis", status: "PASSED", latency: "62ms", desc: "Z3 SMT solver verification of pre/post conditions" },
-    { id: 3, name: "Gate 3: Sandbox Compiler", status: "PASSED", latency: "380ms", desc: "Hermetic containerized compilation with zero network access" },
-    { id: 4, name: "Gate 4: Firecracker MicroVM", status: "PASSED", latency: "410ms", desc: "Hypervisor-level isolation with seccomp BPF filters" },
-    { id: 5, name: "Gate 5: OWASP DAST Probes", status: "PASSED", latency: "290ms", desc: "12 live attack payloads executed against runtime socket" },
-    { id: 6, name: "Gate 6: Merkle Ledger Stamp", status: "PASSED", latency: "18ms", desc: "SHA-256 binary hash leaf inserted into audit tree" },
-    { id: 7, name: "Gate 7: HSM Signature", status: "PASSED", latency: "45ms", desc: "Root authority ECDSA P-384 hardware signing" },
-    { id: 8, name: "Gate 8: Quorum Policy Veto", status: emergencyOverride ? "OVERRIDDEN" : "ENFORCED", latency: "2ms", desc: "Dual-key authorization check before artifact deployment" },
-  ];
+  // Canonical gate taxonomy from schemas/gates.v1.json (via @/lib/gates).
+  // Latencies are display-only demo values keyed by gate id.
+  const gateLatency: Record<string, string> = {
+    G0: "14ms", G1: "240ms", G2: "290ms", G3: "18ms",
+    G4: "62ms", G5: "45ms", G6: "12ms", G7: "8ms",
+  };
+  const verificationGates = GATES.map((g) => ({
+    id: g.id,
+    name: `${g.id} ${g.name}`,
+    status: emergencyOverride && g.id === "G7" ? "OVERRIDDEN" : "PASSED",
+    latency: gateLatency[g.id] ?? "-",
+    desc: g.description,
+  }));
 
   const handleExportCompliancePack = () => {
     setIsExporting(true);
@@ -176,7 +180,7 @@ export default function CisoRolePage() {
           <div className="text-[11px] text-[var(--ink2)]">Live microVM Testing</div>
         </div>
         <div className="p-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
-          <div className="text-[10px] font-mono text-[var(--ink3)] uppercase tracking-wider">Merkle Evidence</div>
+          <div className="text-[10px] font-mono text-[var(--ink3)] uppercase tracking-wider">Chain Evidence</div>
           <div className="text-2xl font-bold font-mono text-emerald-500">10,482</div>
           <div className="text-[11px] text-[var(--ink2)]">SHA-256 Leaves Sealed</div>
         </div>
@@ -362,7 +366,7 @@ export default function CisoRolePage() {
             </div>
 
             <p className="text-xs text-[var(--ink2)] leading-relaxed">
-              Emergency override allows the CISO to manually bypass automated gate quarantine during a zero-day incident response. All override events create an immutable, non-repudiable leaf in the Merkle audit chain.
+              Emergency override allows the CISO to manually bypass automated gate quarantine during a zero-day incident response. All override events create an immutable, non-repudiable entry in the hash-chained audit trail.
             </p>
 
             <div className="p-4 rounded-xl bg-[var(--surface2)] border border-[var(--line)] space-y-3 font-mono text-xs">

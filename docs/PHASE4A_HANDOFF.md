@@ -31,7 +31,7 @@
    - Project creation (`9edc8f48...`) -> Task intake (`f83f1549...`) -> Run trigger (`ed249f7a...`) -> Automated Execution -> `COMPLETED` lifecycle state.
    - Gates G0–G7 evaluated automatically: Security (P03 IDOR) rejected, Correctness (G2) passed, Performance (G4–G7) rejected due to baseline drift.
    - Canonical verdict correctly synthesized: `REJECTED`.
-   - Cryptographic Ledger: 32 blocks chained with SHA-256 HMAC digest, verified intact.
+   - Cryptographic Ledger: 32 blocks chained with a SHA-256 digest, verified intact.
    - Markdown & JSON reports generated and retrievable.
 5. **NVIDIA Hardware Detection (`PASS — LOCAL`)**:
    - Host GPU Detected: Physical `NVIDIA GeForce RTX 3050 6GB Laptop GPU` via native `nvml.dll` ctypes probe.

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { GATES } from "@/lib/gates";
 import BrandLogo from "@/components/common/BrandLogo";
 import {
   ShieldCheck,
@@ -388,13 +389,7 @@ export default function CoreProductSections() {
 
               {/* Checklist */}
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                {[
-                  { name: "Gate 1: AST Syntax Validator", desc: "Python 3.12 grammar compile", time: "12ms" },
-                  { name: "Gate 2: Ruff Strict Style Checker", desc: "Zero formatting regressions", time: "24ms" },
-                  { name: "Gate 3: Negative DAST Replay", desc: "Original exploit fails cleanly", time: "110ms" },
-                  { name: "Gate 4: Pytest Unit Regression Suite", desc: "100% test cases pass", time: "240ms" },
-                  { name: "Gate 5: HMAC-SHA256 Merkle Seal", desc: "Signed block appended", time: "6ms" },
-                ].map((gate) => (
+                {GATES.map((gate) => (
                   <div
                     key={gate.name}
                     style={{
@@ -411,15 +406,16 @@ export default function CoreProductSections() {
                     <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                       <CheckCircle2 size={13} style={{ color: "var(--brand)", flexShrink: 0 }} />
                       <div>
-                        <div style={{ fontWeight: 600, color: "var(--heading-primary)" }}>{gate.name}</div>
-                        <div style={{ fontSize: "10px", color: "var(--ink3)" }}>{gate.desc}</div>
+                        <div style={{ fontWeight: 600, color: "var(--heading-primary)" }}>{gate.id} {gate.name}</div>
+                        <div style={{ fontSize: "10px", color: "var(--ink3)" }}>{gate.description}</div>
                       </div>
                     </div>
-                    <span style={{ fontFamily: "var(--f-mono)", fontSize: "10.5px", color: "var(--ink3)" }}>
-                      {gate.time}
-                    </span>
                   </div>
                 ))}
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "10.5px", color: "var(--ink3)" }}>
+                Optional after the gates: an Ed25519 head seal (<code>proofstack ledger seal</code>) signs the chain
+                head, so truncating the tail of the ledger is also detectable.
               </div>
             </div>
 
@@ -488,7 +484,7 @@ export default function CoreProductSections() {
                   margin: "0 0 6px 0",
                 }}
               >
-                Cryptographic Evidence Ledger (HMAC-SHA256)
+                Cryptographic Evidence Ledger (SHA-256)
               </h3>
               <p
                 style={{
@@ -767,7 +763,7 @@ export default function CoreProductSections() {
               }}
             >
               <CheckCircle2 size={13} style={{ color: "var(--brand)" }} />
-              Zero LLM Commits Policy
+              Model Never Runs Git - Humans Merge
             </span>
             <span
               style={{
@@ -781,7 +777,7 @@ export default function CoreProductSections() {
               }}
             >
               <CheckCircle2 size={13} style={{ color: "var(--brand)" }} />
-              HMAC-SHA256 Merkle Provenance
+              SHA-256 Hash-Chain Provenance
             </span>
           </div>
 
@@ -878,7 +874,7 @@ export default function CoreProductSections() {
               }}
             >
               Autonomous DevSecOps verification engine combining adversarial DAST probing
-              with an 8-gate deterministic interlock and HMAC-SHA256 evidence ledger.
+              with an 8-gate deterministic interlock and SHA-256 hash-chained evidence ledger.
             </p>
           </div>
 
@@ -938,8 +934,8 @@ export default function CoreProductSections() {
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>8 Deterministic Gates</span></li>
-              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>HMAC-SHA256 Merkle Chain</span></li>
-              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>Zero LLM Commits Policy</span></li>
+              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>SHA-256 Hash Chain</span></li>
+              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>Model Never Runs Git - Humans Merge</span></li>
               <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>Python 3.11/3.12 Sandboxes</span></li>
             </ul>
           </div>

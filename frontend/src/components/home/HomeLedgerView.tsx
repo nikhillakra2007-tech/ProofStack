@@ -53,7 +53,7 @@ const INITIAL_BLOCKS: BlockData[] = [
     timestamp: "2026-10-27T10:00:04.550Z",
     prevHash: "b84e0192a83b276e104c89bdf6e41a27e41e4649b934ca495991b7852b855f301",
     currentHash: "4f72d91a83b276e104c89bdf6e41a27e41e4649b934ca495991b7852b8558912",
-    data: "Cryptographic Evidence Sealed · Merkle Root Verified",
+    data: "Cryptographic Evidence Sealed · Chain Head Verified",
   },
 ];
 
@@ -110,8 +110,8 @@ export default function HomeLedgerView({ onOpenTour }: { onOpenTour?: () => void
   const handleExportEvidence = () => {
     downloadEvidenceReport({
       problemId: "INV-4821",
-      problemTitle: "Cryptographic Merkle Chain Audit Export",
-      filename: "merkle_chain_seal.json",
+      problemTitle: "Cryptographic Hash Chain Audit Export",
+      filename: "hash_chain_seal.json",
     });
   };
 
@@ -124,7 +124,7 @@ export default function HomeLedgerView({ onOpenTour }: { onOpenTour?: () => void
             CRYPTOGRAPHIC PROOF CHAIN
           </span>
           <span style={{ fontSize: "12px", background: "#ECFDF5", color: "#065F46", padding: "3px 10px", borderRadius: "12px", border: "1px solid #A7F3D0", fontWeight: 600 }}>
-            ⛓️ SHA-256 Merkle Chained
+            ⛓️ SHA-256 Hash Chained
           </span>
           <span style={{ fontSize: "12px", background: "#EFF6FF", color: "#1E40AF", padding: "3px 10px", borderRadius: "12px", border: "1px solid #BFDBFE", fontWeight: 600 }}>
             🛡️ Zero Tampering Tolerated
@@ -132,11 +132,11 @@ export default function HomeLedgerView({ onOpenTour }: { onOpenTour?: () => void
         </div>
 
         <h1 style={{ fontFamily: "var(--f-display)", fontSize: "40px", fontWeight: 700, margin: "0 0 16px", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
-          Evidence Ledger: Immutable SHA-256 Merkle Chain
+          Evidence Ledger: Immutable SHA-256 Hash Chain
         </h1>
 
         <p style={{ color: "var(--ink2)", fontSize: "16px", lineHeight: 1.6, margin: "0 auto 24px" }}>
-          Every run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a Merkle-linked chain:
+          Every run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a hash-linked chain:
           <br />
           <code className="mono" style={{ fontSize: "13px", color: "var(--brand)", fontWeight: 700 }}>
             entry_hash = SHA256(prev_hash + body)
@@ -177,7 +177,7 @@ export default function HomeLedgerView({ onOpenTour }: { onOpenTour?: () => void
         </div>
       </div>
 
-      {/* Merkle Chain Integrity Status Banner */}
+      {/* Hash Chain Integrity Status Banner */}
       <div
         className="card"
         style={{
@@ -213,8 +213,8 @@ export default function HomeLedgerView({ onOpenTour }: { onOpenTour?: () => void
           <div>
             <b style={{ fontSize: "14.5px", color: isTampered ? "#DC2626" : "#065F46", display: "block" }}>
               {isTampered
-                ? "TAMPER DETECTED: Merkle Hash Linkage Severed Between Block #2 & #3"
-                : "CHAIN VALIDATED: All 5 Cryptographic Hashes Match Merkle Root"}
+                ? "TAMPER DETECTED: Hash Linkage Severed Between Block #2 & #3"
+                : "CHAIN VALIDATED: All 5 Cryptographic Hashes Match Chain Head"}
             </b>
             <span style={{ fontSize: "12px", color: "var(--ink2)" }}>
               {isTampered

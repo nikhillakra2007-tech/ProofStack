@@ -62,7 +62,7 @@ const SEARCH_PAGES = [
   { title: "Workspace Dashboard", category: "Pages", path: "/dashboard", desc: "Platform overview & fleet status" },
   { title: "Cockpit (TASK9142)", category: "Pages", path: "/cockpit/TASK9142", desc: "Six-viewport deep diagnostic console" },
   { title: "Findings & DAST Scanner", category: "Pages", path: "/findings", desc: "Security vulnerabilities & remediations" },
-  { title: "Evidence Ledger", category: "Pages", path: "/ledger", desc: "Cryptographic SHA-256 Merkle chain" },
+  { title: "Evidence Ledger", category: "Pages", path: "/ledger", desc: "Cryptographic SHA-256 hash chain" },
   { title: "Benchmark Catalog", category: "Pages", path: "/catalog", desc: "19-problem industrial test suite" },
   { title: "Control Plane", category: "Pages", path: "/control-plane", desc: "Admin governance & token budgets" },
 ];

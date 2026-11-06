@@ -75,7 +75,7 @@ This document provides full technical attestation of the Phase 2 backend integra
 
 ### 4. Ledger Attestation (`backend/ledger_service.py`)
 - Enforced row-level locking on `Run` (`with_for_update`) during ledger appends to prevent concurrent sequence race conditions.
-- Preserved HMAC-SHA256 hash chaining contract over canonical JSON payloads.
+- Preserved SHA-256 hash chaining contract over canonical JSON payloads.
 - Added `verify_global_chain()` to audit ledger integrity across all stored runs via `GET /api/ledger/verify`.
 
 ### 5. Resilient Event Streaming (`backend/event_bus.py`)

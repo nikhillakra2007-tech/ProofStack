@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col items-start gap-3 max-w-sm">
           <BrandLogo size="md" showWordmark={true} showSubtitle={true} />
           <p className="text-xs leading-relaxed text-[var(--ink-body)]">
-            Autonomous AST invariant verification, 12-vector exploit oracles, and SHA-256 immutable Merkle audit ledger for enterprise engineering teams.
+            Autonomous AST invariant verification, 12-vector exploit oracles, and SHA-256 immutable hash-chained audit ledger for enterprise engineering teams.
           </p>
           <div className="flex items-center gap-2 font-mono text-[11px] text-[var(--primary)] mt-1">
             <span className="w-2 h-2 rounded-full bg-[var(--primary)] inline-block animate-pulse" />
@@ -91,10 +91,10 @@ export const Footer: React.FC = () => {
             Exploit Oracle Sandbox
           </button>
           <button
-            onClick={() => navigateWithCurtain("/ledger", "Merkle Ledger")}
+            onClick={() => navigateWithCurtain("/ledger", "Evidence Ledger")}
             className="text-left text-[var(--ink-body)] hover:text-[var(--primary)] transition-colors"
           >
-            SHA-256 Merkle Ledger
+            SHA-256 Hash Chain
           </button>
           <button
             onClick={() => navigateWithCurtain("/login", "Authentication")}

@@ -9,7 +9,7 @@ import {
   ExternalLink, ShieldAlert, Award
 } from "lucide-react";
 
-interface MerkleBlock {
+interface EvidenceBlock {
   blockNumber: number;
   timestamp: string;
   remediationTarget: string;
@@ -24,7 +24,7 @@ export default function AuditorRolePage() {
   const [tamperTriggered, setTamperTriggered] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  const initialBlocks: MerkleBlock[] = [
+  const initialBlocks: EvidenceBlock[] = [
     {
       blockNumber: 9482,
       timestamp: "2026-10-28 17:41:04 UTC",
@@ -54,7 +54,7 @@ export default function AuditorRolePage() {
     },
   ];
 
-  const [blocks, setBlocks] = useState<MerkleBlock[]>(initialBlocks);
+  const [blocks, setBlocks] = useState<EvidenceBlock[]>(initialBlocks);
 
   const handleSimulateTamper = () => {
     const nextState = !tamperTriggered;
@@ -147,7 +147,7 @@ export default function AuditorRolePage() {
         </div>
       </div>
 
-      {/* 2. Interactive Merkle Chain Inspector & Adversary Bit-Flip Simulator */}
+      {/* 2. Interactive Hash Chain Inspector & Adversary Bit-Flip Simulator */}
       <div className="card" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--line)" }}>
           <div>
@@ -182,7 +182,7 @@ export default function AuditorRolePage() {
             <div>
               <b style={{ color: "var(--fail)", fontSize: "13px" }}>AUTOMATIC DEPLOYMENT QUARANTINE TRIGGERED</b>
               <p style={{ margin: "3px 0 0 0", color: "var(--ink)", fontSize: "12px", lineHeight: 1.5 }}>
-                Adversary modified bytecode in Block #9481. Merkle root signature invalidated: calculated hash does not match stored block pointer. Downstream CI/CD merge gates have been halted.
+                Adversary modified bytecode in Block #9481. Chain integrity invalidated: calculated hash does not match stored previous-hash pointer. Downstream CI/CD merge gates have been halted.
               </p>
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function AuditorRolePage() {
               <span className="chip pass" style={{ fontSize: "9.5px" }}>Verified</span>
             </div>
             <p style={{ margin: 0, fontSize: "12px", color: "var(--ink2)", lineHeight: 1.5 }}>
-              Annex A.10 Cryptography: SHA-256 Merkle chain guarantees tamper detection and irreversible provenance tracking.
+              Annex A.10 Cryptography: SHA-256 hash chain guarantees tamper detection and irreversible provenance tracking.
             </p>
           </div>
         </div>

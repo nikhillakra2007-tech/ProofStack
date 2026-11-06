@@ -44,13 +44,13 @@ While previous PRs established UI layouts, DAST probe definitions, and initial F
 | `/` | Public | Hero terminal, radar, comparisons | None (Static) | Functional presentation landing page. |
 | `/login` | Public | Role presets, credentials | Currently client-only mock | **GAP:** Needs real `POST /api/auth/login` and secure session cookie/JWT. |
 | `/developer` | `developer`, `admin`, `super_admin` | Diff viewer, AST inspector, telemetry | Simulated synthesize timer | **GAP:** Connect to `/api/runs/{id}/propose-patch` and `/api/heal`. |
-| `/auditor` | `auditor`, `super_admin` | Merkle blocks, tamper simulator | Static mock chain | **GAP:** Connect to `/api/ledger/verify` and export real cryptographically signed packs. |
+| `/auditor` | `auditor`, `super_admin` | Ledger blocks, tamper simulator | Static mock chain | **GAP:** Connect to `/api/ledger/verify` and export real cryptographically signed packs. |
 | `/admin` | `admin`, `super_admin` | MicroVM pool metrics, runner status | Static runner objects | **GAP:** Connect to `/api/health`, `/api/ready`, `/api/model/status`. |
 | `/ciso` | `super_admin` | SOC2/FedRAMP matrices, override gates | Static compliance items | **GAP:** Connect to real gate policy endpoints and verified ledger status. |
 | `/cockpit` | All authenticated | Finding selector, 8-gate status, AST diff | `/api/health`, `/api/heal` (fallback) | **GAP:** Use typed API client, load real runs/findings from backend. |
 | `/dast` | `admin`, `super_admin`, `developer` | 12 DAST exploit probe vectors | `/api/dast/scans` (hardcoded URL) | **GAP:** Validate target URL, protect against SSRF, persist scans in database. |
 | `/findings` | All authenticated | AST findings catalog, filters | Static `MOCK_FINDINGS` | **GAP:** Query backend findings table `/api/runs/{id}/findings`. |
-| `/ledger` | `auditor`, `super_admin` | Merkle blocks, hash-chain tamper | `/api/ledger/verify` (hardcoded URL) | **GAP:** Connect to real database-backed SHA-256 ledger verification. |
+| `/ledger` | `auditor`, `super_admin` | Ledger blocks, hash-chain tamper | `/api/ledger/verify` (hardcoded URL) | **GAP:** Connect to real database-backed SHA-256 ledger verification. |
 | `/studio` | `developer`, `admin`, `super_admin` | Interactive editor, patch synthesizer | `/api/heal` (fallback) | **GAP:** Typed API client, real error states, proper authentication header. |
 | `/settings` | `admin`, `super_admin` | Model engine, noise floor, policies | Client state only | **GAP:** Connect to `/api/model/status` and backend config. |
 

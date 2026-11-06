@@ -2,7 +2,7 @@
 ## Live Competition Demonstration Runbook for Technical Evaluators and Judges
 
 **Showcase Scenario:** High-Assurance AI Patch Evaluation & Zero-Compromise Security Veto  
-**Demonstrated Defenses:** P03 IDOR Cache Vulnerability, NVIDIA Hardware Detection, Statistical Noise Gating, HMAC-SHA256 Evidence Ledger, and Model Integration with Honest Fallback.  
+**Demonstrated Defenses:** P03 IDOR Cache Vulnerability, NVIDIA Hardware Detection, Statistical Noise Gating, SHA-256 Evidence Ledger, and Model Integration with Honest Fallback.  
 **Demonstration Time:** 5–7 minutes  
 
 ---
@@ -69,7 +69,7 @@ Keep open in repository root for CLI verification commands.
 
 ### Act 5: The Cryptographic Evidence Ledger
 - **Presenter says**:
-  > *"Every single step—task intake, baseline samples, audit findings, model calls, patch diffs, and gate results—is cryptographically hashed into an append-only HMAC-SHA256 ledger. Let's verify it live."*
+  > *"Every single step—task intake, baseline samples, audit findings, model calls, patch diffs, and gate results—is cryptographically hashed into an append-only SHA-256 hash-chained ledger. Let's verify it live."*
 - **Action in UI**:
   - Switch to the **"Cryptographic Evidence Ledger"** tab.
   - Show the 32 chained blocks.

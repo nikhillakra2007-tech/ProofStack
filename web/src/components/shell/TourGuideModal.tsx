@@ -30,7 +30,7 @@ const TOUR_STEPS: TourStep[] = [
     highlights: [
       "Deterministic microVM test harnesses with zero network egress.",
       "Self-healing patches synthesized via NVIDIA Nemotron-3.5-Lightning.",
-      "Immutable SHA-256 Merkle chain ensures auditability.",
+      "Immutable SHA-256 hash chain ensures auditability.",
     ],
     suggestedAction: {
       label: "View Dashboard Overview",
@@ -94,7 +94,7 @@ const TOUR_STEPS: TourStep[] = [
     description:
       "Every accepted patch, hypothesis discrimination score, and gate verdict is cryptographically hashed and chained into an append-only ledger.",
     highlights: [
-      "SHA-256 Merkle chain with interactive tamper simulation.",
+      "SHA-256 hash chain with interactive tamper simulation.",
       "One-click 'Export Evidence (Markdown)' generates comprehensive audit reports.",
       "Non-repudiable proof signed by Nebius Token Factory / NVIDIA Nemotron.",
     ],

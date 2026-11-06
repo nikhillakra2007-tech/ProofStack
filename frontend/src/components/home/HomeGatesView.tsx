@@ -456,7 +456,7 @@ export default function HomeGatesView({ onOpenTour }: { onOpenTour?: () => void 
             </span>
           ) : (
             <span style={{ color: "#059669", fontWeight: 600 }}>
-              ✓ ALL INVARIANTS PRESERVED: Patch eliminates 41 redundant SQL queries (-97.6%), verifies 84/84 unit tests, preserves multi-tenant isolation, and executes in isolated rootless microVM. Gate 0 through Gate 7 passed. Verdict sealed to SHA-256 Merkle chain.
+              ✓ ALL INVARIANTS PRESERVED: Patch eliminates 41 redundant SQL queries (-97.6%), verifies 84/84 unit tests, preserves multi-tenant isolation, and executes in isolated rootless microVM. Gate 0 through Gate 7 passed. Verdict sealed to a SHA-256 hash chain.
             </span>
           )}
         </div>

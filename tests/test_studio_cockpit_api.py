@@ -3,10 +3,12 @@ import pytest
 from fastapi.testclient import TestClient
 from backend.server import app
 from backend.config import settings
+from backend.database import Base, engine
 
 
 @pytest.fixture
 def client():
+    Base.metadata.create_all(bind=engine)
     return TestClient(app, headers={"X-API-Key": settings.secret_key})
 
 
@@ -62,6 +64,38 @@ def test_public_heal_endpoint(client):
 
 
 def test_public_ledger_verify_endpoint(client):
+    # Seed a real project -> task -> run -> ledger entry so the endpoint
+    # verifies an actual chain instead of an empty database.
+    import uuid as _uuid
+    from backend.database import SessionLocal
+    from backend import models
+    from backend.ledger_service import LedgerService
+
+    db = SessionLocal()
+    try:
+        project = models.Project(id=str(_uuid.uuid4()), name="ledger-verify-proj", repository_path="/tmp/repo")
+        db.add(project)
+        task = models.Task(
+            id=str(_uuid.uuid4()),
+            project_id=project.id,
+            name="ledger-verify-task",
+            target_file="app.py",
+            target_symbol="main",
+            baseline_commit="0" * 40,
+            benchmark_command=["pytest"],
+            test_command=["pytest"],
+            protected_paths=[],
+            workload_seed=1,
+        )
+        db.add(task)
+        run = models.Run(id=str(_uuid.uuid4()), task_id=task.id, requested_baseline="0" * 40)
+        db.add(run)
+        db.commit()
+        LedgerService(db).append(run_id=run.id, event_type="RUN_CREATED", payload={"note": "seed for verify endpoint test"})
+        db.commit()
+    finally:
+        db.close()
+
     res = client.get("/api/ledger/verify")
     assert res.status_code == 200
     data = res.json()

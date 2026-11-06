@@ -10,7 +10,7 @@ export const metadata = {
     template: "%s | ProofStack",
   },
   description:
-    "Autonomous DevSecOps engine with zero-compromise compiler gates, live microVM DAST, NVIDIA Nemotron neural remediation, and cryptographic Merkle evidence ledger.",
+    "Autonomous DevSecOps engine with zero-compromise compiler gates, live microVM DAST, NVIDIA Nemotron neural remediation, and cryptographic hash-chained evidence ledger.",
   keywords: [
     "ProofStack",
     "DevSecOps",
@@ -18,7 +18,7 @@ export const metadata = {
     "AST Repair",
     "Deterministic Verification",
     "DAST Sandbox",
-    "Merkle Ledger",
+    "Evidence Ledger",
     "Ed25519 Hardware Attestation",
   ],
   authors: [{ name: "ProofStack Engineering Team" }],
@@ -33,7 +33,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "ProofStack | Autonomous DevSecOps & Evidence Ledger",
     description:
-      "Deterministic compiler verification engine with live DAST exploit replays and cryptographic Merkle ledgers.",
+      "Deterministic compiler verification engine with live DAST exploit replays and cryptographic hash-chained ledgers.",
   },
 };
 
