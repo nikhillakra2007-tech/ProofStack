@@ -393,7 +393,7 @@ export default function CoreProductSections() {
                   { name: "Gate 2: Ruff Strict Style Checker", desc: "Zero formatting regressions", time: "24ms" },
                   { name: "Gate 3: Negative DAST Replay", desc: "Original exploit fails cleanly", time: "110ms" },
                   { name: "Gate 4: Pytest Unit Regression Suite", desc: "100% test cases pass", time: "240ms" },
-                  { name: "Gate 5: SHA-256 Chain Seal", desc: "Signed block appended", time: "6ms" },
+                  { name: "Gate 5: SHA-256 Chain Seal", desc: "Chain link appended", time: "6ms" },
                 ].map((gate) => (
                   <div
                     key={gate.name}
@@ -420,6 +420,10 @@ export default function CoreProductSections() {
                     </span>
                   </div>
                 ))}
+              </div>
+              <div style={{ marginTop: "8px", fontSize: "10.5px", color: "var(--ink3)" }}>
+                Optional after the gates: an Ed25519 head seal (<code>proofstack ledger seal</code>) signs the chain
+                head, so truncating the tail of the ledger is also detectable.
               </div>
             </div>
 
