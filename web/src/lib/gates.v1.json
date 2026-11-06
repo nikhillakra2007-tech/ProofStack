@@ -1,0 +1,55 @@
+{
+  "$id": "https://proofstack.dev/schemas/gates.v1.json",
+  "version": "1.0",
+  "description": "Canonical taxonomy of the eight deterministic verification gates. Source of truth: proofstack/gates/g0_pregate.py .. g7_hygiene.py. UI must render gate names and descriptions from this file.",
+  "gates": [
+    {
+      "id": "G0",
+      "name": "Pre-Gate",
+      "description": "Static AST scan before anything runs: import allowlist vs lockfile, secret scanning, banned unsafe constructs.",
+      "catches": "Supply-chain and unsafe-code problems: slopsquatting, committed secrets, shell=True, pickle.loads, yaml.load."
+    },
+    {
+      "id": "G1",
+      "name": "Correctness",
+      "description": "Runs the test suite on baseline vs candidate.",
+      "catches": "Regressions: any previously passing test that fails on the candidate, or a differential property mismatch."
+    },
+    {
+      "id": "G2",
+      "name": "Security",
+      "description": "Re-runs every applicable exploit probe on the candidate; untouched security probes must stay green.",
+      "catches": "Patches that do not actually fix the vulnerability."
+    },
+    {
+      "id": "G3",
+      "name": "Identity-Preservation",
+      "description": "Guards authenticated user/session parameters, tenant identifiers, ownership checks and role/permission decorators.",
+      "catches": "Patches that remove, bypass or weaken identity, tenancy or permission checks."
+    },
+    {
+      "id": "G4",
+      "name": "Concurrency",
+      "description": "Analyzes the candidate under concurrent execution.",
+      "catches": "Race conditions, lost updates, deadlocks and event-loop blocking."
+    },
+    {
+      "id": "G5",
+      "name": "Performance",
+      "description": "Evaluates speedups strictly against the ranked truth hierarchy (exact counts, scaling ratios, allocation bytes), not wall-clock luck.",
+      "catches": "Fake or noisy performance claims."
+    },
+    {
+      "id": "G6",
+      "name": "Resources",
+      "description": "Validates memory growth (tracemalloc), file-descriptor deltas and database connection pool releases.",
+      "catches": "Leaks: memory growth, file-descriptor leaks, unreleased connections."
+    },
+    {
+      "id": "G7",
+      "name": "Patch Hygiene",
+      "description": "Enforces diff scope against the declared writable paths.",
+      "catches": "Scope creep: edits outside writable paths, changes to tests/benchmarks/probes/checker configs, unapproved new dependencies."
+    }
+  ]
+}
