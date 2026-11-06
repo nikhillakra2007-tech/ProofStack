@@ -39,9 +39,10 @@ Every model-proposed patch must pass all eight deterministic gates before it is 
 7. **G6 Resources** - catches leaks: memory growth, file-descriptor leaks, and unreleased database connections.
 8. **G7 Patch Hygiene** - catches scope creep: only files in the declared writable paths may be edited.
 
-## The two frontend trees (temporary)
+## The frontend app
 
-This repo currently contains two Next.js apps. `web/` (package `proofstack-cockpit`) is the earlier snapshot that powers https://proofstack-cockpit.vercel.app; `frontend/` (package `proofstack`) is the newer canonical app. Both deployments are live, so `web/` is kept until the cockpit Vercel project is repointed at `frontend/` (Vercel project settings, root directory) or retired - then `web/` gets removed. New UI work lands in `frontend/`.
+The repo's single Next.js app lives in `frontend/` (package `proofstack`) and powers both https://proofstack-app.vercel.app and https://proofstack-cockpit.vercel.app (the cockpit project builds from the `frontend/` root directory). New UI work lands in `frontend/`.
+
 
 ## Why this exists
 
