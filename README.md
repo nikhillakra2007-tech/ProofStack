@@ -37,6 +37,10 @@ Every model-proposed patch must pass all eight deterministic gates before it is 
 7. **G6 Resources** - catches leaks: memory growth, file-descriptor leaks, and unreleased database connections.
 8. **G7 Patch Hygiene** - catches scope creep: only files in the declared writable paths may be edited.
 
+## The two frontend trees (temporary)
+
+This repo currently contains two Next.js apps. `web/` (package `proofstack-cockpit`) is the earlier snapshot that powers https://proofstack-cockpit.vercel.app; `frontend/` (package `proofstack`) is the newer canonical app. Both deployments are live, so `web/` is kept until the cockpit Vercel project is repointed at `frontend/` (Vercel project settings, root directory) or retired - then `web/` gets removed. New UI work lands in `frontend/`.
+
 ## Why this exists
 
 AI writes patches faster than people can review them. The bottleneck in code repair is no longer generation - it is trust. A model that proposes a plausible patch is cheap; proving the patch compiles, fixes the vulnerability, preserves authorization, and doesn't regress anything is the hard part. ProofStack closes that gap: Nemotron proposes, and eight deterministic gates decide.
