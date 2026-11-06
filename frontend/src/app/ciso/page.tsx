@@ -176,7 +176,7 @@ export default function CisoRolePage() {
           <div className="text-[11px] text-[var(--ink2)]">Live microVM Testing</div>
         </div>
         <div className="p-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
-          <div className="text-[10px] font-mono text-[var(--ink3)] uppercase tracking-wider">Merkle Evidence</div>
+          <div className="text-[10px] font-mono text-[var(--ink3)] uppercase tracking-wider">Chain Evidence</div>
           <div className="text-2xl font-bold font-mono text-emerald-500">10,482</div>
           <div className="text-[11px] text-[var(--ink2)]">SHA-256 Leaves Sealed</div>
         </div>
@@ -362,7 +362,7 @@ export default function CisoRolePage() {
             </div>
 
             <p className="text-xs text-[var(--ink2)] leading-relaxed">
-              Emergency override allows the CISO to manually bypass automated gate quarantine during a zero-day incident response. All override events create an immutable, non-repudiable leaf in the Merkle audit chain.
+              Emergency override allows the CISO to manually bypass automated gate quarantine during a zero-day incident response. All override events create an immutable, non-repudiable entry in the hash-chained audit trail.
             </p>
 
             <div className="p-4 rounded-xl bg-[var(--surface2)] border border-[var(--line)] space-y-3 font-mono text-xs">

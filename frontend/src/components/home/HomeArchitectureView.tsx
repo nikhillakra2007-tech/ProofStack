@@ -32,7 +32,7 @@ const FAQS: FaqItem[] = [
     category: "Cryptographic Audit",
     question: "Can the evidence ledger or verification chain be forged?",
     answer:
-      "No. Every single run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a Merkle-linked chain (entry_hash = SHA256(prev_hash + body)). Any modification to any past record immediately breaks downstream integrity.",
+      "No. Every single run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a hash-linked chain (entry_hash = SHA256(prev_hash + body)). Any modification to any past record immediately breaks downstream integrity.",
   },
   {
     category: "AI Architecture",
@@ -161,7 +161,7 @@ export default function HomeArchitectureView({ onOpenTour }: { onOpenTour?: () =
           {
             step: "05",
             title: "Gates & Ledger",
-            desc: "Gauntlet runs G0 through G7. Cryptographic verdict is sealed into SHA-256 Merkle chain.",
+            desc: "Gauntlet runs G0 through G7. Cryptographic verdict is sealed into a SHA-256 hash chain.",
             model: "Gauntlet Engine",
             tag: "SHA-256",
             badgeColor: "#D97706",

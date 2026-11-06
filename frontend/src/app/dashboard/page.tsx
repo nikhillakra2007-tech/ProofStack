@@ -1062,11 +1062,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* SHA-256 Merkle Chain Integrity Status */}
+            {/* SHA-256 Hash Chain Integrity Status */}
             <div className="card" style={{ padding: "18px" }}>
               <div className="eyebrow" style={{ fontSize: "10px" }}>CRYPTOGRAPHIC PROOF &amp; TAMPER STATUS</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "4px 0 10px" }}>
-                <h3 style={{ margin: 0, fontSize: "15px" }}>SHA-256 Merkle Chain Integrity</h3>
+                <h3 style={{ margin: 0, fontSize: "15px" }}>SHA-256 Hash Chain Integrity</h3>
                 <span className={`chip ${isTampered ? "fail" : "pass"}`} style={{ fontSize: "10.5px", fontWeight: 700 }}>
                   {isTampered ? "TAMPER ALERT DETECTED" : "CHAIN VALID (100%)"}
                 </span>

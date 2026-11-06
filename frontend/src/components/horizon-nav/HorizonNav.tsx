@@ -114,7 +114,7 @@ export function HorizonNav() {
       case "auditor":
         return [
           { label: "Auditor Hub", href: "/auditor", pageName: "Auditor Hub" },
-          { label: "Evidence Ledger", href: "/ledger", pageName: "Merkle Ledger" },
+          { label: "Evidence Ledger", href: "/ledger", pageName: "Evidence Ledger" },
           { label: "Findings", href: "/findings", pageName: "Security Findings" },
           { label: "Settings", href: "/settings", pageName: "Model Settings" },
         ];
@@ -131,7 +131,7 @@ export function HorizonNav() {
         return [
           { label: "CISO Control Plane", href: "/ciso", pageName: "CISO Control Plane" },
           { label: "Remediation Cockpit", href: "/cockpit", pageName: "Remediation Cockpit" },
-          { label: "Evidence Ledger", href: "/ledger", pageName: "Merkle Ledger" },
+          { label: "Evidence Ledger", href: "/ledger", pageName: "Evidence Ledger" },
           { label: "Findings", href: "/findings", pageName: "Security Findings" },
           { label: "Settings", href: "/settings", pageName: "Model Settings" },
         ];

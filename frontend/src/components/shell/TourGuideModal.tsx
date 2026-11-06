@@ -97,7 +97,7 @@ export default function TourGuideModal({ isOpen, onClose }: TourGuideModalProps)
           highlights: [
             "Pending Developer Patch Approvals queue right on your dashboard.",
             "One-click '🛡️ Audit OK — Approve & Seal to Ledger'.",
-            "Full tamper detection and SHA-256 Merkle chain verification.",
+            "Full tamper detection and SHA-256 hash chain verification.",
           ],
           suggestedAction: { label: "Open Auditor Dashboard", route: "/dashboard" },
         },
@@ -129,12 +129,12 @@ export default function TourGuideModal({ isOpen, onClose }: TourGuideModalProps)
         },
         {
           title: "Cryptographic SHA-256 Ledger & Reports",
-          badge: "STEP 4 OF 4 · MERKLE AUDIT",
+          badge: "STEP 4 OF 4 · CHAIN AUDIT",
           icon: "📜",
           description:
             "Inspect append-only ledger blocks, simulate cryptographic tampering on Block #2, and export non-repudiable audit markdown packs for regulatory compliance.",
           highlights: [
-            "SHA-256 Merkle hash chain with live tamper detection.",
+            "SHA-256 hash chain with live tamper detection.",
             "Export Audit Pack (.md) with full signing metadata.",
             "Non-repudiable proof signed by Nebius Token Factory.",
           ],
@@ -246,7 +246,7 @@ export default function TourGuideModal({ isOpen, onClose }: TourGuideModalProps)
         badge: "STEP 4 OF 4 · EVIDENCE",
         icon: "📜",
         description:
-          "Full immutable audit trail with SHA-256 Merkle chain verification, interactive tamper simulation, and exportable regulatory compliance packages.",
+          "Full immutable audit trail with SHA-256 hash chain verification, interactive tamper simulation, and exportable regulatory compliance packages.",
         highlights: [
           "Inspect full ledger blocks and SHA-256 hashes.",
           "Simulate tampering on Block #2 to demonstrate fraud detection.",

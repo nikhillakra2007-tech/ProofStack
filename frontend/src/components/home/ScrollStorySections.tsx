@@ -34,7 +34,7 @@ const FAQS: FaqItem[] = [
     category: "Cryptographic Audit",
     question: "Can the evidence ledger or verification chain be forged?",
     answer:
-      "No. Every single run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a Merkle-linked chain (entry_hash = SHA256(prev_hash + body)). Any modification to any past record immediately breaks downstream integrity.",
+      "No. Every single run event—from baseline telemetry to gate verdicts—is sealed with SHA-256 in a hash-linked chain (entry_hash = SHA256(prev_hash + body)). Any modification to any past record immediately breaks downstream integrity.",
   },
   {
     category: "AI Architecture",
@@ -637,7 +637,7 @@ export default function ScrollStorySections() {
                 <span>NVIDIA Nemotron 3</span>
                 <span>Nebius Token Factory</span>
                 <span>Rootless MicroVMs</span>
-                <span>SHA-256 Merkle Ledger</span>
+                <span>SHA-256 Hash Chain</span>
                 <span>Multi-Tenant RBAC</span>
               </div>
             </div>

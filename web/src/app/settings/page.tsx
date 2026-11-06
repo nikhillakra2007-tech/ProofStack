@@ -1048,7 +1048,7 @@ export default function SettingsPage() {
                 <div>Version: ProofStack Cockpit v1.0 Production</div>
                 <div>Model Runtime: NVIDIA Nemotron-3 Super 120B / 3.5 Lightning</div>
                 <div>Execution Sandbox: Nebius Token Factory Isolated MicroVM</div>
-                <div>Ledger Hash: SHA-256 Merkle Chained Cryptographic Ledger</div>
+                <div>Ledger Hash: SHA-256 Hash-Chained Cryptographic Ledger</div>
               </div>
             </div>
           )}

@@ -840,7 +840,7 @@ export default function HeroShowcaseTriad() {
                   <CheckCircle2 size={11} /> DAST Replay Pass
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--pass)" }}>
-                  <CheckCircle2 size={11} /> Merkle Chained
+                  <CheckCircle2 size={11} /> Hash Chained
                 </div>
               </div>
             </div>

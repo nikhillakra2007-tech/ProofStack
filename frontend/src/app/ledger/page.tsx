@@ -45,7 +45,7 @@ export default function LedgerPage() {
     downloadEvidenceReport({
       ledgerBlocks: blocks,
     });
-    setNotification("Downloaded ProofStack_Verification_Evidence_Report.md with SHA-256 Merkle chain.");
+    setNotification("Downloaded ProofStack_Verification_Evidence_Report.md with SHA-256 hash chain.");
     setTimeout(() => setNotification(""), 4000);
   };
 

@@ -92,7 +92,7 @@ All measurements obtained via isolated \`pyperf\` benchmarks under hardened micr
 
 ---
 
-## 4. Cryptographic SHA-256 Merkle Ledger Hash Chain
+## 4. Cryptographic SHA-256 Hash Chain
 
 Every stage of verification is canonically hashed:
 $$\\text{entry\\_hash} = \\text{SHA256}(\\text{bytes.fromhex}(\\text{prev\\_hash}) + \\text{canonical\\_json}(\\text{payload}))$$

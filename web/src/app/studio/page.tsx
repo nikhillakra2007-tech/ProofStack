@@ -1172,7 +1172,7 @@ def process_user_records(db_session, user_ids: list[str]):
 
           {/* =========================================================================
               STYLED BOTTOM TABS
-              Verification Gates (8) | MicroVM Execution Logs | Merkle Ledger Evidence
+              Verification Gates (8) | MicroVM Execution Logs | Hash Chain Evidence
               ========================================================================= */}
           <div
             style={{
@@ -1254,7 +1254,7 @@ def process_user_records(db_session, user_ids: list[str]):
                 }}
               >
                 <Layers style={{ width: "15px", height: "15px" }} />
-                <span>Merkle Ledger Evidence</span>
+                <span>Hash Chain Evidence</span>
               </button>
             </div>
 
@@ -1350,7 +1350,7 @@ def process_user_records(db_session, user_ids: list[str]):
               </div>
             )}
 
-            {/* Tab Content 3: Merkle Ledger */}
+            {/* Tab Content 3: Hash Chain Ledger */}
             {panelTab === "ledger" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontFamily: "var(--f-mono)", fontSize: "12px" }}>
                 {ledgerChain.slice(0, 5).map((block) => (
