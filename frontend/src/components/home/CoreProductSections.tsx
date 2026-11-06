@@ -393,7 +393,7 @@ export default function CoreProductSections() {
                   { name: "Gate 2: Ruff Strict Style Checker", desc: "Zero formatting regressions", time: "24ms" },
                   { name: "Gate 3: Negative DAST Replay", desc: "Original exploit fails cleanly", time: "110ms" },
                   { name: "Gate 4: Pytest Unit Regression Suite", desc: "100% test cases pass", time: "240ms" },
-                  { name: "Gate 5: HMAC-SHA256 Merkle Seal", desc: "Signed block appended", time: "6ms" },
+                  { name: "Gate 5: SHA-256 Chain Seal", desc: "Signed block appended", time: "6ms" },
                 ].map((gate) => (
                   <div
                     key={gate.name}
@@ -488,7 +488,7 @@ export default function CoreProductSections() {
                   margin: "0 0 6px 0",
                 }}
               >
-                Cryptographic Evidence Ledger (HMAC-SHA256)
+                Cryptographic Evidence Ledger (SHA-256)
               </h3>
               <p
                 style={{
@@ -781,7 +781,7 @@ export default function CoreProductSections() {
               }}
             >
               <CheckCircle2 size={13} style={{ color: "var(--brand)" }} />
-              HMAC-SHA256 Merkle Provenance
+              SHA-256 Hash-Chain Provenance
             </span>
           </div>
 
@@ -878,7 +878,7 @@ export default function CoreProductSections() {
               }}
             >
               Autonomous DevSecOps verification engine combining adversarial DAST probing
-              with an 8-gate deterministic interlock and HMAC-SHA256 evidence ledger.
+              with an 8-gate deterministic interlock and SHA-256 hash-chained evidence ledger.
             </p>
           </div>
 
@@ -938,7 +938,7 @@ export default function CoreProductSections() {
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
               <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>8 Deterministic Gates</span></li>
-              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>HMAC-SHA256 Merkle Chain</span></li>
+              <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>SHA-256 Hash Chain</span></li>
               <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>Zero LLM Commits Policy</span></li>
               <li><span style={{ fontSize: "12.5px", color: "var(--ink2)" }}>Python 3.11/3.12 Sandboxes</span></li>
             </ul>

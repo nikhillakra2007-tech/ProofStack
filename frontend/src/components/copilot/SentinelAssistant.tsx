@@ -362,7 +362,7 @@ export default function SentinelAssistant() {
         cardData = {
           title: "CWE-639: Cross-Tenant Isolation Sealed",
           baseline: "HTTP 200 OK cross-tenant data leak",
-          fix: "HTTP 403 Forbidden with HMAC-SHA256 audit anchor",
+          fix: "HTTP 403 Forbidden with SHA-256 audit anchor",
         };
       }
 

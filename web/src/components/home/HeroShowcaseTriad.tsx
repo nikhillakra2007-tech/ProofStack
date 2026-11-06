@@ -443,7 +443,7 @@ export default function HeroShowcaseTriad() {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--ink2, #42534E)" }}>
                     <Check size={12} style={{ color: "var(--brand, #20C9A6)", strokeWidth: 3 }} />
-                    <span>HMAC-SHA256 Merkle Chain</span>
+                    <span>SHA-256 Hash Chain</span>
                   </div>
                 </div>
               </div>

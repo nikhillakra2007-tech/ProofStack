@@ -141,7 +141,7 @@ export const BentoPillars: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-mono uppercase tracking-wider text-violet-400 font-bold">Pillar 04</span>
               <span className="text-xs text-[var(--ink-muted)]">•</span>
-              <span className="text-xs font-mono text-[var(--ink-muted)]">HMAC-SHA256</span>
+              <span className="text-xs font-mono text-[var(--ink-muted)]">SHA-256</span>
             </div>
 
             <h3 className="text-lg font-bold text-[var(--ink)] mb-2">

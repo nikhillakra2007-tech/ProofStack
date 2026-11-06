@@ -27,7 +27,7 @@ const FAQS: FAQItem[] = [
   {
     question: "What is the cryptographic evidence ledger?",
     answer:
-      "Every test run, container probe result, and accepted patch diff is hashed and recorded with HMAC-SHA256 signatures in an append-only audit trail. This provides auditors with a verifiable record of why a fix was accepted and proves that the evidence has not been modified after the fact.",
+      "Every test run, container probe result, and accepted patch diff is hashed and recorded in an append-only SHA-256 hash chain. This provides auditors with a verifiable record of why a fix was accepted and proves that the evidence has not been modified after the fact.",
   },
   {
     question: "How can reviewers evaluate the platform?",

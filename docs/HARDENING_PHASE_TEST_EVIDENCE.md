@@ -36,5 +36,5 @@
 
 ### Defect INT-01: Cryptographic Ledger Tampering
 - **Before**: Model calls had no tamper-evident ledger tracking.
-- **After**: `MODEL_CALL`, `HYPOTHESES`, and `PATCH` entries are appended to the HMAC-SHA256 hash chain with strict sequential linking.
+- **After**: `MODEL_CALL`, `HYPOTHESES`, and `PATCH` entries are appended to the SHA-256 hash chain with strict sequential linking.
 - **Evidence**: `test_ledger_chain_and_tamper_detection_with_model_events` passed.
