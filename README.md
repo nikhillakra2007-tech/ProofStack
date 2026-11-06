@@ -4,6 +4,8 @@
 
 [Live demo](https://proofstack-app.vercel.app/) | [Cockpit](https://proofstack-cockpit.vercel.app/)
 
+<img src="docs/assets/cockpit-gates-diff.png" alt="ProofStack cockpit: all eight verification gates passing on a candidate patch, with the split diff viewer of baseline vs proposed fix" width="900">
+
 ## Quickstart
 
 ```bash
